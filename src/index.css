@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-dark: #0e1117;
+    --card-dark: #161a23;
+    --border-dark: #272d3b;
+    --accent-emerald: #10b981;
+    --accent-amber: #f59e0b;
+    --accent-sky: #38bdf8;
+    --text-primary: #f3f4f6;
+    --text-muted: #9ca3af;
+  }
+
+  body {
+    background-color: #0b0d13;
+    color: #f3f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom grain effect */
+.bg-grain {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* 3D card carousel perspective */
+.deck-container {
+  perspective: 1200px;
+}
+
+.deck-card-front {
+  transform: translate3d(0, 0, 40px) scale(1);
+  z-index: 30;
+  opacity: 1;
+}
+
+.deck-card-left {
+  transform: translate3d(-105px, 12px, -30px) rotate(-6deg) scale(0.86);
+  z-index: 10;
+  opacity: 0.65;
+}
+
+.deck-card-right {
+  transform: translate3d(105px, 12px, -30px) rotate(6deg) scale(0.86);
+  z-index: 10;
+  opacity: 0.65;
+}
+
+.deck-card-hidden {
+  transform: translate3d(0, 40px, -100px) scale(0.7);
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hide scrollbars cleanly */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Typewriter cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 0.9s infinite;
+}
+
+/* Glow pulse */
+@keyframes halo-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.75;
+  }
+}
+
+.animate-halo {
+  animation: halo-glow 2.4s ease-in-out infinite;
+}
+
+/* Organic floating keyframes for bubble droplets */
+@keyframes droplet-float-1 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(0.6deg); }
+}
+
+@keyframes droplet-float-2 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(4px) rotate(-0.6deg); }
+}
+
+@keyframes droplet-pop {
+  0% { transform: scale(0.82); opacity: 0; }
+  65% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-droplet-1 {
+  animation: droplet-float-1 3.5s ease-in-out infinite;
+}
+
+.animate-droplet-2 {
+  animation: droplet-float-2 4.1s ease-in-out infinite;
+}
+
+.animate-droplet-pop {
+  animation: droplet-pop 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+/* Galaxy Compass Keyframes */
+@keyframes compass-pulse {
+  0%, 100% {
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.25), inset 0 0 15px rgba(245, 158, 11, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(245, 158, 11, 0.5), inset 0 0 25px rgba(245, 158, 11, 0.3);
+  }
+}
+
+.animate-compass-pulse {
+  animation: compass-pulse 3s ease-in-out infinite;
+}
