@@ -18,25 +18,25 @@ export const LEVEL_METAS: Record<
 > = {
   'A1-': {
     levelLabel: 'A1- 入门启蒙',
-    code: 'L1',
+    code: 'L1', // 对应 L1, L2, L3，默认起点 L1
     color: '#38BDF8',
     tagline: '短句高频词，零负担轻松读'
   },
   'A2': {
     levelLabel: 'A2 基础衔接',
-    code: 'L2',
+    code: 'L4', // 对应 L4, L5, L6，默认起点 L4
     color: '#34D399',
     tagline: '生活语境叙事，自然建立语感'
   },
   'B1': {
     levelLabel: 'B1 地道流畅',
-    code: 'L3',
+    code: 'L7', // 对应 L7, L8, L9，默认起点 L7
     color: '#FBBF24',
     tagline: '复合从句与地道短语，畅读原版'
   },
   'B2+': {
     levelLabel: 'B2+ 原汁原味',
-    code: 'L4',
+    code: 'L10', // 对应 L10, L11, L12，默认起点 L10
     color: '#F472B6',
     tagline: '原生文笔与细腻修辞，深度探究'
   }
@@ -553,7 +553,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                   </div>
 
                   {/* Clean Sentence Body (No Circled Numbers) */}
-                  <div className="p-4 sm:p-4.5 text-[14px] leading-relaxed text-slate-100 font-serif">
+                  <div className="p-4 sm:p-4.5 text-[15.5px] sm:text-[16px] leading-relaxed text-slate-100 font-serif">
                     <p className="tracking-wide selection:bg-amber-500/30">
                       {m.sentenceCard.text}
                     </p>
@@ -582,7 +582,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                     </button>
                   </div>
 
-                  <div className="p-3.5 space-y-2 text-[13px] leading-relaxed text-slate-200 font-serif">
+                  <div className="p-3.5 space-y-2 text-[14.5px] leading-relaxed text-slate-200 font-serif">
                     {m.summaryCard.sentences.map((sent, sIdx) => (
                       <p key={sIdx} className="p-1.5 rounded-lg hover:bg-slate-800/50 transition-colors">
                         {sent}
@@ -598,7 +598,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
               ) : (
                 /* Normal Chat Text Bubble */
                 <div
-                  className={`p-3 rounded-2xl text-[13px] sm:text-[13.5px] leading-relaxed ${
+                  className={`p-3.5 rounded-2xl text-[14.5px] sm:text-[15px] leading-relaxed ${
                     m.sender === 'user'
                       ? 'bg-amber-500 text-slate-950 font-semibold rounded-tr-xs shadow-md'
                       : 'bg-slate-800/80 backdrop-blur-md text-slate-100 border border-white/5 rounded-tl-xs shadow-sm'
@@ -624,7 +624,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                 }}
               />
             </div>
-            <div className="p-3 rounded-2xl text-[13px] sm:text-[13.5px] leading-relaxed max-w-[88%] bg-slate-800/80 backdrop-blur-md text-slate-100 border border-white/5 rounded-tl-xs flex items-center min-h-[40px] shadow-sm">
+            <div className="p-3.5 rounded-2xl text-[14.5px] sm:text-[15px] leading-relaxed max-w-[88%] bg-slate-800/80 backdrop-blur-md text-slate-100 border border-white/5 rounded-tl-xs flex items-center min-h-[42px] shadow-sm">
               {isThinkingDots ? (
                 <div className="flex items-center gap-1.5 py-1 px-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -659,24 +659,24 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(1, '🟢 刚刚好，理解顺畅，继续保持', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[13px] sm:text-[13.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
               >
                 <span>🟢 刚刚好，理解顺畅</span>
-                <CheckCircle2 size={14} />
+                <CheckCircle2 size={15} />
               </button>
               <button
                 onClick={() => advanceToSentence(1, '🔴 稍显吃力，想降为轻盈基础版', 'down')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
               >
                 <span>🔴 偏难吃力，降为更轻盈基础版</span>
-                <ChevronRight size={14} className="text-slate-400" />
+                <ChevronRight size={15} className="text-slate-400" />
               </button>
               <button
                 onClick={() => advanceToSentence(1, '🔵 太简单了，想要更地道有挑战', 'up')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
               >
                 <span>🔵 太简单，想更有挑战感</span>
-                <ChevronRight size={14} className="text-slate-400" />
+                <ChevronRight size={15} className="text-slate-400" />
               </button>
             </div>
           </div>
@@ -688,27 +688,27 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(2, '🟢 刚刚好，这个难度很舒服', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[13px] sm:text-[13.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
               >
                 <span>🟢 刚刚好，保持当前难度节奏</span>
-                <CheckCircle2 size={14} />
+                <CheckCircle2 size={15} />
               </button>
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => advanceToSentence(2, '🔵 读起来轻松，想继续往上挑战！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
                 >
                   <span>🔵 读起来轻松，往上加点挑战</span>
-                  <ChevronRight size={14} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-slate-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => advanceToSentence(2, '🔴 略有阻碍，稍微降低一点点', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
                 >
                   <span>🔴 略有阻碍，稍降一点更稳</span>
-                  <ChevronRight size={14} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-slate-400" />
                 </button>
               )}
             </div>
@@ -721,27 +721,27 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(3, '🟢 刚刚好，很有阅读代入感', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[13px] sm:text-[13.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
               >
                 <span>🟢 刚刚好，契合当前阅读心流</span>
-                <CheckCircle2 size={14} />
+                <CheckCircle2 size={15} />
               </button>
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => advanceToSentence(3, '🔵 游刃有余，第 4 句想冲刺高阶！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
                 >
                   <span>🔵 游刃有余，冲刺更高阶</span>
-                  <ChevronRight size={14} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-slate-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => advanceToSentence(3, '🔴 有点吃力，第 4 句微调更基础', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
                 >
                   <span>🔴 有点吃力，微调更基础一点</span>
-                  <ChevronRight size={14} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-slate-400" />
                 </button>
               )}
             </div>
@@ -754,27 +754,27 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => completeEvaluation(`🟢 完美契合！就锁定为【${LEVEL_METAS[currentLevel].levelLabel}】`, 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[13px] sm:text-[13.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
               >
                 <span>🟢 完美契合！锁定【{LEVEL_METAS[currentLevel].levelLabel}】</span>
-                <CheckCircle2 size={14} />
+                <CheckCircle2 size={15} />
               </button>
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => completeEvaluation('🔵 感觉还能再挑战高一阶！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
                 >
                   <span>🔵 还能更强，加档一阶挑战</span>
-                  <ChevronRight size={14} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-slate-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => completeEvaluation('🔴 整体有点难，稳妥降一阶起步', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
                 >
                   <span>🔴 稳妥起步，降一阶更轻松</span>
-                  <ChevronRight size={14} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-slate-400" />
                 </button>
               )}
             </div>
@@ -819,7 +819,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                   ? `输入第 ${Math.max(1, Math.min(4, step - 2))}/4 句阅读感受，如：刚刚好、有点难、太简单...`
                   : '输入消息与伴读互动...'
               }
-              className="w-full py-2.5 pl-3.5 pr-3 rounded-xl bg-slate-900 border border-slate-750 text-xs sm:text-[13px] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-amber-400/80 transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2.5 pl-3.5 pr-3 rounded-xl bg-slate-900 border border-slate-750 text-[13px] sm:text-[13.5px] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-amber-400/80 transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 

@@ -37,10 +37,7 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-bold text-sm tracking-tight text-white">AI 英语阅读旅伴</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 font-mono border border-emerald-500/30">
-                  V5 闭环
-                </span>
+                <span className="font-bold text-sm tracking-tight text-white">一鹿知</span>
               </div>
             </div>
           </div>

@@ -232,7 +232,6 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
 
               <div className="flex items-center gap-1.5 text-slate-300">
                 <Signal size={12} />
-                <span className="font-mono text-[10px] text-slate-400 font-bold">5G</span>
                 <Wifi size={12} />
                 <Battery size={13} className="text-emerald-400" />
               </div>

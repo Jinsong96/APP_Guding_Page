@@ -78,7 +78,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
               今天，想读点什么？
             </h1>
             <p className="text-xs text-slate-400 mb-4">
-              根据你的 L1 起点，为你精编的趣味沉浸读物。
+              根据你的 {preferences.profile?.startingLevel || 'L4'} 起点，为你精编的趣味沉浸读物。
             </p>
 
             {/* Featured Hero Story Card */}
@@ -191,7 +191,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
           <div>
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
               <div>
-                <h2 className="text-lg font-bold text-white">我的生词本</h2>
+                <h2 className="text-lg font-bold text-white">我的词句本</h2>
                 <p className="text-xs text-slate-400">已收录 {preferences.bookmarkedWords.length} 个阅读高频词</p>
               </div>
               <span className="text-xs font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
@@ -202,7 +202,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
             {preferences.bookmarkedWords.length === 0 ? (
               <div className="text-center py-12 text-slate-500 text-xs">
                 <Bookmark size={32} className="mx-auto mb-2 opacity-40" />
-                <p>在阅读正文中轻触绿色高亮词汇，即可加入生词本。</p>
+                <p>在阅读正文中轻触绿色高亮词汇，即可加入词句本。</p>
               </div>
             ) : (
               <div className="space-y-2.5">
@@ -322,7 +322,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
           }`}
         >
           <BookOpen size={18} />
-          <span className="text-[10px] font-medium">世界首页</span>
+          <span className="text-[10px] font-medium">首页</span>
         </button>
 
         <button
@@ -332,7 +332,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
           }`}
         >
           <Bookmark size={18} />
-          <span className="text-[10px] font-medium">生词本</span>
+          <span className="text-[10px] font-medium">词句本</span>
         </button>
 
         <button
@@ -342,7 +342,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
           }`}
         >
           <User size={18} />
-          <span className="text-[10px] font-medium">我的画像</span>
+          <span className="text-[10px] font-medium">我的</span>
         </button>
       </nav>
     </div>

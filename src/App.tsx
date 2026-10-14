@@ -112,8 +112,15 @@ export default function App() {
                   companion={currentCompanion}
                   onBack={() => setCurrentStage(1)}
                   onComplete={(themes, cefrLevel) => {
+                    // A1- -> L1 (L1-L3), A2 -> L4 (L4-L6), B1 -> L7 (L7-L9), B2+ -> L10 (L10-L12)
                     const startingLevelCode =
-                      cefrLevel === 'A1-' ? 'L1' : cefrLevel === 'A2' ? 'L2' : cefrLevel === 'B1' ? 'L3' : 'L4';
+                      cefrLevel === 'A1-'
+                        ? 'L1'
+                        : cefrLevel === 'A2'
+                        ? 'L4'
+                        : cefrLevel === 'B1'
+                        ? 'L7'
+                        : 'L10';
                     const mappedLevel: ReadingLevel =
                       cefrLevel === 'A1-' ? 'easy' : cefrLevel === 'B1' || cefrLevel === 'B2+' ? 'hard' : 'mid';
 
@@ -146,7 +153,7 @@ export default function App() {
                   interestTheme={preferences.interestTheme}
                   selectedThemes={preferences.selectedThemes}
                   determinedCefr={preferences.determinedCefr || 'A2'}
-                  startingLevel={preferences.profile.startingLevel || 'L2'}
+                  startingLevel={preferences.profile.startingLevel || 'L4'}
                   preferences={preferences}
                   onUpdatePreferences={handleUpdatePreferences}
                   onBack={() => setCurrentStage(2)}

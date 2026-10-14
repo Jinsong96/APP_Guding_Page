@@ -61,7 +61,7 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
               建议阅读起点
             </span>
             <strong className="text-2xl font-bold font-mono text-emerald-400">
-              {preferences.profile.startingLevel || 'L2'}
+              {preferences.profile.startingLevel || 'L4'}
             </strong>
           </div>
 

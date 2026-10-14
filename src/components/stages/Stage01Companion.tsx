@@ -49,8 +49,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
     <div className="h-full flex flex-col justify-between p-5 text-slate-100 select-none relative overflow-hidden bg-gradient-to-b from-[#141721] via-[#10131B] to-[#0B0D13]">
       {/* Top Header */}
       <div>
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-          <span className="font-mono text-emerald-400 font-semibold tracking-wider">01 / 04</span>
+        <div className="flex items-center justify-end text-xs text-slate-400 mb-2">
           <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300">
             建立关系
           </span>

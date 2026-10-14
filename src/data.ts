@@ -128,6 +128,17 @@ export const SEED_SETS: BubbleSeed[][] = [
 
 export const COMPANIONS: Companion[] = [
   {
+    id: 'light',
+    name: '小灯',
+    nameEn: 'Light',
+    type: '引路型旅伴',
+    quote: '“慢慢来，我在。”',
+    avatarUrl: '/assets/light.png',
+    accentColor: '#A855F7',
+    bgGlow: 'rgba(168, 85, 247, 0.15)',
+    description: '温和细腻的节奏大师，总能帮你找到恰到好处的阅读速度。'
+  },
+  {
     id: 'pal',
     name: '帕利',
     nameEn: 'Pal',
@@ -157,19 +168,8 @@ export const COMPANIONS: Companion[] = [
     quote: '“看正文时，我会安静下来。”',
     avatarUrl: '/assets/nubo.png',
     accentColor: '#10B981',
-    bgGlow: 'rgba(16, 185, 129, 0.15)',
+    bgGlow: 'rgba(168, 185, 129, 0.15)',
     description: '热情鼓励每一个小突破，陪你一步步解锁更多主题大陆。'
-  },
-  {
-    id: 'light',
-    name: '小灯',
-    nameEn: 'Light',
-    type: '引路型旅伴',
-    quote: '“慢慢来，我在。”',
-    avatarUrl: '/assets/light.png',
-    accentColor: '#A855F7',
-    bgGlow: 'rgba(168, 85, 247, 0.15)',
-    description: '温和细腻的节奏大师，总能帮你找到恰到好处的阅读速度。'
   }
 ];
 
@@ -356,13 +356,13 @@ export const WORLD_STORIES = [
 ];
 
 export const INITIAL_PREFERENCES: UserPreferences = {
-  companionId: 'pal',
+  companionId: 'light',
   interestTheme: '科学',
   pacing: 'relaxed',
   readingRatings: {},
   currentLevel: 'mid',
   profile: {
-    startingLevel: 'L1',
+    startingLevel: 'L4',
     hintDensity: 'light',
     sessionDuration: 5
   },

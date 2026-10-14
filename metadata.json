@@ -1,6 +1,8 @@
 {
   "name": "AI 英语阅读旅伴",
-  "description": "专为提升英语阅读体验设计的 AI 陪伴阅读应用，涵盖 10 屏引导流程、旅伴选择、自适应多档阅读与定制推荐。",
+  "description": "Guiding pages",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

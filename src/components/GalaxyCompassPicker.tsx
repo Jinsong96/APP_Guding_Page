@@ -9,13 +9,6 @@ interface GalaxyCompassPickerProps {
   companionAccent?: string;
 }
 
-interface InfluxParticle {
-  id: number;
-  startX: number;
-  startY: number;
-  color: string;
-}
-
 export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
   selectedTags,
   onToggleTag,
@@ -27,7 +20,6 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [activeDomainIndex, setActiveDomainIndex] = useState<number>(1); // default to 科学 (science)
   const [tagOffset, setTagOffset] = useState<number>(0);
-  const [influxParticles, setInfluxParticles] = useState<InfluxParticle[]>([]);
   const [coreRipple, setCoreRipple] = useState<number>(0);
 
   // Progressive unfolding animation steps on mount:
@@ -160,32 +152,12 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
     return result;
   }, [currentDomain, tagOffset]);
 
-  // Gravitational Influx Attraction Trigger
-  const handleTagClick = (tag: string, event: React.MouseEvent<HTMLButtonElement>) => {
+  // Tag Selection Trigger
+  const handleTagClick = (tag: string) => {
     const isAlreadySelected = selectedTags.includes(tag);
-    
-    if (!isAlreadySelected && containerRef.current) {
-      // Create particle flying from bubble center to compass core
-      const btnRect = event.currentTarget.getBoundingClientRect();
-      const contRect = containerRef.current.getBoundingClientRect();
-      const scaleX = contRect.width / (containerRef.current.offsetWidth || 1);
-      const scaleY = contRect.height / (containerRef.current.offsetHeight || 1);
-      const startX = (btnRect.left + btnRect.width / 2 - contRect.left) / (scaleX || 1);
-      const startY = (btnRect.top + btnRect.height / 2 - contRect.top) / (scaleY || 1);
-
-      const pId = Date.now() + Math.random();
-      setInfluxParticles((prev) => [
-        ...prev,
-        { id: pId, startX, startY, color: currentDomain.color }
-      ]);
-
-      // Trigger core shockwave ripple after slight travel delay
-      setTimeout(() => {
-        setCoreRipple((r) => r + 1);
-        setInfluxParticles((prev) => prev.filter((p) => p.id !== pId));
-      }, 380);
+    if (!isAlreadySelected) {
+      setCoreRipple((r) => r + 1);
     }
-
     onToggleTag(tag);
   };
 
@@ -250,7 +222,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             return (
               <button
                 key={tag}
-                onClick={(e) => handleTagClick(tag, e)}
+                onClick={() => handleTagClick(tag)}
                 style={{
                   transitionDelay: animStep < 5 ? `${i * 60}ms` : '0ms',
                   borderColor: isSelected ? currentDomain.color : 'rgba(255, 255, 255, 0.12)',
@@ -473,27 +445,6 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
               </span>
             </div>
           </div>
-
-          {/* SVG Influx Flying Particle Light Trails */}
-          {influxParticles.map((p) => {
-            const cx = 135;
-            const cy = 135;
-            return (
-              <svg key={p.id} className="absolute inset-0 w-full h-full pointer-events-none z-40 overflow-visible">
-                {/* Curved streaming arc trail */}
-                <path
-                  d={`M ${p.startX} ${p.startY} Q ${(p.startX + cx) / 2 + 20} ${(p.startY + cy) / 2 - 20} ${cx} ${cy}`}
-                  fill="none"
-                  stroke={p.color}
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  className="animate-in fade-in duration-75"
-                  strokeDasharray="12 4"
-                />
-                <circle cx={cx} cy={cy} r="4" fill="#FFFFFF" className="animate-ping" />
-              </svg>
-            );
-          })}
         </div>
 
       </div>

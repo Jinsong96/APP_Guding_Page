@@ -14,17 +14,32 @@ interface Stage08CustomizingProps {
   onNext: () => void;
 }
 
+// CEFR to starting level mapping:
+// A1- -> L1 (L1, L2, L3)
+// A2  -> L4 (L4, L5, L6)
+// B1  -> L7 (L7, L8, L9)
+// B2+ -> L10 (L10, L11, L12)
+export const CEFR_TO_STARTING_LEVEL: Record<string, string> = {
+  'A1-': 'L1',
+  'A2': 'L4',
+  'B1': 'L7',
+  'B2+': 'L10'
+};
+
 export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
   companion,
   interestTheme,
   selectedThemes,
   determinedCefr = 'A2',
-  startingLevel = 'L2',
+  startingLevel,
   preferences,
   onUpdatePreferences,
   onBack,
   onNext
 }) => {
+  const resolvedStartingLevel =
+    (determinedCefr && CEFR_TO_STARTING_LEVEL[determinedCefr]) || startingLevel || 'L4';
+
   const [progress, setProgress] = useState(10);
   const [activeStep, setActiveStep] = useState(1);
   const [isCalibrated, setIsCalibrated] = useState(false);
@@ -74,7 +89,7 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
       />
 
       {/* Top Header Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0 z-20">
+      <div className="flex items-center pb-3 border-b border-slate-800 shrink-0 z-20">
         <button
           onClick={onBack}
           className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer"
@@ -82,9 +97,6 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
         >
           <ArrowLeft size={16} />
         </button>
-        <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono transition-all">
-          {isCalibrated ? '03 / 04 · 定制画像 · 阅读画像' : '03 / 04 · 定制画像 · 正在生成'}
-        </span>
       </div>
 
       {/* Middle Content Area */}
@@ -206,7 +218,7 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
                   <Check size={12} />
                 </span>
                 <p className="text-xs">
-                  <strong className="text-white font-medium">微试读自适应定级：</strong> {determinedCefr}（建议起点 {startingLevel}）
+                  <strong className="text-white font-medium">微试读自适应定级：</strong> {determinedCefr}（建议起点 {resolvedStartingLevel}）
                 </p>
               </div>
 
@@ -239,7 +251,7 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
                 建议阅读起点
               </span>
               <strong className="text-2xl font-bold font-mono text-emerald-400 leading-none mt-0.5">
-                {startingLevel}
+                {resolvedStartingLevel}
               </strong>
             </div>
 
