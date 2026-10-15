@@ -5,10 +5,74 @@ import { GalaxyCompassPicker } from '../GalaxyCompassPicker';
 
 export type CefrLevelKey = 'A1-' | 'A2' | 'B1' | 'B2+';
 
+export interface SurveyAnswers {
+  goal?: string;
+  challenge?: string;
+  duration?: string;
+  companionStyle?: string;
+}
+
+export interface SurveyQuestionDef {
+  step: number; // 11, 12, 13, 14
+  number: number; // 1, 2, 3, 4
+  title: string;
+  options: {
+    label: string;
+    desc: string;
+    icon: string;
+  }[];
+}
+
+export const getSurveyQuestions = (companionName: string): SurveyQuestionDef[] => [
+  {
+    step: 11,
+    number: 1,
+    title: '平时你读英语，最想达成什么目标呢？',
+    options: [
+      { label: '拓展视野看原版', desc: '看懂英文原版资讯、前沿科技与外媒故事', icon: '🌟' },
+      { label: '职场与专业应用', desc: '提升工作商务沟通、邮件撰写与文献阅读', icon: '💼' },
+      { label: '升学与备考冲刺', desc: '四六级、雅思、托福或考研考证高效提分', icon: '🎯' },
+      { label: '兴趣充能重拾语感', desc: '零压力轻松读，找回学英语的纯粹乐趣', icon: '🌱' }
+    ]
+  },
+  {
+    step: 12,
+    number: 2,
+    title: '遇到全英文或长难句时，你通常觉得最大的阻碍是？',
+    options: [
+      { label: '生词较多断节奏', desc: '频繁查词打断阅读连贯感与心流体验', icon: '🧩' },
+      { label: '读得较慢容易累', desc: '信息密度大，句子需要反复回读多次才懂', icon: '⏳' },
+      { label: '复杂句式理不清', desc: '从句套从句，容易抓不住核心主干逻辑', icon: '🧭' },
+      { label: '感觉顺畅想进阶', desc: '大体能看懂，希望能掌握更多地道纯正表达', icon: '☕' }
+    ]
+  },
+  {
+    step: 13,
+    number: 3,
+    title: '每天如果留一段专注阅读时间，你更习惯哪种时长节奏？',
+    options: [
+      { label: '5-8 分钟', desc: '碎片化微阅读，随时随地零负担打卡', icon: '⚡' },
+      { label: '10-15 分钟', desc: '完整读完 1-2 篇精选短文，节奏最适中', icon: '⏱️' },
+      { label: '20 分钟以上', desc: '沉浸式深度阅读，持续探索更多领域', icon: '📖' }
+    ]
+  },
+  {
+    step: 14,
+    number: 4,
+    title: `在接下来的阅读过程中，你希望${companionName}怎样陪伴你？`,
+    options: [
+      { label: '智能点拨', desc: '遇到难词长句，主动支招点拨与语法拆解', icon: '💡' },
+      { label: '静默守护', desc: '尽量少打扰，遇到卡壳处点击时再细致解答', icon: '🍃' },
+      { label: '鼓励打气', desc: '多给正向激励与微小成就反馈，战胜惰性', icon: '🎉' },
+      { label: '背景拓展', desc: '多补充文化背景、地道俚语与历史趣味典故', icon: '🌏' }
+    ]
+  }
+];
+
 interface Stage02AiChatProps {
   companion: Companion;
   onBack: () => void;
-  onComplete: (selectedInterests: string[], determinedLevel: CefrLevelKey) => void;
+  onComplete: (selectedInterests: string[], determinedLevel: CefrLevelKey, surveyAnswers?: SurveyAnswers) => void;
   onSkip: () => void;
 }
 
@@ -122,6 +186,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const [inputText, setInputText] = useState<string>('');
   const [playingSentenceIdx, setPlayingSentenceIdx] = useState<number | null>(null);
   const [isBusy, setIsBusy] = useState<boolean>(false);
+  const [surveyAnswers, setSurveyAnswers] = useState<SurveyAnswers>({});
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -310,7 +375,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     });
   };
 
-  // Step 1 -> Step 2: Confirm tags, then present Sentence 1 at A2 level
+  // Step 1 -> Survey: Confirm tags, then introduce 4 friendly profiling questions to understand user better
   const handleConfirmTags = (tags: string[]) => {
     if (isBusy) return;
     const confirmedTags = tags.length > 0 ? tags : (selectedTags.length > 0 ? selectedTags : ['前沿科技', '天文探索']);
@@ -325,13 +390,69 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       }
     ]);
 
+    setIsBusy(true);
+    setStep(-1);
+
     const topTags = confirmedTags.slice(0, 2).join('与');
-    const introMsg = `【${topTags}】收到！我们通过 4 句微试读来为你精准定级。先看第 1 句：`;
+    const introMsg = `【${topTags}】收到啦！在开始试读前，想先了解你 4 个阅读小习惯，这样能让${companion.name}在以后的阅读里更懂你的节奏～`;
 
-    const initialLevel: CefrLevelKey = 'A2';
-    setCurrentLevel(initialLevel);
+    runTypewriter(introMsg, 'm-intro-survey', 180, 26, () => {
+      const q1Msg = `第 1 问：你平时读英语，最想达成什么目标呢？`;
+      runTypewriter(q1Msg, 'm-q1', 120, 26, () => {
+        setStep(11);
+        setIsBusy(false);
+      });
+    });
+  };
 
-    presentSentenceWithRhythm(0, initialLevel, introMsg, 'm-read-intro', 3);
+  // Handle answering any of the 4 profiling questions (Q1: 11, Q2: 12, Q3: 13, Q4: 14)
+  const handleAnswerSurvey = (currentStep: number, answerText: string) => {
+    if (isBusy) return;
+    setIsBusy(true);
+    setStep(-1);
+
+    setMessages((prev) => [
+      ...prev,
+      { id: `u-q${currentStep}-${Date.now()}`, sender: 'user', text: answerText }
+    ]);
+
+    if (currentStep === 11) {
+      setSurveyAnswers((prev) => ({ ...prev, goal: answerText }));
+      const companionReaction = `很棒的目标！一步一步来，${companion.name}会陪你走得很稳～`;
+      runTypewriter(companionReaction, 'm-react-q1', 160, 24, () => {
+        const q2Msg = `第 2 问：遇到全英文或长难句时，你通常觉得最大的阻碍是？`;
+        runTypewriter(q2Msg, 'm-q2', 120, 24, () => {
+          setStep(12);
+          setIsBusy(false);
+        });
+      });
+    } else if (currentStep === 12) {
+      setSurveyAnswers((prev) => ({ ...prev, challenge: answerText }));
+      const companionReaction = `记在心里了！以后的阅读里我会主动帮你拆解长句，不让生词打断心流～`;
+      runTypewriter(companionReaction, 'm-react-q2', 160, 24, () => {
+        const q3Msg = `第 3 问：每天如果留一段专注阅读时间，你更习惯哪种时长节奏？`;
+        runTypewriter(q3Msg, 'm-q3', 120, 24, () => {
+          setStep(13);
+          setIsBusy(false);
+        });
+      });
+    } else if (currentStep === 13) {
+      setSurveyAnswers((prev) => ({ ...prev, duration: answerText }));
+      const companionReaction = `收到！微步前行聚沙成塔，这个时长非常舒适～`;
+      runTypewriter(companionReaction, 'm-react-q3', 160, 24, () => {
+        const q4Msg = `第 4 问：在接下来的阅读过程中，你希望${companion.name}怎样陪伴你？`;
+        runTypewriter(q4Msg, 'm-q4', 120, 24, () => {
+          setStep(14);
+          setIsBusy(false);
+        });
+      });
+    } else if (currentStep === 14) {
+      setSurveyAnswers((prev) => ({ ...prev, companionStyle: answerText }));
+      const transitionMsg = `太好啦！${companion.name}现在已经越来越懂你的阅读习惯与偏好了✨ 接下来我们通过 4 句微试读来为你精准定级。先看第 1 句：`;
+      const initialLevel: CefrLevelKey = 'A2';
+      setCurrentLevel(initialLevel);
+      presentSentenceWithRhythm(0, initialLevel, transitionMsg, 'm-read-intro', 3);
+    }
   };
 
   // Proceed to Next Sentence (Sentence 1 -> 2, Sentence 2 -> 3, Sentence 3 -> 4)
@@ -401,6 +522,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       // User typed interest keyword
       const customTag = trimmed.slice(0, 10);
       handleConfirmTags([customTag, '前沿科技']);
+    } else if (step >= 11 && step <= 14) {
+      handleAnswerSurvey(step, trimmed);
     } else if (step === 3) {
       // Sentence 1 feedback
       if (trimmed.includes('难') || trimmed.includes('吃力') || trimmed.includes('生词') || trimmed.includes('慢')) {
@@ -448,20 +571,20 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#0A0D14] text-slate-100 overflow-hidden relative select-none">
+    <div className="w-full h-full flex flex-col bg-[#FAF6ED] text-stone-900 overflow-hidden relative select-none">
       {/* Background Ambient Glow */}
       <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full blur-[110px] pointer-events-none opacity-20 transition-all duration-700"
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full blur-[110px] pointer-events-none opacity-15 transition-all duration-700"
         style={{
           background: `radial-gradient(circle, ${companion.accentColor} 0%, transparent 70%)`
         }}
       />
 
       {/* Top Header Bar */}
-      <div className="shrink-0 h-12 px-3.5 flex items-center justify-between border-b border-slate-800/80 bg-[#0A0D14]/90 backdrop-blur-md z-20">
+      <div className="shrink-0 h-12 px-3.5 flex items-center justify-between border-b border-[#E8DFC8] bg-[#FAF6ED]/95 backdrop-blur-md z-20">
         <button
           onClick={onBack}
-          className="p-1.5 -ml-1 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          className="p-1.5 -ml-1 rounded-full text-stone-600 hover:text-stone-900 hover:bg-[#F2ECE1] transition-colors cursor-pointer"
           aria-label="返回"
         >
           <ArrowLeft size={17} />
@@ -472,37 +595,24 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <img
               src={companion.avatarUrl}
               alt={companion.name}
-              className="w-7 h-7 rounded-full object-cover ring-1 ring-white/10"
+              className="w-7 h-7 rounded-full object-cover ring-1 ring-stone-300"
             />
             <span
-              className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-slate-900 bg-emerald-400"
+              className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-white bg-emerald-500"
             />
           </div>
-          <div className="text-left">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-white tracking-wide">
-                {companion.name}
-              </span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300 font-mono">
-                AI 伴读
-              </span>
-            </div>
-            <div className="text-[10px] text-slate-400 font-mono">
-              {step <= 1
-                ? '兴趣星盘校准中'
-                : step === 7
-                ? '定级完成'
-                : `4 句自适应微定级 (${currentLevel})`}
-            </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-bold text-stone-900 tracking-wide">
+              {companion.name}
+            </span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#EFE7D8] text-stone-600 font-mono">
+              AI 伴读
+            </span>
           </div>
         </div>
 
-        <button
-          onClick={onSkip}
-          className="text-xs px-2.5 py-1 rounded-full bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
-        >
-          跳过
-        </button>
+        {/* Balance layout without skip button */}
+        <div className="w-7" />
       </div>
 
       {/* Main Conversational Stream */}
@@ -518,22 +628,22 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                 <img
                   src={companion.avatarUrl}
                   alt={companion.name}
-                  className="w-7 h-7 rounded-full object-cover shadow-sm ring-1 ring-white/10"
+                  className="w-7 h-7 rounded-full object-cover shadow-xs ring-1 ring-stone-200"
                   style={{
-                    boxShadow: `0 0 10px ${companion.accentColor}33`
+                    boxShadow: `0 0 10px ${companion.accentColor}25`
                   }}
                 />
               </div>
             )}
 
             <div className={`max-w-[90%] sm:max-w-[88%] ${m.sender === 'user' ? 'ml-auto' : ''}`}>
-              {/* Sentence Card (Pure, focused reading card without clutter) */}
+              {/* Sentence Card (Pure, focused reading card on warm paper) */}
               {m.sentenceCard ? (
-                <div className="rounded-2xl bg-[#141824] border border-slate-750 overflow-hidden shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] overflow-hidden shadow-md animate-in fade-in slide-in-from-bottom-2 duration-300">
                   {/* Card Header with Progress Indicator & Clean Audio Button */}
-                  <div className="px-3.5 py-2.5 bg-slate-800/80 border-b border-slate-750 flex items-center justify-between">
+                  <div className="px-3.5 py-2.5 bg-[#FAF6ED] border-b border-[#E8DFC8] flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-semibold text-amber-400 flex items-center gap-1.5 font-mono">
+                      <span className="text-[11px] font-semibold text-amber-700 flex items-center gap-1.5 font-mono">
                         <BookOpen size={13} />
                         第 {m.sentenceCard.sentenceIndex + 1}/{m.sentenceCard.totalSentences} 句
                       </span>
@@ -541,67 +651,67 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
 
                     <button
                       onClick={() => handlePlayAudio(m.sentenceCard!.text, m.sentenceCard!.sentenceIndex)}
-                      className="px-2 py-1 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-[11px]"
+                      className="px-2 py-1 rounded-lg bg-white hover:bg-[#F2ECE1] text-stone-700 hover:text-stone-900 border border-[#E2D8C6] transition-colors cursor-pointer flex items-center gap-1.5 text-[11px] shadow-xs"
                       title="朗读本句"
                     >
                       <Volume2
                         size={13}
-                        className={playingSentenceIdx === m.sentenceCard.sentenceIndex ? 'text-amber-400 animate-pulse' : 'text-slate-300'}
+                        className={playingSentenceIdx === m.sentenceCard.sentenceIndex ? 'text-amber-600 animate-pulse' : 'text-stone-600'}
                       />
-                      <span className="text-[11px] text-slate-300">朗读</span>
+                      <span className="text-[11px] text-stone-700 font-medium">朗读</span>
                     </button>
                   </div>
 
-                  {/* Clean Sentence Body (No Circled Numbers) */}
-                  <div className="p-4 sm:p-4.5 text-[15.5px] sm:text-[16px] leading-relaxed text-slate-100 font-serif">
-                    <p className="tracking-wide selection:bg-amber-500/30">
+                  {/* Clean Sentence Body */}
+                  <div className="p-4 sm:p-4.5 text-[17px] sm:text-[17.5px] leading-relaxed text-stone-900 font-serif">
+                    <p className="tracking-wide selection:bg-amber-100">
                       {m.sentenceCard.text}
                     </p>
                   </div>
                 </div>
               ) : m.summaryCard ? (
                 /* Full Passage Summary Card upon Completing 4 Sentences */
-                <div className="rounded-2xl bg-[#141824] border border-emerald-500/30 overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="px-3.5 py-2.5 bg-gradient-to-r from-emerald-950/60 to-slate-800/80 border-b border-emerald-500/20 flex items-center justify-between">
+                <div className="rounded-2xl bg-[#FFFFFF] border border-emerald-500/30 overflow-hidden shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="px-3.5 py-2.5 bg-emerald-50/80 border-b border-emerald-200/80 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span
-                        className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider text-slate-950 font-mono"
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider text-white font-mono"
                         style={{ backgroundColor: m.summaryCard.color }}
                       >
                         {m.summaryCard.levelLabel}
                       </span>
-                      <span className="text-xs text-emerald-300 font-medium">4 句试读全貌</span>
+                      <span className="text-xs text-emerald-800 font-medium">4 句试读全貌</span>
                     </div>
                     <button
                       onClick={() => handlePlayAudio(m.summaryCard!.sentences.join(' '))}
-                      className="p-1 rounded-md hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-[11px]"
+                      className="p-1 rounded-md hover:bg-emerald-100 text-stone-700 hover:text-stone-900 transition-colors cursor-pointer flex items-center gap-1 text-[11px]"
                       title="朗读全文"
                     >
-                      <Volume2 size={13} className="text-emerald-400" />
-                      <span className="text-[10px] text-emerald-300">全文朗读</span>
+                      <Volume2 size={13} className="text-emerald-700" />
+                      <span className="text-[10px] text-emerald-800 font-medium">全文朗读</span>
                     </button>
                   </div>
 
-                  <div className="p-3.5 space-y-2 text-[14.5px] leading-relaxed text-slate-200 font-serif">
+                  <div className="p-3.5 space-y-2 text-[15.5px] leading-relaxed text-stone-800 font-serif">
                     {m.summaryCard.sentences.map((sent, sIdx) => (
-                      <p key={sIdx} className="p-1.5 rounded-lg hover:bg-slate-800/50 transition-colors">
+                      <p key={sIdx} className="p-1.5 rounded-lg hover:bg-emerald-50/50 transition-colors">
                         {sent}
                       </p>
                     ))}
                   </div>
 
-                  <div className="px-3.5 py-2 bg-[#0F121C] border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                  <div className="px-3.5 py-2 bg-[#FAF6ED] border-t border-[#E8DFC8] text-[11px] text-stone-600 flex items-center justify-between">
                     <span>{m.summaryCard.tagline}</span>
-                    <span className="text-[10px] text-amber-400 font-mono">建议起点 {m.summaryCard.code}</span>
+                    <span className="text-[10px] text-amber-700 font-mono font-semibold">建议起点 {m.summaryCard.code}</span>
                   </div>
                 </div>
               ) : (
                 /* Normal Chat Text Bubble */
                 <div
-                  className={`p-3.5 rounded-2xl text-[14.5px] sm:text-[15px] leading-relaxed ${
+                  className={`p-3.5 sm:p-4 rounded-2xl text-[16px] sm:text-[16.5px] leading-relaxed ${
                     m.sender === 'user'
-                      ? 'bg-amber-500 text-slate-950 font-semibold rounded-tr-xs shadow-md'
-                      : 'bg-slate-800/80 backdrop-blur-md text-slate-100 border border-white/5 rounded-tl-xs shadow-sm'
+                      ? 'bg-amber-600 text-white font-semibold rounded-tr-xs shadow-xs'
+                      : 'bg-[#FFFFFF] text-stone-900 border border-[#E8DFC8] rounded-tl-xs shadow-xs'
                   }`}
                 >
                   {m.text}
@@ -618,23 +728,23 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
               <img
                 src={companion.avatarUrl}
                 alt={companion.name}
-                className="w-7 h-7 rounded-full object-cover shadow-sm ring-1 ring-white/10"
+                className="w-7 h-7 rounded-full object-cover shadow-xs ring-1 ring-stone-200"
                 style={{
-                  boxShadow: `0 0 10px ${companion.accentColor}33`
+                  boxShadow: `0 0 10px ${companion.accentColor}25`
                 }}
               />
             </div>
-            <div className="p-3.5 rounded-2xl text-[14.5px] sm:text-[15px] leading-relaxed max-w-[88%] bg-slate-800/80 backdrop-blur-md text-slate-100 border border-white/5 rounded-tl-xs flex items-center min-h-[42px] shadow-sm">
+            <div className="p-3.5 sm:p-4 rounded-2xl text-[16px] sm:text-[16.5px] leading-relaxed max-w-[88%] bg-[#FFFFFF] text-stone-900 border border-[#E8DFC8] rounded-tl-xs flex items-center min-h-[46px] shadow-xs">
               {isThinkingDots ? (
                 <div className="flex items-center gap-1.5 py-1 px-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               ) : (
                 <div className="flex items-center gap-1">
                   <span>{typedText}</span>
-                  <span className="w-1.5 h-3.5 bg-amber-400 cursor-blink inline-block rounded-xs" />
+                  <span className="w-1.5 h-3.5 bg-amber-600 cursor-blink inline-block rounded-xs" />
                 </div>
               )}
             </div>
@@ -653,30 +763,67 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
           </div>
         )}
 
+        {/* STEPS 11-14: 4 Interactive Survey Questions to Understand the User Better */}
+        {step >= 11 && step <= 14 && !isAiTyping && !isBusy && (
+          <div className="pl-9 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center px-1 text-xs text-stone-500">
+              <span className="font-mono text-amber-700 flex items-center gap-1.5 font-semibold text-[13px]">
+                <Sparkles size={13} />
+                阅读习惯探索 · 第 {step - 10}/4 题
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2">
+              {getSurveyQuestions(companion.name)
+                .find((q) => q.step === step)
+                ?.options.map((opt) => (
+                  <button
+                    key={opt.label}
+                    onClick={() => handleAnswerSurvey(step, `${opt.icon} ${opt.label}`)}
+                    className="w-full p-3 rounded-xl bg-[#FFFFFF] hover:bg-[#FFFDF8] border border-[#E8DFC8] hover:border-amber-500/70 text-left transition-all active:scale-[0.98] cursor-pointer group flex items-center justify-between gap-2 shadow-xs"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-lg shrink-0">{opt.icon}</span>
+                      <div className="min-w-0">
+                        <div className="text-[14px] sm:text-[14.5px] font-semibold text-stone-900 group-hover:text-amber-700 transition-colors">
+                          {opt.label}
+                        </div>
+                        <div className="text-[11.5px] sm:text-[12px] text-stone-500 truncate mt-0.5">
+                          {opt.desc}
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight size={15} className="text-stone-400 group-hover:text-amber-600 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                  </button>
+                ))}
+            </div>
+          </div>
+        )}
+
         {/* STEP 3: Rating for Sentence 1 (A2 initial) -> Leads to Sentence 2 */}
         {step === 3 && !isAiTyping && !isBusy && (
           <div className="pl-9 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(1, '🟢 刚刚好，理解顺畅，继续保持', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[13px] sm:text-[13.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
               >
                 <span>🟢 刚刚好，理解顺畅</span>
                 <CheckCircle2 size={15} />
               </button>
               <button
                 onClick={() => advanceToSentence(1, '🔴 稍显吃力，想降为轻盈基础版', 'down')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
               >
                 <span>🔴 偏难吃力，降为更轻盈基础版</span>
-                <ChevronRight size={15} className="text-slate-400" />
+                <ChevronRight size={15} className="text-stone-400" />
               </button>
               <button
                 onClick={() => advanceToSentence(1, '🔵 太简单了，想要更地道有挑战', 'up')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
               >
                 <span>🔵 太简单，想更有挑战感</span>
-                <ChevronRight size={15} className="text-slate-400" />
+                <ChevronRight size={15} className="text-stone-400" />
               </button>
             </div>
           </div>
@@ -688,7 +835,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(2, '🟢 刚刚好，这个难度很舒服', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[13px] sm:text-[13.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
               >
                 <span>🟢 刚刚好，保持当前难度节奏</span>
                 <CheckCircle2 size={15} />
@@ -696,19 +843,19 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => advanceToSentence(2, '🔵 读起来轻松，想继续往上挑战！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
                 >
                   <span>🔵 读起来轻松，往上加点挑战</span>
-                  <ChevronRight size={15} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => advanceToSentence(2, '🔴 略有阻碍，稍微降低一点点', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
                 >
                   <span>🔴 略有阻碍，稍降一点更稳</span>
-                  <ChevronRight size={15} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
             </div>
@@ -721,7 +868,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(3, '🟢 刚刚好，很有阅读代入感', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[13px] sm:text-[13.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
               >
                 <span>🟢 刚刚好，契合当前阅读心流</span>
                 <CheckCircle2 size={15} />
@@ -729,19 +876,19 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => advanceToSentence(3, '🔵 游刃有余，第 4 句想冲刺高阶！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
                 >
                   <span>🔵 游刃有余，冲刺更高阶</span>
-                  <ChevronRight size={15} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => advanceToSentence(3, '🔴 有点吃力，第 4 句微调更基础', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
                 >
                   <span>🔴 有点吃力，微调更基础一点</span>
-                  <ChevronRight size={15} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
             </div>
@@ -754,7 +901,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => completeEvaluation(`🟢 完美契合！就锁定为【${LEVEL_METAS[currentLevel].levelLabel}】`, 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[13px] sm:text-[13.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
               >
                 <span>🟢 完美契合！锁定【{LEVEL_METAS[currentLevel].levelLabel}】</span>
                 <CheckCircle2 size={15} />
@@ -762,19 +909,19 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => completeEvaluation('🔵 感觉还能再挑战高一阶！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
                 >
                   <span>🔵 还能更强，加档一阶挑战</span>
-                  <ChevronRight size={15} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => completeEvaluation('🔴 整体有点难，稳妥降一阶起步', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[13px] sm:text-[13.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
                 >
                   <span>🔴 稳妥起步，降一阶更轻松</span>
-                  <ChevronRight size={15} className="text-slate-400" />
+                  <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
             </div>
@@ -785,10 +932,11 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         {step === 7 && !isAiTyping && (
           <div className="pl-9 pt-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <button
-              onClick={() => onComplete(selectedTags, currentLevel)}
-              className="w-full py-3.5 px-4 rounded-2xl font-bold text-slate-950 text-sm flex items-center justify-center gap-2 shadow-xl transition-all active:scale-[0.98] cursor-pointer hover:brightness-110"
+              onClick={() => onComplete(selectedTags, currentLevel, surveyAnswers)}
+              className="w-full py-3.5 px-4 rounded-2xl font-bold text-white text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer hover:brightness-105"
               style={{
-                backgroundColor: companion.accentColor || '#F59E0B'
+                backgroundColor: companion.accentColor || '#D97706',
+                boxShadow: `0 6px 20px rgba(180, 100, 20, 0.25)`
               }}
             >
               <span>开启专属定制</span>
@@ -801,7 +949,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       </div>
 
       {/* Bottom Conversation Input Bar */}
-      <div className="shrink-0 p-2.5 sm:p-3 bg-[#0D1017] border-t border-slate-800/80 z-30">
+      <div className="shrink-0 p-2.5 sm:p-3 bg-[#FAF6ED] border-t border-[#E8DFC8] z-30">
         <div className="flex items-center gap-2 max-w-full">
           <div className="relative flex-1 flex items-center">
             <input
@@ -815,20 +963,28 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                   ? '伴读互动中...'
                   : step === 1
                   ? '或直接输入你感兴趣的主题...'
+                  : step === 11
+                  ? '输入你的目标，或点击上方选项...'
+                  : step === 12
+                  ? '输入你的阅读痛点，或点击上方选项...'
+                  : step === 13
+                  ? '输入你期望的时长，或点击上方选项...'
+                  : step === 14
+                  ? '输入你期望的陪伴方式，或点击上方选项...'
                   : step >= 3 && step <= 6
                   ? `输入第 ${Math.max(1, Math.min(4, step - 2))}/4 句阅读感受，如：刚刚好、有点难、太简单...`
                   : '输入消息与伴读互动...'
               }
-              className="w-full py-2.5 pl-3.5 pr-3 rounded-xl bg-slate-900 border border-slate-750 text-[13px] sm:text-[13.5px] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-amber-400/80 transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2.5 pl-3.5 pr-3 rounded-xl bg-[#FFFFFF] border border-[#E2D8C6] text-[14px] sm:text-[14.5px] text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-600 transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
           <button
             onClick={handleSendMessage}
             disabled={!inputText.trim() || isAiTyping || isBusy}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-950 font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-md shrink-0 active:scale-95 hover:brightness-110"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs shrink-0 active:scale-95 hover:brightness-105"
             style={{
-              backgroundColor: companion.accentColor || '#F59E0B'
+              backgroundColor: companion.accentColor || '#D97706'
             }}
             aria-label="发送消息"
           >

@@ -81,7 +81,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
     return (
       <p
         key={pIdx}
-        className="leading-[1.85] text-slate-150 font-serif text-[16px] sm:text-[17px] mb-5 tracking-normal transition-opacity duration-300"
+        className="leading-[1.85] text-stone-900 font-serif text-[16px] sm:text-[17px] mb-5 tracking-normal transition-opacity duration-300"
       >
         {parts.map((part, idx) => {
           const matchKey = terms.find((t) => t.toLowerCase() === part.toLowerCase());
@@ -95,8 +95,8 @@ export const StageReader: React.FC<StageReaderProps> = ({
                 tabIndex={0}
                 className={`cursor-pointer px-1 py-0.5 rounded transition-all font-sans font-medium border-b ${
                   isBookmarked
-                    ? 'bg-amber-500/25 text-amber-200 border-amber-400'
-                    : 'bg-emerald-500/15 text-emerald-300 border-emerald-400/80 hover:bg-emerald-500/25'
+                    ? 'bg-amber-100 text-amber-900 border-amber-500'
+                    : 'bg-emerald-100/70 text-emerald-900 border-emerald-500 hover:bg-emerald-100'
                 }`}
                 title="点击查看释义"
               >
@@ -111,13 +111,13 @@ export const StageReader: React.FC<StageReaderProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col justify-between p-5 text-slate-100 select-none relative overflow-hidden bg-gradient-to-b from-[#141721] via-[#10131B] to-[#0B0D13]">
+    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#FAF6ED]">
       {/* 1. Minimal Header */}
-      <div className="shrink-0 pb-3 border-b border-slate-800/80">
+      <div className="shrink-0 pb-3 border-b border-[#E8DFC8]">
         <div className="flex items-center justify-between">
           <button
             onClick={onBack}
-            className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+            className="w-8 h-8 rounded-full bg-white hover:bg-[#F2ECE1] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E2D8C6] shadow-xs cursor-pointer"
             aria-label="返回上一步"
           >
             <ArrowLeft size={16} />
@@ -125,30 +125,30 @@ export const StageReader: React.FC<StageReaderProps> = ({
 
           {/* Minimal Progress Line */}
           <div className="flex-1 mx-4 flex items-center gap-2.5">
-            <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+            <div className="flex-1 h-1.5 bg-[#E8DFC8] rounded-full overflow-hidden">
               <div
-                className="h-full bg-emerald-400 transition-all duration-300 rounded-full"
+                className="h-full bg-emerald-600 transition-all duration-300 rounded-full"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
-            <span className="text-[11px] font-mono text-slate-400 shrink-0">
+            <span className="text-[11px] font-mono text-stone-500 shrink-0">
               {timeRemaining}
             </span>
           </div>
 
-          <span className="text-[11px] text-slate-400 font-mono">
+          <span className="text-[11px] text-stone-500 font-mono">
             0{stageNumber}/10
           </span>
         </div>
 
         {/* Quiet Kicker & Title */}
         <div className="mt-3.5">
-          <div className="text-[11px] text-slate-400 mb-1 flex items-center gap-1.5">
+          <div className="text-[11px] text-stone-500 mb-1 flex items-center gap-1.5">
             <span>科学大陆</span>
             <span>·</span>
             <span>第 {stageNumber - 3} / 4 段</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white font-serif tracking-tight leading-snug">
+          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 font-serif tracking-tight leading-snug">
             The 47th Minute Without Power
           </h1>
         </div>
@@ -164,8 +164,8 @@ export const StageReader: React.FC<StageReaderProps> = ({
       </div>
 
       {/* 3. Minimal Bottom Adaptive Interaction */}
-      <div className="shrink-0 pt-3 pb-1 border-t border-slate-800/80 space-y-2.5">
-        <p className="text-xs text-center text-slate-400 font-medium">
+      <div className="shrink-0 pt-3 pb-1 border-t border-[#E8DFC8] space-y-2.5">
+        <p className="text-xs text-center text-stone-500 font-medium">
           你感觉这个难度怎么样？
         </p>
 
@@ -173,10 +173,10 @@ export const StageReader: React.FC<StageReaderProps> = ({
         <div className="grid grid-cols-3 gap-2">
           <button
             onClick={() => handleDifficultyClick('hard')}
-            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 ${
+            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 cursor-pointer ${
               stageNumber === 6 && activeLevel === 'easy'
-                ? 'bg-emerald-500 text-slate-950 font-bold border-emerald-400 shadow-lg shadow-emerald-500/20'
-                : 'bg-slate-800/80 border-slate-700/80 hover:border-slate-600 text-slate-200 hover:text-white'
+                ? 'bg-emerald-600 text-white font-bold border-emerald-600 shadow-sm'
+                : 'bg-white border-[#E8DFC8] hover:bg-[#F8F4EC] text-stone-800 hover:text-stone-950 shadow-xs'
             }`}
           >
             有点难了
@@ -184,10 +184,10 @@ export const StageReader: React.FC<StageReaderProps> = ({
 
           <button
             onClick={() => handleDifficultyClick('just_right')}
-            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 ${
+            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 cursor-pointer ${
               stageNumber === 6 && activeLevel === 'mid'
-                ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow-lg shadow-amber-500/20'
-                : 'bg-slate-800/80 border-slate-700/80 hover:border-slate-600 text-slate-200 hover:text-white'
+                ? 'bg-amber-600 text-white font-bold border-amber-600 shadow-sm'
+                : 'bg-white border-[#E8DFC8] hover:bg-[#F8F4EC] text-stone-800 hover:text-stone-950 shadow-xs'
             }`}
           >
             刚刚好
@@ -195,10 +195,10 @@ export const StageReader: React.FC<StageReaderProps> = ({
 
           <button
             onClick={() => handleDifficultyClick('easy')}
-            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 ${
+            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 cursor-pointer ${
               stageNumber === 6 && activeLevel === 'hard'
-                ? 'bg-sky-500 text-slate-950 font-bold border-sky-400 shadow-lg shadow-sky-500/20'
-                : 'bg-slate-800/80 border-slate-700/80 hover:border-slate-600 text-slate-200 hover:text-white'
+                ? 'bg-sky-600 text-white font-bold border-sky-600 shadow-sm'
+                : 'bg-white border-[#E8DFC8] hover:bg-[#F8F4EC] text-stone-800 hover:text-stone-950 shadow-xs'
             }`}
           >
             简简单单
@@ -210,7 +210,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
           <div className="pt-1 animate-in fade-in duration-200">
             <button
               onClick={handleStage6Proceed}
-              className="w-full py-3 px-4 rounded-2xl bg-amber-500 hover:bg-amber-450 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/15 transition-all active:scale-98"
+              className="w-full py-3 px-4 rounded-2xl bg-amber-600 hover:bg-amber-550 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-98 cursor-pointer"
             >
               <span>{hasInteractedOnStage6 ? '完成试读，生成我的专属路线' : '继续下一步'}</span>
               <ArrowRight size={15} />

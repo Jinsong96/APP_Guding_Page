@@ -7,6 +7,9 @@ export interface Companion {
   type: string;
   quote: string;
   avatarUrl: string;
+  celebrateAvatarUrl?: string;
+  celebrateActionName?: string;
+  celebrateQuote?: string;
   accentColor: string;
   bgGlow: string;
   description: string;
@@ -78,6 +81,10 @@ export interface UserPreferences {
     startingLevel: string;
     hintDensity: 'light' | 'detailed';
     sessionDuration: 5 | 10;
+    goal?: string;
+    challenge?: string;
+    durationPreference?: string;
+    companionStyle?: string;
   };
   bookmarkedWords: string[];
   streakDays: number;

@@ -88,22 +88,22 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
   return (
     <div ref={containerRef} className="relative flex flex-col items-center select-none py-0.5">
       {/* Sleek iPhone 15 Model & Scale Adjustment Bar */}
-      <div className="mb-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/95 border border-slate-800 text-slate-300 shadow-xl backdrop-blur-md text-[11px] font-medium z-30">
-        <div className="flex items-center gap-1 text-slate-400 mr-1 text-[11px] font-medium">
-          <Smartphone size={12} className="text-amber-400" />
-          <span className="font-semibold text-slate-200">iPhone 15</span>
-          <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">(393×852)</span>
+      <div className="mb-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-[#E7DFD1] text-stone-700 shadow-md backdrop-blur-md text-[11px] font-medium z-30">
+        <div className="flex items-center gap-1 text-stone-500 mr-1 text-[11px] font-medium">
+          <Smartphone size={12} className="text-amber-600" />
+          <span className="font-semibold text-stone-800">iPhone 15</span>
+          <span className="text-[10px] text-stone-400 font-mono hidden sm:inline">(393×852)</span>
         </div>
 
-        <span className="w-px h-3 bg-slate-800 mx-0.5" />
+        <span className="w-px h-3 bg-stone-200 mx-0.5" />
 
         {/* Quick Presets */}
         <button
           onClick={() => applyScale(0.75)}
           className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
             !isAutoFit && Math.abs(scale - 0.75) < 0.02
-              ? 'bg-amber-500 text-slate-950 font-bold'
-              : 'hover:bg-slate-800 text-slate-400 hover:text-white'
+              ? 'bg-amber-600 text-white font-bold shadow-xs'
+              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
           }`}
           title="75% 满屏免滚视图（推荐）"
         >
@@ -114,8 +114,8 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
           onClick={() => applyScale(0.80)}
           className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
             !isAutoFit && Math.abs(scale - 0.80) < 0.02
-              ? 'bg-amber-500 text-slate-950 font-bold'
-              : 'hover:bg-slate-800 text-slate-400 hover:text-white'
+              ? 'bg-amber-600 text-white font-bold shadow-xs'
+              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
           }`}
           title="80% 适中视图"
         >
@@ -126,8 +126,8 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
           onClick={() => applyScale(0.90)}
           className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
             !isAutoFit && Math.abs(scale - 0.90) < 0.02
-              ? 'bg-amber-500 text-slate-950 font-bold'
-              : 'hover:bg-slate-800 text-slate-400 hover:text-white'
+              ? 'bg-amber-600 text-white font-bold shadow-xs'
+              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
           }`}
           title="90% 放大视图"
         >
@@ -138,23 +138,23 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
           onClick={() => applyScale(1.0)}
           className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
             !isAutoFit && Math.abs(scale - 1.0) < 0.02
-              ? 'bg-amber-500 text-slate-950 font-bold'
-              : 'hover:bg-slate-800 text-slate-400 hover:text-white'
+              ? 'bg-amber-600 text-white font-bold shadow-xs'
+              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
           }`}
           title="100% 1:1 原机尺寸"
         >
           100%
         </button>
 
-        <span className="w-px h-3 bg-slate-800 mx-0.5" />
+        <span className="w-px h-3 bg-stone-200 mx-0.5" />
 
         {/* Auto fit to window height */}
         <button
           onClick={handleAutoFit}
           className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
             isAutoFit
-              ? 'bg-amber-500 text-slate-950 font-bold'
-              : 'hover:bg-slate-800 text-slate-400 hover:text-white'
+              ? 'bg-amber-600 text-white font-bold shadow-xs'
+              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
           }`}
           title="根据当前窗口高度自动填充最佳尺寸"
         >
@@ -162,25 +162,25 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
           <span>自适应</span>
         </button>
 
-        <span className="w-px h-3 bg-slate-800 mx-0.5" />
+        <span className="w-px h-3 bg-stone-200 mx-0.5" />
 
         {/* Fine-tuning +/- */}
         <div className="flex items-center gap-0.5">
           <button
             onClick={handleZoomOut}
             disabled={scale <= 0.55}
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
+            className="p-1 rounded hover:bg-stone-100 text-stone-500 hover:text-stone-900 disabled:opacity-30 transition-colors cursor-pointer"
             title="缩小"
           >
             <ZoomOut size={12} />
           </button>
-          <span className="font-mono text-[10px] text-slate-300 w-8 text-center">
+          <span className="font-mono text-[10px] text-stone-700 w-8 text-center font-semibold">
             {Math.round(scale * 100)}%
           </span>
           <button
             onClick={handleZoomIn}
             disabled={scale >= 1.10}
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
+            className="p-1 rounded hover:bg-stone-100 text-stone-500 hover:text-stone-900 disabled:opacity-30 transition-colors cursor-pointer"
             title="放大"
           >
             <ZoomIn size={12} />
@@ -196,7 +196,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
           height: `${scaledH}px`
         }}
       >
-        {/* iPhone 15 Outer Hardware Shell (Contoured aerospace aluminum frame) */}
+        {/* iPhone 15 Outer Hardware Shell (Space Black Aerospace Titanium Frame) */}
         <div
           style={{
             width: `${BASE_WIDTH}px`,
@@ -204,47 +204,46 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
             transform: `scale(${scale})`,
             transformOrigin: 'top left'
           }}
-          className="relative rounded-[50px] bg-[#1A1D27] p-[6px] shadow-[0_25px_70px_rgba(0,0,0,0.85)] border-[2.5px] border-[#363B4D] ring-1 ring-white/10 overflow-hidden flex flex-col"
+          className="relative rounded-[50px] bg-[#16181F] p-[6px] shadow-[0_25px_70px_rgba(0,0,0,0.4)] border-[2.5px] border-[#2A2E39] ring-1 ring-black/40 overflow-hidden flex flex-col"
         >
-          {/* iPhone 15 Left buttons: Action button & Volume rocker */}
-          <div className="absolute top-24 -left-[3px] w-[3px] h-7 bg-[#4E566F] rounded-l-xs" />
-          <div className="absolute top-36 -left-[3px] w-[3px] h-12 bg-[#4E566F] rounded-l-xs" />
-          <div className="absolute top-52 -left-[3px] w-[3px] h-12 bg-[#4E566F] rounded-l-xs" />
+          {/* iPhone 15 Left buttons: Action button & Volume rocker (Midnight Titanium) */}
+          <div className="absolute top-24 -left-[3px] w-[3px] h-7 bg-[#2A2E39] rounded-l-xs" />
+          <div className="absolute top-36 -left-[3px] w-[3px] h-12 bg-[#2A2E39] rounded-l-xs" />
+          <div className="absolute top-52 -left-[3px] w-[3px] h-12 bg-[#2A2E39] rounded-l-xs" />
 
           {/* iPhone 15 Right button: Side power key */}
-          <div className="absolute top-36 -right-[3px] w-[3px] h-16 bg-[#4E566F] rounded-r-xs" />
+          <div className="absolute top-36 -right-[3px] w-[3px] h-16 bg-[#2A2E39] rounded-r-xs" />
 
-          {/* iPhone 15 Screen Display Viewport (Exact 393 × 852 px) */}
-          <div className="relative w-[393px] h-[852px] rounded-[44px] bg-[#0B0D13] overflow-hidden flex flex-col shadow-inner">
+          {/* iPhone 15 Screen Display Viewport (Warm Paper Ivory #FAF6ED) */}
+          <div className="relative w-[393px] h-[852px] rounded-[44px] bg-[#FAF6ED] overflow-hidden flex flex-col shadow-inner border border-[#EAE2D3]">
             {/* iOS Top Status Bar with iPhone 15 Dynamic Island (灵动岛) */}
-            <div className="h-11 px-7 pt-2 flex items-center justify-between text-slate-200 text-xs font-semibold z-40 select-none bg-[#0B0D13]/90 backdrop-blur-sm shrink-0">
-              <span className="font-mono text-[13px] tracking-tight">9:41</span>
+            <div className="h-11 px-7 pt-2 flex items-center justify-between text-stone-800 text-xs font-semibold z-40 select-none bg-[#FAF6ED]/95 backdrop-blur-sm shrink-0 border-b border-[#EAE2D3]/60">
+              <span className="font-mono text-[13px] tracking-tight font-bold text-stone-800">9:41</span>
               
               {/* Precision iPhone 15 Dynamic Island */}
-              <div className="w-[122px] h-[33px] bg-black rounded-full mx-auto -mt-1 flex items-center justify-between px-3 shadow-lg border border-white/10">
+              <div className="w-[122px] h-[33px] bg-[#000000] rounded-full mx-auto -mt-1 flex items-center justify-between px-3 shadow-md border border-white/10">
                 {/* Front camera lens reflection */}
-                <span className="w-2.5 h-2.5 rounded-full bg-[#181B26] ring-1 ring-white/10 flex items-center justify-center">
-                  <span className="w-1 h-1 rounded-full bg-[#0C101B]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1A1C22] ring-1 ring-white/10 flex items-center justify-center">
+                  <span className="w-1 h-1 rounded-full bg-[#0A0B0E]" />
                 </span>
                 {/* Microphone / Sensor indicator */}
-                <span className="w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
 
-              <div className="flex items-center gap-1.5 text-slate-300">
-                <Signal size={12} />
+              <div className="flex items-center gap-1.5 text-stone-700">
                 <Wifi size={12} />
-                <Battery size={13} className="text-emerald-400" />
+                <Battery size={13} className="text-emerald-600" />
               </div>
             </div>
 
-            {/* Screen Content Viewport */}
-            <div className="flex-1 overflow-hidden relative">
+            {/* Screen Content Viewport (Warm Paper Ivory) */}
+            <div className="flex-1 overflow-hidden relative bg-[#FAF6ED]">
               {children}
             </div>
 
             {/* Bottom Home Indicator Bar (iPhone 15 ergonomic safe area) */}
-            <div className="h-6 bg-[#0B0D13] flex items-center justify-center shrink-0 z-40 select-none">
-              <div className="w-36 h-1 bg-slate-500/60 rounded-full" />
+            <div className="h-6 bg-[#FAF6ED] flex items-center justify-center shrink-0 z-40 select-none">
+              <div className="w-36 h-1 bg-stone-700/30 rounded-full" />
             </div>
           </div>
         </div>

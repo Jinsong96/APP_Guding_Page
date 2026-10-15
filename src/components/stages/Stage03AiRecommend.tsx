@@ -39,27 +39,27 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col justify-between p-5 text-slate-100 select-none relative overflow-hidden bg-gradient-to-b from-[#141721] via-[#10131B] to-[#0B0D13]">
+    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#FAF6ED]">
       {/* Top Bar */}
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E8DFC8]">
           <button
             onClick={onBack}
-            className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+            className="w-8 h-8 rounded-full bg-white hover:bg-[#F2ECE1] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E2D8C6] shadow-xs cursor-pointer"
             aria-label="返回上一步"
           >
             <ArrowLeft size={16} />
           </button>
 
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs text-stone-500">
             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: companion.accentColor }} />
-            <span className="text-slate-300">已理解你的偏好</span>
-            <span className="text-slate-500">· 推荐 1/1</span>
+            <span className="text-stone-700 font-medium">已理解你的偏好</span>
+            <span className="text-stone-400">· 推荐 1/1</span>
           </div>
 
           <button
             onClick={handleSwap}
-            className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+            className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-white hover:bg-[#F2ECE1] text-stone-600 hover:text-stone-900 border border-[#E2D8C6] shadow-xs transition-colors cursor-pointer"
           >
             <RefreshCw size={12} />
             <span>换一条</span>
@@ -68,11 +68,11 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
 
         {/* Lead Title */}
         <div className="mt-4">
-          <div className="flex items-center gap-1 text-xs text-amber-400 font-medium mb-1">
+          <div className="flex items-center gap-1 text-xs text-amber-700 font-medium mb-1">
             <Sparkles size={13} />
             <span>{companion.name} 专属推荐</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white leading-tight">
+          <h1 className="text-2xl font-bold tracking-tight text-stone-900 leading-tight">
             我先带你去<br />
             <span style={{ color: companion.accentColor }}>
               {selectedThemes && selectedThemes.length > 0
@@ -85,7 +85,7 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
               {selectedThemes.map((t) => (
                 <span
                   key={t}
-                  className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300 font-medium"
+                  className="text-[11px] px-2.5 py-0.5 rounded-full bg-white border border-[#E2D8C6] text-stone-700 font-medium shadow-xs"
                 >
                   {t}
                 </span>
@@ -97,15 +97,15 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
 
       {/* Recommended Story Card */}
       <div className="my-auto py-2">
-        <div className="rounded-3xl bg-[#181D29] border border-slate-750 overflow-hidden shadow-2xl relative transition-all duration-300">
+        <div className="rounded-3xl bg-[#FFFFFF] border border-[#E8DFC8] overflow-hidden shadow-md relative transition-all duration-300">
           {/* Cover Image Banner */}
-          <div className="relative h-44 w-full overflow-hidden bg-slate-900">
+          <div className="relative h-44 w-full overflow-hidden bg-stone-100">
             <img
               src={currentStory.coverImage || '/assets/story/hero.webp'}
               alt={currentStory.title}
               className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#181D29] via-[#181D29]/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             
             {/* Minute badge */}
             <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[11px] text-white flex items-center gap-1">
@@ -114,29 +114,29 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
             </div>
 
             <div className="absolute bottom-3 left-4 right-4 flex items-center gap-2 text-xs">
-              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-medium border border-emerald-500/30">
+              <span className="px-2 py-0.5 rounded bg-emerald-500/80 text-white font-medium">
                 {currentStory.continent}
               </span>
-              <span className="text-slate-400">·</span>
-              <span className="text-slate-300 text-[11px] truncate">
+              <span className="text-white/70">·</span>
+              <span className="text-white text-[11px] truncate">
                 {currentStory.series}
               </span>
-              <span className="text-slate-400">·</span>
-              <span className="text-amber-400 text-[11px] font-mono">
+              <span className="text-white/70">·</span>
+              <span className="text-amber-300 text-[11px] font-mono">
                 {currentStory.part}
               </span>
             </div>
           </div>
 
           {/* Story Body */}
-          <div className="p-4 pt-2">
-            <h2 className="text-lg font-bold text-white mb-1">
+          <div className="p-4 pt-2.5">
+            <h2 className="text-lg font-bold text-stone-900 mb-1">
               {currentStory.chineseTitle}
             </h2>
-            <p className="text-xs font-serif text-slate-400 italic mb-2.5">
+            <p className="text-xs font-serif text-stone-500 italic mb-2.5">
               {currentStory.title}
             </p>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/50 p-2.5 rounded-xl border border-slate-800">
+            <p className="text-xs text-stone-700 leading-relaxed bg-[#FAF6ED] p-2.5 rounded-xl border border-[#E8DFC8]">
               {currentStory.synopsis}
             </p>
           </div>
@@ -147,9 +147,10 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
       <div className="space-y-2.5 pt-2">
         <button
           onClick={onNext}
-          className="w-full py-3.5 px-4 rounded-2xl font-semibold text-slate-950 flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98]"
+          className="w-full py-3.5 px-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer hover:brightness-105"
           style={{
-            backgroundColor: companion.accentColor || '#F59E0B'
+            backgroundColor: companion.accentColor || '#D97706',
+            boxShadow: `0 6px 20px rgba(180, 100, 20, 0.25)`
           }}
         >
           <span>开始这篇故事</span>
@@ -158,7 +159,7 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
 
         <button
           onClick={handleSwap}
-          className="w-full py-2.5 px-4 rounded-xl text-xs text-slate-400 hover:text-slate-200 bg-slate-800/40 hover:bg-slate-800 border border-slate-750 flex items-center justify-center gap-1.5 transition-colors"
+          className="w-full py-2.5 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-white hover:bg-[#F2ECE1] border border-[#E2D8C6] flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
         >
           <span>我想换一个感觉</span>
         </button>

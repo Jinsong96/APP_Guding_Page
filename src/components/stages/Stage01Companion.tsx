@@ -46,24 +46,21 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
   const currentCompanion = COMPANIONS[currentIndex] || COMPANIONS[0];
 
   return (
-    <div className="h-full flex flex-col justify-between p-5 text-slate-100 select-none relative overflow-hidden bg-gradient-to-b from-[#141721] via-[#10131B] to-[#0B0D13]">
-      {/* Top Header */}
-      <div>
-        <div className="flex items-center justify-end text-xs text-slate-400 mb-2">
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300">
-            建立关系
-          </span>
+    <div className="h-full flex flex-col justify-between p-5 text-stone-800 select-none relative overflow-hidden bg-[#FAF6ED]">
+      {/* Central Hero Focus: Centered Title + 3D Carousel Deck */}
+      <div className="flex-1 flex flex-col justify-center items-center pt-1 pb-1">
+        {/* Centered Title directly above cards with entrance & gradient animation */}
+        <div className="text-center mb-3 sm:mb-4 px-2 relative animate-title-entrance">
+          <div className="absolute -inset-x-4 -inset-y-1.5 bg-gradient-to-r from-amber-200/20 via-orange-100/30 to-amber-200/20 blur-md pointer-events-none rounded-full -z-10" />
+          <h1 className="text-[19px] sm:text-xl font-bold tracking-tight leading-snug animate-title-gradient">
+            选一只合拍的萌宠搭子，
+            <br />
+            陪你轻松读英语吧
+          </h1>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white mt-1">
-          选择谁陪你读
-        </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          不是选老师，是选一个合拍的英语阅读搭子。
-        </p>
-      </div>
 
-      {/* 3D Carousel Stack Area */}
-      <div className="relative my-auto py-2 deck-container flex flex-col items-center">
+        {/* 3D Carousel Stack Area */}
+        <div className="relative deck-container flex flex-col items-center">
         <div className="relative w-64 h-[310px] flex items-center justify-center">
           {/* Companions cards */}
           {COMPANIONS.map((companion, idx) => {
@@ -79,16 +76,16 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                   setCurrentIndex(idx);
                   onSelectCompanion(companion.id);
                 }}
-                className={`absolute inset-0 rounded-3xl bg-[#191E2B] border border-slate-750 p-4 shadow-2xl flex flex-col items-center justify-between transition-all duration-300 cursor-pointer ${posClass}`}
+                className={`absolute inset-0 rounded-3xl bg-[#FFFFFF] border p-4 shadow-xl flex flex-col items-center justify-between transition-all duration-300 cursor-pointer ${posClass}`}
                 style={{
-                  boxShadow: idx === currentIndex ? `0 12px 30px -8px ${companion.bgGlow}` : undefined,
-                  borderColor: idx === currentIndex ? companion.accentColor : '#252B3C'
+                  boxShadow: idx === currentIndex ? `0 16px 36px -10px rgba(180, 100, 20, 0.16)` : undefined,
+                  borderColor: idx === currentIndex ? companion.accentColor : '#E8DFC8'
                 }}
               >
                 {/* Check badge */}
                 {idx === currentIndex && (
                   <span
-                    className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-slate-950 shadow-md font-bold text-xs"
+                    className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-white shadow-md font-bold text-xs"
                     style={{ backgroundColor: companion.accentColor }}
                   >
                     <Check size={14} />
@@ -98,21 +95,21 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                 {/* Avatar */}
                 <div className="w-32 h-32 my-auto relative flex items-center justify-center">
                   <div
-                    className="absolute inset-0 rounded-full blur-xl opacity-30 animate-pulse"
+                    className="absolute inset-0 rounded-full blur-xl opacity-20 animate-pulse"
                     style={{ backgroundColor: companion.accentColor }}
                   />
                   <img
                     src={companion.avatarUrl}
                     alt={companion.name}
-                    className="w-28 h-28 object-contain drop-shadow-xl relative z-10 transition-transform duration-300 hover:scale-105"
+                    className="w-28 h-28 object-contain drop-shadow-md relative z-10 transition-transform duration-300 hover:scale-105"
                   />
                 </div>
 
                 {/* Text Content */}
                 <div className="text-center w-full pb-1">
                   <div className="flex items-center justify-center gap-1.5">
-                    <h3 className="text-lg font-bold text-white">{companion.name}</h3>
-                    <span className="text-xs text-slate-400 font-mono">{companion.nameEn}</span>
+                    <h3 className="text-lg font-bold text-stone-900">{companion.name}</h3>
+                    <span className="text-xs text-stone-400 font-mono">{companion.nameEn}</span>
                   </div>
                   <div
                     className="text-[11px] font-medium tracking-wide mt-0.5 inline-block px-2 py-0.5 rounded-full"
@@ -123,7 +120,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                   >
                     {companion.type}
                   </div>
-                  <p className="text-xs text-slate-300 italic mt-2 line-clamp-2 px-1 font-serif">
+                  <p className="text-xs text-stone-600 italic mt-2 line-clamp-2 px-1 font-serif">
                     {companion.quote}
                   </p>
                 </div>
@@ -143,14 +140,14 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
               <div
                 key="coming-soon"
                 onClick={() => setCurrentIndex(idx)}
-                className={`absolute inset-0 rounded-3xl bg-[#181D29] border border-dashed border-slate-700 p-4 shadow-xl flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer ${posClass}`}
+                className={`absolute inset-0 rounded-3xl bg-[#FAF6ED] border border-dashed border-[#D5CABB] p-4 shadow-md flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer ${posClass}`}
               >
-                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 mb-3">
                   <Sparkles size={24} />
                 </div>
-                <h3 className="text-base font-bold text-white">更多伴读萌宠</h3>
-                <span className="text-[11px] text-amber-400/90 font-mono mt-0.5">正在旅程孵化中</span>
-                <p className="text-xs text-slate-400 mt-2 leading-relaxed px-2">
+                <h3 className="text-base font-bold text-stone-900">更多伴读萌宠</h3>
+                <span className="text-[11px] text-amber-600 font-mono mt-0.5">正在旅程孵化中</span>
+                <p className="text-xs text-stone-500 mt-2 leading-relaxed px-2">
                   团子、毛豆还在路上——它们也在等待一位爱读书的朋友。
                 </p>
               </div>
@@ -162,7 +159,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
         <div className="flex items-center justify-center gap-4 mt-4">
           <button
             onClick={handlePrev}
-            className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-slate-700"
+            className="w-9 h-9 rounded-full bg-[#FFFFFF] hover:bg-[#F4ECE0] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E2D8C6] shadow-xs cursor-pointer"
             aria-label="上一个旅伴"
           >
             <ArrowLeft size={16} />
@@ -177,7 +174,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                   if (i < COMPANIONS.length) onSelectCompanion(COMPANIONS[i].id);
                 }}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === currentIndex ? 'w-5 bg-amber-400' : 'w-1.5 bg-slate-700 hover:bg-slate-600'
+                  i === currentIndex ? 'w-5 bg-amber-600' : 'w-1.5 bg-[#DCD2C0] hover:bg-[#C2B59F]'
                 }`}
                 aria-label={`跳转到第 ${i + 1} 个卡片`}
               />
@@ -186,22 +183,23 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
 
           <button
             onClick={handleNext}
-            className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors border border-slate-700"
+            className="w-9 h-9 rounded-full bg-[#FFFFFF] hover:bg-[#F4ECE0] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E2D8C6] shadow-xs cursor-pointer"
             aria-label="下一个旅伴"
           >
             <ArrowRight size={16} />
           </button>
         </div>
       </div>
+      </div>
 
       {/* Action Buttons */}
       <div className="space-y-2.5 pt-2">
         <button
           onClick={onNext}
-          className="w-full py-3.5 px-4 rounded-2xl font-semibold text-slate-950 flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98]"
+          className="w-full py-3.5 px-4 rounded-2xl font-semibold text-white flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer"
           style={{
-            backgroundColor: currentCompanion.accentColor || '#F59E0B',
-            boxShadow: `0 4px 18px ${currentCompanion.bgGlow}`
+            backgroundColor: currentCompanion.accentColor || '#D97706',
+            boxShadow: `0 6px 20px rgba(180, 100, 20, 0.25)`
           }}
         >
           <span>让 {currentCompanion.name} 陪我出发</span>
@@ -210,7 +208,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
 
         <button
           onClick={handleRandom}
-          className="w-full py-2.5 px-4 rounded-xl text-xs text-slate-400 hover:text-slate-200 bg-slate-800/40 hover:bg-slate-800 border border-slate-750 flex items-center justify-center gap-1.5 transition-colors"
+          className="w-full py-2.5 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-[#FFFFFF] hover:bg-[#F4ECE0] border border-[#E2D8C6] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
         >
           <Shuffle size={13} />
           <span>帮我随机选一个</span>

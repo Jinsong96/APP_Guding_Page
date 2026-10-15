@@ -28,67 +28,67 @@ export const BoardView: React.FC<BoardViewProps> = ({
   onUpdatePreferences
 }) => {
   const STAGE_TITLES = [
-    { num: 1, label: '01', title: '选择旅伴', desc: '建立关系，选一个合拍的阅读搭子' },
+    { num: 1, label: '01', title: '选择旅伴', desc: '选一只合拍的萌宠搭子，陪你轻松读英语吧' },
     { num: 2, label: '02', title: '对话定级', desc: '星盘吸纳兴趣 + 4句自适应微定级 + 底部对话框' },
     { num: 8, label: '03', title: '定制画像', desc: '智能匹配计算，动态切换为建议起点与阅读画像' },
     { num: 10, label: '04', title: '阅读首页', desc: '今日精选、专属推荐书架与三大导航' },
   ];
 
   return (
-    <div className="w-full min-h-screen p-4 sm:p-8 bg-[#0B0D13]">
+    <div className="w-full min-h-screen p-4 sm:p-8 bg-[#EDE7DC]">
       {/* Board Description Header */}
-      <div className="max-w-7xl mx-auto mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="max-w-7xl mx-auto mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#D8CEBC] pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1 justify-center sm:justify-start">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-            <span className="text-xs font-mono uppercase tracking-widest text-emerald-400">
-              Streamlined Flow Architecture Overview
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+            <span className="text-xs font-mono uppercase tracking-widest text-emerald-700 font-bold">
+              一鹿知 · 阅读旅程全景看板
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            AI 英语阅读旅伴 · 全景看板
+          <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
+            一鹿知 · 4 步完整旅程
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-            已整合第 02 屏对话中 4 句自适应微定级与底部输入框，逐句交互调档并直接衔接第 03 屏定制画像与第 04 屏阅读首页。
+          <p className="text-xs sm:text-sm text-stone-600 mt-1 max-w-2xl">
+            涵盖选伴、360°星轨罗盘兴趣吸纳、4 问友好互动、4 句自适应微定级、建议起点定制画像及沉浸阅读首页。
           </p>
         </div>
 
         <button
           onClick={() => onJumpToStage(1)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-450 text-slate-950 font-semibold text-xs shadow-lg transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
         >
           <Smartphone size={16} />
           <span>进入手机交互模式 (从第 01 屏开始)</span>
         </button>
       </div>
 
-      {/* Grid of 10 Phones */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8 justify-items-center">
+      {/* Grid of Phones */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 justify-items-center">
         {STAGE_TITLES.map((stage) => (
           <div key={stage.num} className="w-[280px] sm:w-[310px] flex flex-col">
             {/* Screen Top Header Tag */}
             <div className="flex items-center justify-between mb-2.5 px-1">
               <div className="flex items-center gap-1.5">
-                <span className="w-6 h-5 rounded-md bg-slate-800 border border-slate-700 text-[11px] font-mono font-bold text-amber-400 flex items-center justify-center">
+                <span className="w-6 h-5 rounded-md bg-white border border-[#E2D8C6] text-[11px] font-mono font-bold text-amber-700 flex items-center justify-center shadow-xs">
                   {stage.label}
                 </span>
-                <h3 className="text-xs font-bold text-slate-200 truncate">{stage.title}</h3>
+                <h3 className="text-xs font-bold text-stone-800 truncate">{stage.title}</h3>
               </div>
               <button
                 onClick={() => onJumpToStage(stage.num)}
-                className="text-[10px] text-slate-400 hover:text-amber-400 flex items-center gap-0.5 transition-colors font-medium"
+                className="text-[10px] text-stone-500 hover:text-amber-700 flex items-center gap-0.5 transition-colors font-medium cursor-pointer"
               >
                 <span>试玩</span>
                 <ArrowRight size={10} />
               </button>
             </div>
 
-            {/* Scaled Phone Frame Container */}
+            {/* Scaled Phone Frame Container (Black phone chassis with warm cream screen) */}
             <div
               onClick={() => onJumpToStage(stage.num)}
-              className="relative w-full h-[580px] rounded-[32px] bg-[#141722] border-2 border-slate-750 hover:border-amber-400/70 p-2 shadow-xl hover:shadow-2xl hover:shadow-amber-500/10 transition-all cursor-pointer overflow-hidden group flex flex-col"
+              className="relative w-full h-[580px] rounded-[32px] bg-[#16181F] border-2 border-[#2A2E39] hover:border-amber-500 p-2 shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden group flex flex-col"
             >
-              <div className="w-full h-full rounded-[24px] bg-[#0E1117] overflow-hidden relative pointer-events-none text-left">
+              <div className="w-full h-full rounded-[24px] bg-[#FAF6ED] overflow-hidden relative pointer-events-none text-left">
                 {stage.num === 1 && (
                   <Stage01Companion
                     selectedCompanionId={preferences.companionId}

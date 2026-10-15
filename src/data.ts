@@ -134,6 +134,8 @@ export const COMPANIONS: Companion[] = [
     type: '引路型旅伴',
     quote: '“慢慢来，我在。”',
     avatarUrl: '/assets/light.png',
+    celebrateActionName: '喜悦欢呼跃动',
+    celebrateQuote: '“太棒啦！小鹿准备好啦，我们开读吧！🐾”',
     accentColor: '#A855F7',
     bgGlow: 'rgba(168, 85, 247, 0.15)',
     description: '温和细腻的节奏大师，总能帮你找到恰到好处的阅读速度。'
@@ -145,6 +147,8 @@ export const COMPANIONS: Companion[] = [
     type: '机灵型旅伴',
     quote: '“我会吐槽难句，不吐槽你。”',
     avatarUrl: '/assets/pal.png',
+    celebrateActionName: '机智跃动致意',
+    celebrateQuote: '“完美定级！走，看我带你拆解长难句～🦊”',
     accentColor: '#F59E0B',
     bgGlow: 'rgba(245, 158, 11, 0.15)',
     description: '对复杂从句有本能的幽默感，会在关键处给你机智提示。'
@@ -156,6 +160,8 @@ export const COMPANIONS: Companion[] = [
     type: '安静型旅伴',
     quote: '“你读你的，我替你留灯。”',
     avatarUrl: '/assets/wick.png',
+    celebrateActionName: '轻盈欣喜点亮',
+    celebrateQuote: '“阅读之光为你点亮，享受专属故事之旅吧✨”',
     accentColor: '#38BDF8',
     bgGlow: 'rgba(56, 189, 248, 0.15)',
     description: '默默守护你的阅读专注力，只在真正卡壳时悄悄标注生词。'
@@ -167,6 +173,8 @@ export const COMPANIONS: Companion[] = [
     type: '活力型旅伴',
     quote: '“看正文时，我会安静下来。”',
     avatarUrl: '/assets/nubo.png',
+    celebrateActionName: '元气活力跳跃',
+    celebrateQuote: '“叮！阅读引擎已全功率启动！冲鸭～🚀”',
     accentColor: '#10B981',
     bgGlow: 'rgba(168, 185, 129, 0.15)',
     description: '热情鼓励每一个小突破，陪你一步步解锁更多主题大陆。'

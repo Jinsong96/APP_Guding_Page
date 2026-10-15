@@ -43,6 +43,7 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
   const [progress, setProgress] = useState(10);
   const [activeStep, setActiveStep] = useState(1);
   const [isCalibrated, setIsCalibrated] = useState(false);
+  const [celebrateBounces, setCelebrateBounces] = useState(0);
 
   // Unhurried, relaxing calibration rhythm (takes ~3.6s total)
   useEffect(() => {
@@ -79,20 +80,20 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
       : interestTheme || '前沿科技';
 
   return (
-    <div className="h-full flex flex-col justify-between p-4 sm:p-5 text-slate-100 select-none relative overflow-hidden bg-gradient-to-b from-[#141721] via-[#10131B] to-[#0B0D13]">
+    <div className="h-full flex flex-col justify-between p-4 sm:p-5 text-stone-900 select-none relative overflow-hidden bg-[#FAF6ED]">
       {/* Background Ambient Cosmic Glow */}
       <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full blur-[110px] pointer-events-none opacity-25 transition-all duration-700"
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full blur-[110px] pointer-events-none opacity-20 transition-all duration-700"
         style={{
           background: `radial-gradient(circle, ${companion.accentColor} 0%, transparent 70%)`
         }}
       />
 
       {/* Top Header Bar */}
-      <div className="flex items-center pb-3 border-b border-slate-800 shrink-0 z-20">
+      <div className="flex items-center pb-3 border-b border-[#E8DFC8] shrink-0 z-20">
         <button
           onClick={onBack}
-          className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-full bg-white hover:bg-[#F2ECE1] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E2D8C6] shadow-xs cursor-pointer"
           aria-label="返回上一步"
         >
           <ArrowLeft size={16} />
@@ -104,80 +105,73 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
         {/* Top Companion Hero - Stays at top, gains sparkling & glowing effects when calibrated */}
         <div className="relative flex flex-col items-center text-center shrink-0 mb-3 sm:mb-4">
           <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
-            {/* Halo Glow */}
+            {/* Halo Glow & Breathing Ambient Light */}
             <div
-              className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 ${
-                isCalibrated ? 'opacity-70 scale-125' : 'opacity-40 animate-halo'
+              className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 pointer-events-none ${
+                isCalibrated ? 'animate-companion-glow' : 'opacity-30 animate-halo'
               }`}
               style={{ backgroundColor: companion.accentColor }}
             />
 
-            {/* Pulsing Aura Rings when Calibrated */}
+            {/* Soft Ambient Breathing Ring when Calibrated (No aggressive ping/flash) */}
             {isCalibrated && (
-              <>
-                <div
-                  className="absolute inset-0 rounded-full border-2 animate-ping opacity-40 pointer-events-none"
-                  style={{ borderColor: companion.accentColor }}
-                />
-                <div
-                  className="absolute -inset-2 rounded-full border border-amber-400/40 animate-pulse pointer-events-none"
-                />
-              </>
+              <div
+                className="absolute -inset-2.5 rounded-full border pointer-events-none animate-companion-glow"
+                style={{ borderColor: `${companion.accentColor}45` }}
+              />
             )}
 
-            {/* Sparkle Icons Floating Around Companion */}
+            {/* Soft Sparkle Icons Floating Around Companion with gentle pacing */}
             {isCalibrated && (
               <div className="absolute inset-0 pointer-events-none">
-                <span className="absolute -top-1 -right-1 text-amber-400 animate-bounce">
-                  <Sparkles size={17} />
+                <span className="absolute -top-1 -right-1 text-amber-500/90 animate-sparkle-soft-1">
+                  <Sparkles size={16} />
                 </span>
-                <span className="absolute top-1/2 -left-2 text-emerald-300 animate-pulse">
-                  <Star size={13} fill="#6EE7B7" />
+                <span className="absolute top-1/2 -left-2 text-emerald-600/80 animate-sparkle-soft-2">
+                  <Star size={13} fill="#059669" />
                 </span>
-                <span className="absolute -bottom-1 right-2 text-amber-300 animate-spin" style={{ animationDuration: '6s' }}>
+                <span className="absolute -bottom-1 right-2 text-amber-500/75 animate-sparkle-spin-slow">
                   <Sparkles size={14} />
                 </span>
               </div>
             )}
 
-            {/* Companion Avatar Image */}
+            {/* Companion Avatar Image: keeps 100% of the original 3D character design, style, and details */}
             <img
+              key={isCalibrated ? `${companion.id}-celebrate-${celebrateBounces}` : `${companion.id}-normal`}
               src={companion.avatarUrl}
-              alt={companion.name}
-              className={`w-20 h-20 sm:w-24 sm:h-24 object-contain relative z-10 drop-shadow-2xl transition-transform duration-500 ${
-                isCalibrated ? 'scale-105' : 'scale-100'
+              alt={`${companion.name}${isCalibrated ? ' · 庆祝完成定级' : ''}`}
+              className={`w-20 h-20 sm:w-24 sm:h-24 object-contain relative z-10 drop-shadow-md select-none transition-transform duration-300 ${
+                isCalibrated
+                  ? 'animate-celebrate-action hover:scale-105 active:scale-95 cursor-pointer'
+                  : 'animate-companion-float scale-100'
               }`}
+              onClick={() => {
+                if (isCalibrated) {
+                  setCelebrateBounces((prev) => prev + 1);
+                }
+              }}
+              title={isCalibrated ? '点击让它再次欢呼跳跃！' : undefined}
             />
           </div>
-
-          {/* Companion Celebration Badge / State Label */}
-          {isCalibrated && (
-            <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[11px] font-medium text-amber-300 animate-in fade-in zoom-in-95 duration-300">
-              <Sparkles size={11} className="text-amber-400" />
-              <span>专属微定级已锁定</span>
-            </div>
-          )}
         </div>
 
         {/* Phase 1: Generating & Customizing (Before 100%) */}
         {!isCalibrated ? (
           <div className="w-full max-w-xs flex flex-col items-center text-center animate-in fade-in duration-300">
-            <h1 className="text-lg sm:text-xl font-bold text-white mb-1">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 mb-4">
               {companion.name} 在读你的兴趣与水平
             </h1>
-            <p className="text-xs text-slate-400 mb-5">
-              结合你的真实反馈，正在调适最适合你的起步坡度。
-            </p>
 
             {/* Progress Track */}
-            <div className="w-full bg-slate-800/90 h-2 rounded-full overflow-hidden p-0.5 border border-slate-700/60 mb-2">
+            <div className="w-full bg-[#E8DFC8] h-2 rounded-full overflow-hidden p-0.5 border border-[#DDD3BC] mb-2">
               <div
-                className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 rounded-full transition-all duration-200"
+                className="h-full bg-gradient-to-r from-amber-600 to-emerald-600 rounded-full transition-all duration-200"
                 style={{ width: `${progress}%` }}
               />
             </div>
 
-            <div className="w-full flex items-center justify-between text-[11px] text-slate-400 font-mono mb-5">
+            <div className="w-full flex items-center justify-between text-[11px] text-stone-500 font-mono mb-5">
               <span>已匹配 {progress}%</span>
               <span>{progress >= 100 ? '匹配完成' : '细致调适难度坡度中...'}</span>
             </div>
@@ -187,136 +181,138 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
               <div
                 className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 ${
                   activeStep >= 1
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-slate-200'
-                    : 'bg-slate-900/40 border-slate-800 text-slate-500'
+                    ? 'bg-emerald-50 border-emerald-300 text-stone-800 shadow-xs'
+                    : 'bg-white/80 border-[#E8DFC8] text-stone-400'
                 }`}
               >
                 <span
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 font-bold ${
-                    activeStep >= 1 ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-500'
+                    activeStep >= 1 ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-400'
                   }`}
                 >
                   <Check size={12} />
                 </span>
                 <p className="text-xs truncate">
-                  <strong className="text-white font-medium">锁定兴趣星系：</strong> {displayThemes}
+                  <strong className="text-stone-900 font-medium">锁定兴趣领域：</strong> {displayThemes}
                 </p>
               </div>
 
               <div
                 className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 ${
                   activeStep >= 2
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-slate-200'
-                    : 'bg-slate-900/40 border-slate-800 text-slate-500'
+                    ? 'bg-emerald-50 border-emerald-300 text-stone-800 shadow-xs'
+                    : 'bg-white/80 border-[#E8DFC8] text-stone-400'
                 }`}
               >
                 <span
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 font-bold ${
-                    activeStep >= 2 ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-500'
+                    activeStep >= 2 ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-400'
                   }`}
                 >
                   <Check size={12} />
                 </span>
                 <p className="text-xs">
-                  <strong className="text-white font-medium">微试读自适应定级：</strong> {determinedCefr}（建议起点 {resolvedStartingLevel}）
+                  <strong className="text-stone-900 font-medium">微试读自适应定级：</strong>建议起点 {resolvedStartingLevel}
                 </p>
               </div>
 
               <div
                 className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 ${
                   activeStep >= 3
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-slate-200'
-                    : 'bg-slate-900/40 border-slate-800 text-slate-500'
+                    ? 'bg-emerald-50 border-emerald-300 text-stone-800 shadow-xs'
+                    : 'bg-white/80 border-[#E8DFC8] text-stone-400'
                 }`}
               >
                 <span
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 font-bold ${
-                    activeStep >= 3 ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-500'
+                    activeStep >= 3 ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-400'
                   }`}
                 >
                   <Check size={12} />
                 </span>
                 <p className="text-xs">
-                  <strong className="text-white font-medium">已生成专属阅读画像与路线</strong>
+                  <strong className="text-stone-900 font-medium">已生成专属阅读画像与路线</strong>
                 </p>
               </div>
             </div>
           </div>
         ) : (
-          /* Phase 2: Calibrated Stage 09 Content (Cleaned: no 释义提示 or 单词目标) */
+          /* Phase 2: Calibrated Stage 09 Content */
           <div className="w-full max-w-xs flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
-            {/* Starting Level Anchor Badge */}
-            <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-emerald-500/15 border-2 border-emerald-400 flex flex-col items-center justify-center shadow-lg shadow-emerald-500/15 mb-2.5">
-              <span className="text-[9px] font-medium text-emerald-300 tracking-wider uppercase">
-                建议阅读起点
-              </span>
-              <strong className="text-2xl font-bold font-mono text-emerald-400 leading-none mt-0.5">
-                {resolvedStartingLevel}
-              </strong>
-            </div>
+            {/* Centered Starting Level Anchor Badge with Dynamic Pop Animation */}
+            <div className="relative mb-3.5 flex flex-col items-center justify-center animate-in zoom-in-75 fade-in duration-700 ease-out">
+              {/* Dynamic light pulse glow */}
+              <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-md animate-pulse opacity-40 pointer-events-none" />
 
-            {/* Level & Themes Subtag */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/90 border border-slate-750 text-xs font-mono text-amber-300 mb-2.5 shadow-sm">
-              <span>定级评定：{determinedCefr}</span>
-              <span>·</span>
-              <span className="text-slate-300 truncate max-w-[150px]">{displayThemes}</span>
+              {/* Centered Pill Badge - perfectly balanced vertically and horizontally */}
+              <div className="relative inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-2 border-emerald-500 shadow-md shadow-emerald-700/10 transition-transform duration-300 hover:scale-102">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="text-[14px] sm:text-[14.5px] font-bold text-stone-800 tracking-wider">
+                  建议阅读起点
+                </span>
+                <strong className="text-2xl sm:text-2xl font-black font-mono text-emerald-700 leading-none tracking-tight">
+                  {resolvedStartingLevel}
+                </strong>
+              </div>
             </div>
 
             {/* Headline */}
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-4">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-900 mb-4">
               从这里开始，刚刚好
             </h1>
 
             {/* Two Core Pillars Cards */}
-            <div className="w-full grid grid-cols-2 gap-2.5 text-left">
-              <div className="p-3.5 rounded-2xl bg-[#181D29] border border-slate-750/80 shadow-md flex flex-col justify-between">
+            <div className="w-full grid grid-cols-2 gap-2.5 text-left mb-4">
+              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-sm flex flex-col justify-between">
                 <div>
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
                     <Sparkles size={14} />
                   </div>
-                  <h3 className="text-xs font-bold text-white mb-1">难度更贴合</h3>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <h3 className="text-xs font-bold text-stone-900 mb-1">难度更适合</h3>
+                  <p className="text-[11px] text-stone-500 leading-relaxed">
                     绕过过易与过繁冗长语篇，聚焦核心高频长句。
                   </p>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#181D29] border border-slate-750/80 shadow-md flex flex-col justify-between">
+              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-sm flex flex-col justify-between">
                 <div>
-                  <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center mb-2">
+                  <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
                     <Compass size={14} />
                   </div>
-                  <h3 className="text-xs font-bold text-white mb-1">随阅读调整</h3>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <h3 className="text-xs font-bold text-stone-900 mb-1">随阅读调整</h3>
+                  <p className="text-[11px] text-stone-500 leading-relaxed">
                     越读越懂你的节奏，随时一键自适应换档。
                   </p>
                 </div>
               </div>
             </div>
+
+            {/* "开启阅读体验" Button located right below the two cards */}
+            <button
+              onClick={onNext}
+              className="w-full py-3.5 px-4 rounded-2xl font-bold text-white text-[15px] sm:text-base flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer hover:brightness-105 animate-in fade-in slide-in-from-bottom-2 duration-300"
+              style={{
+                backgroundColor: companion.accentColor || '#D97706',
+                boxShadow: `0 6px 20px rgba(180, 100, 20, 0.25)`
+              }}
+            >
+              <span>开启阅读体验</span>
+              <ArrowRight size={17} />
+            </button>
           </div>
         )}
       </div>
 
-      {/* Bottom CTA Button Area */}
-      <div className="pt-2 shrink-0 z-20">
-        {isCalibrated ? (
-          <button
-            onClick={onNext}
-            className="w-full py-3.5 px-4 rounded-2xl font-bold text-slate-950 text-sm flex items-center justify-center gap-2 shadow-xl transition-all active:scale-[0.98] cursor-pointer hover:brightness-110 animate-in fade-in slide-in-from-bottom-2 duration-300"
-            style={{
-              backgroundColor: companion.accentColor || '#F59E0B'
-            }}
-          >
-            <span>开启阅读首页</span>
-            <ArrowRight size={17} />
-          </button>
-        ) : (
-          <div className="w-full py-3 flex items-center justify-center gap-2 text-xs text-slate-400 font-mono">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+      {/* Bottom Area - shown during calibration */}
+      {!isCalibrated && (
+        <div className="pt-2 shrink-0 z-20">
+          <div className="w-full py-3 flex items-center justify-center gap-2 text-xs text-stone-500 font-mono">
+            <span className="w-2 h-2 rounded-full bg-amber-600 animate-ping" />
             <span>细致调适难度坡度与画像中...</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

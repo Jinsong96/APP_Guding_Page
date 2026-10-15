@@ -65,7 +65,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0D13] text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#EDE7DC] text-stone-900 flex flex-col font-sans selection:bg-amber-600 selection:text-white">
       {/* Top Global Navigation Bar */}
       <TopNavigationHeader
         currentStage={currentStage}
@@ -111,7 +111,7 @@ export default function App() {
                 <Stage02AiChat
                   companion={currentCompanion}
                   onBack={() => setCurrentStage(1)}
-                  onComplete={(themes, cefrLevel) => {
+                  onComplete={(themes, cefrLevel, surveyData) => {
                     // A1- -> L1 (L1-L3), A2 -> L4 (L4-L6), B1 -> L7 (L7-L9), B2+ -> L10 (L10-L12)
                     const startingLevelCode =
                       cefrLevel === 'A1-'
@@ -132,7 +132,12 @@ export default function App() {
                       currentLevel: mappedLevel,
                       profile: {
                         ...prev.profile,
-                        startingLevel: startingLevelCode
+                        startingLevel: startingLevelCode,
+                        goal: surveyData?.goal || prev.profile.goal,
+                        challenge: surveyData?.challenge || prev.profile.challenge,
+                        durationPreference: surveyData?.duration || prev.profile.durationPreference,
+                        companionStyle: surveyData?.companionStyle || prev.profile.companionStyle,
+                        sessionDuration: surveyData?.duration?.includes('5') ? 5 : prev.profile.sessionDuration
                       }
                     }));
                     // Complete dialogue rating and jump directly to Stage 8
@@ -184,7 +189,7 @@ export default function App() {
 
       {/* Floating Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-slate-900/95 border border-slate-700/80 text-white text-xs font-medium shadow-2xl backdrop-blur-md flex items-center gap-2 animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-stone-900/95 border border-stone-800 text-stone-100 text-xs font-medium shadow-xl backdrop-blur-md flex items-center gap-2 animate-in fade-in slide-in-from-bottom-3 duration-200">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           <span>{toastMessage}</span>
         </div>

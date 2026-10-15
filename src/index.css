@@ -2,19 +2,20 @@
 
 @layer base {
   :root {
-    --bg-dark: #0e1117;
-    --card-dark: #161a23;
-    --border-dark: #272d3b;
-    --accent-emerald: #10b981;
-    --accent-amber: #f59e0b;
-    --accent-sky: #38bdf8;
-    --text-primary: #f3f4f6;
-    --text-muted: #9ca3af;
+    --bg-paper: #FAF6EE;
+    --bg-workbench: #F4EFE6;
+    --card-paper: #FFFFFF;
+    --border-paper: #E7DFD1;
+    --accent-emerald: #059669;
+    --accent-amber: #D97706;
+    --accent-sky: #0284C7;
+    --text-primary: #1C1F26;
+    --text-muted: #6B7280;
   }
 
   body {
-    background-color: #0b0d13;
-    color: #f3f4f6;
+    background-color: #F4EFE6;
+    color: #1C1F26;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
@@ -133,4 +134,154 @@
 
 .animate-compass-pulse {
   animation: compass-pulse 3s ease-in-out infinite;
+}
+
+/* Premium Entrance & Gradient Flow Keyframes */
+@keyframes title-entrance {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes title-gradient-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-title-entrance {
+  animation: title-entrance 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-title-gradient {
+  background: linear-gradient(
+    120deg,
+    #1c1917 0%,
+    #44403c 22%,
+    #b45309 48%,
+    #d97706 58%,
+    #44403c 78%,
+    #1c1917 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: title-gradient-shimmer 6s ease infinite;
+}
+
+/* Companion Breathing & Floating Keyframes */
+@keyframes companion-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes companion-glow-breathe {
+  0%, 100% {
+    opacity: 0.32;
+    transform: scale(0.98);
+    filter: blur(20px);
+  }
+  50% {
+    opacity: 0.58;
+    transform: scale(1.12);
+    filter: blur(28px);
+  }
+}
+
+@keyframes sparkle-twinkle-soft {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 0.88;
+    transform: scale(1.08);
+  }
+}
+
+.animate-companion-float {
+  animation: companion-float 3.6s ease-in-out infinite;
+}
+
+.animate-companion-glow {
+  animation: companion-glow-breathe 4s ease-in-out infinite;
+}
+
+.animate-sparkle-soft-1 {
+  animation: sparkle-twinkle-soft 4.2s ease-in-out infinite;
+}
+
+.animate-sparkle-soft-2 {
+  animation: sparkle-twinkle-soft 5.2s ease-in-out infinite 1s;
+}
+
+.animate-sparkle-spin-slow {
+  animation: spin 10s linear infinite;
+}
+
+/* Companion Celebration Motion: Keeps 100% of original 3D mascot styling & details while delivering dynamic celebration action */
+@keyframes celebrate-jump-action {
+  0% {
+    transform: translateY(0) scale(1, 1) rotate(0deg);
+  }
+  14% {
+    /* Anticipation squat */
+    transform: translateY(5px) scale(1.07, 0.93) rotate(0deg);
+  }
+  34% {
+    /* Joyful leap up */
+    transform: translateY(-16px) scale(0.95, 1.07) rotate(-3.5deg);
+  }
+  52% {
+    /* Mid-air celebratory flourish */
+    transform: translateY(-11px) scale(1.04, 1.02) rotate(3deg);
+  }
+  72% {
+    /* Buoyant landing squash */
+    transform: translateY(3px) scale(1.05, 0.95) rotate(-1deg);
+  }
+  86% {
+    /* Elastic rebound */
+    transform: translateY(-3px) scale(0.98, 1.02) rotate(0.5deg);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1) rotate(0deg);
+  }
+}
+
+@keyframes celebrate-rhythm-loop {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-6px) rotate(-2.5deg) scale(1.03);
+  }
+  50% {
+    transform: translateY(-1px) rotate(0deg) scale(1);
+  }
+  75% {
+    transform: translateY(-5px) rotate(2.5deg) scale(1.03);
+  }
+}
+
+.animate-celebrate-action {
+  animation: celebrate-jump-action 0.85s cubic-bezier(0.25, 1, 0.5, 1) 1,
+             celebrate-rhythm-loop 2.8s ease-in-out infinite 0.85s;
 }

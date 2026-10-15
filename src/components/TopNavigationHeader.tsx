@@ -27,29 +27,29 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#10131B]/95 backdrop-blur-md border-b border-slate-800 text-slate-200 px-3 sm:px-6 py-2.5">
+    <header className="sticky top-0 z-50 bg-[#FAF6ED]/95 backdrop-blur-md border-b border-[#E8DFC8] text-stone-800 px-3 sm:px-6 py-2.5">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2.5">
         {/* Brand & Companion info */}
         <div className="flex items-center justify-between w-full md:w-auto gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500 to-emerald-400 flex items-center justify-center text-slate-950 font-bold text-xs shadow-md">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-600 to-amber-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
               <BookOpen size={15} />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-bold text-sm tracking-tight text-white">一鹿知</span>
+                <span className="font-bold text-sm tracking-tight text-stone-900">一鹿知</span>
               </div>
             </div>
           </div>
 
           {/* Current Companion Badge */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700/80 text-xs">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F2ECE1] border border-[#E2D8C6] text-xs">
             <img
               src={companion.avatarUrl}
               alt={companion.name}
               className="w-4 h-4 rounded-full object-cover"
             />
-            <span className="text-slate-300 text-[11px] font-medium">{companion.name} 同行</span>
+            <span className="text-stone-700 text-[11px] font-medium">{companion.name} 同行</span>
           </div>
         </div>
 
@@ -64,8 +64,8 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
               }}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
                 currentStage === s.num && viewMode === 'phone'
-                  ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
-                  : 'bg-slate-850/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-amber-600 text-white font-bold shadow-xs'
+                  : 'bg-[#F2ECE1] hover:bg-[#EBE2D2] text-stone-600 hover:text-stone-900'
               }`}
             >
               {s.label}
@@ -75,13 +75,13 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
 
         {/* View Mode Toggle & Reset */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center p-0.5 bg-slate-900 rounded-xl border border-slate-800">
+          <div className="flex items-center p-0.5 bg-[#F2ECE1] rounded-xl border border-[#E2D8C6]">
             <button
               onClick={() => onSetViewMode('phone')}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                 viewMode === 'phone'
-                  ? 'bg-[#1E2433] text-white shadow-sm border border-slate-700'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-stone-900 shadow-xs border border-[#E0D5C2]'
+                  : 'text-stone-500 hover:text-stone-800'
               }`}
             >
               <Smartphone size={13} />
@@ -92,8 +92,8 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
               onClick={() => onSetViewMode('board')}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                 viewMode === 'board'
-                  ? 'bg-[#1E2433] text-white shadow-sm border border-slate-700'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-stone-900 shadow-xs border border-[#E0D5C2]'
+                  : 'text-stone-500 hover:text-stone-800'
               }`}
             >
               <LayoutGrid size={13} />
@@ -103,7 +103,7 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
 
           <button
             onClick={onReset}
-            className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 text-slate-400 hover:text-white transition-colors border border-slate-700/60"
+            className="p-1.5 rounded-xl bg-[#F2ECE1] hover:bg-[#EBE2D2] text-stone-600 hover:text-stone-900 transition-colors border border-[#E2D8C6]"
             title="重置回第 01 屏"
           >
             <RotateCcw size={14} />
