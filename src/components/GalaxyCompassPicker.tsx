@@ -1,42 +1,43 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Sparkles, ArrowRight, Check, Compass } from 'lucide-react';
 import { CONTENT_DOMAINS, ContentCategory } from '../data';
+import { StardustCanvas } from './StardustCanvas';
 
 interface GalaxyCompassPickerProps {
   selectedTags: string[];
   onToggleTag: (tag: string) => void;
   onConfirm: (tags: string[]) => void;
   companionAccent?: string;
+  targetDomainIndex?: number | null;
+  onDomainChange?: (domainIndex: number) => void;
 }
 
 export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
   selectedTags,
   onToggleTag,
   onConfirm,
-  companionAccent = '#F59E0B'
+  companionAccent = '#F59E0B',
+  targetDomainIndex,
+  onDomainChange
 }) => {
-  // Current rotation angle of the 360° compass (in degrees)
+  // Current rotation angle of the 360° astrolabe (in degrees)
   const [rotationDeg, setRotationDeg] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const [activeDomainIndex, setActiveDomainIndex] = useState<number>(1); // default to 科学 (science)
   const [tagOffset, setTagOffset] = useState<number>(0);
   const [coreRipple, setCoreRipple] = useState<number>(0);
+  const lastTargetDomainRef = useRef<number | null | undefined>(undefined);
 
   // Progressive unfolding animation steps on mount:
-  // 0: Initial hidden state
-  // 1: Center core light sparks up (80ms)
-  // 2: Disc & astrolabe rings expand into view (260ms)
-  // 3: 6 domain planetary nodes pop in with staggered bounce (520ms)
-  // 4: Inspiration tag bubbles blossom into view (780ms)
-  // 5: Complete & fully interactive (1050ms)
   const [animStep, setAnimStep] = useState<number>(0);
 
   useEffect(() => {
     const t1 = setTimeout(() => setAnimStep(1), 80);
-    const t2 = setTimeout(() => setAnimStep(2), 260);
-    const t3 = setTimeout(() => setAnimStep(3), 520);
-    const t4 = setTimeout(() => setAnimStep(4), 780);
-    const t5 = setTimeout(() => setAnimStep(5), 1050);
+    const t2 = setTimeout(() => setAnimStep(2), 240);
+    const t3 = setTimeout(() => setAnimStep(3), 480);
+    const t4 = setTimeout(() => setAnimStep(4), 720);
+    const t5 = setTimeout(() => setAnimStep(5), 950);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -53,7 +54,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
   const wheelRef = useRef<HTMLDivElement>(null);
 
   // 6 domain nodes arranged at 60 degree intervals (0°, 60°, 120°, 180°, 240°, 300°)
-  const domains = CONTENT_DOMAINS; // 6 domains
+  const domains = CONTENT_DOMAINS; // 6 domains, total 81 official tags
   const stepAngle = 360 / domains.length; // 60°
 
   // Current active domain based on activeDomainIndex
@@ -61,21 +62,19 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
 
   // Align activeDomainIndex whenever rotation settles or changes
   const updateActiveDomainFromRotation = useCallback((currentRot: number) => {
-    // Top pointer is at -90 degrees (12 o'clock).
-    // Domain i is at angle = i * 60 + currentRot.
-    // We want domain i where (i * 60 + currentRot) % 360 ≈ 270 (or -90).
-    // That means i * 60 ≈ 270 - currentRot = -90 - currentRot.
     const normalized = ((-currentRot - 90) % 360 + 360) % 360;
     const closestIdx = Math.round(normalized / stepAngle) % domains.length;
-    setActiveDomainIndex(closestIdx);
-  }, [domains.length, stepAngle]);
+    setActiveDomainIndex((prevIdx) => {
+      if (prevIdx !== closestIdx) {
+        onDomainChange?.(closestIdx);
+      }
+      return closestIdx;
+    });
+  }, [domains.length, stepAngle, onDomainChange]);
 
-  // Rotate to specific domain on node tap
-  const rotateToDomain = (idx: number) => {
-    // Target: make domain idx land at 12 o'clock (-90°)
-    // idx * 60 + rot = 270 (mod 360) => rot = 270 - idx * 60
+  // Rotate to specific domain on node tap or AI auto-match
+  const rotateToDomain = useCallback((idx: number, fromUserAction = false) => {
     const targetBase = 270 - idx * stepAngle;
-    // Find closest rotation equivalent to targetBase
     const currentBase = rotationDeg % 360;
     let diff = (targetBase - currentBase) % 360;
     if (diff > 180) diff -= 360;
@@ -85,9 +84,28 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
     setRotationDeg(newRot);
     setActiveDomainIndex(idx);
     setTagOffset(0);
-  };
+    setCoreRipple((r) => r + 1);
 
-  // Pointer drag calculations for 360-degree rotation
+    if (fromUserAction) {
+      onDomainChange?.(idx);
+    }
+  }, [rotationDeg, stepAngle, onDomainChange]);
+
+  // Respond to external AI intention auto-recognition targetDomainIndex
+  useEffect(() => {
+    if (
+      targetDomainIndex !== undefined &&
+      targetDomainIndex !== null &&
+      targetDomainIndex !== lastTargetDomainRef.current
+    ) {
+      lastTargetDomainRef.current = targetDomainIndex;
+      rotateToDomain(targetDomainIndex);
+    } else if (targetDomainIndex === null || targetDomainIndex === undefined) {
+      lastTargetDomainRef.current = targetDomainIndex;
+    }
+  }, [targetDomainIndex, rotateToDomain]);
+
+  // Pointer drag calculations for 360-degree astrolabe rotation
   const handlePointerDown = (e: React.PointerEvent) => {
     let cx = 0;
     let cy = 0;
@@ -112,6 +130,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
     startDragAngleRef.current = angleDeg;
     startRotationRef.current = rotationDeg;
     setIsDragging(true);
+    setDragPos({ x: e.clientX - cx + 145, y: e.clientY - cy + 145 });
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
 
@@ -127,30 +146,30 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
     const newRot = startRotationRef.current + delta;
     setRotationDeg(newRot);
     updateActiveDomainFromRotation(newRot);
+    setDragPos({ x: dx + 145, y: dy + 145 });
   };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const handlePointerUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
+    setDragPos(null);
     updateActiveDomainFromRotation(rotationDeg);
   };
 
-  // Switch batch of tags within current galaxy
-  const handleShuffleTags = () => {
-    setTagOffset((prev) => (prev + 5) % currentDomain.tags.length);
-  };
-
-  // Active tags to display for current galaxy (6 tags displayed in orbital arc)
+  // Active tags to display for current domain (2 rows x 3 tags = 6 tags)
   const visibleTags = useMemo(() => {
     const all = currentDomain.tags;
+    const selectedInDomain = all.filter((t) => selectedTags.includes(t));
+    const unselectedInDomain = all.filter((t) => !selectedTags.includes(t));
+    const ordered = [...selectedInDomain, ...unselectedInDomain];
     const sliceLen = 6;
     const result: string[] = [];
-    for (let i = 0; i < sliceLen; i++) {
-      const idx = (tagOffset + i) % all.length;
-      result.push(all[idx]);
+    for (let i = 0; i < Math.min(sliceLen, ordered.length); i++) {
+      const idx = (tagOffset + i) % ordered.length;
+      result.push(ordered[idx]);
     }
     return result;
-  }, [currentDomain, tagOffset]);
+  }, [currentDomain, tagOffset, selectedTags]);
 
   // Tag Selection Trigger
   const handleTagClick = (tag: string) => {
@@ -161,48 +180,38 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
     onToggleTag(tag);
   };
 
-  const canProceed = selectedTags.length >= 1;
-
   return (
     <div
       ref={containerRef}
-      className="w-full relative select-none flex flex-col items-center justify-between min-h-[430px] bg-transparent"
+      className="w-full relative select-none flex flex-col items-center justify-between min-h-[430px] bg-transparent font-sans"
     >
-      {/* Subtle pinpoint floating stardust particles without block glows */}
+      {/* Subtle pinpoint floating stardust particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-        <div className="absolute top-6 left-8 w-1 h-1 bg-white rounded-full animate-ping" />
+        <div className="absolute top-6 left-8 w-1 h-1 bg-amber-200 rounded-full animate-ping" />
         <div className="absolute top-20 right-10 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-pulse" />
-        <div className="absolute bottom-28 left-12 w-1 h-1 bg-amber-300 rounded-full animate-pulse" />
+        <div className="absolute bottom-28 left-12 w-1 h-1 bg-amber-400 rounded-full animate-pulse" />
         <div className="absolute top-36 left-1/4 w-0.5 h-0.5 bg-white rounded-full" />
         <div className="absolute bottom-16 right-16 w-1 h-1 bg-purple-300 rounded-full animate-pulse" />
       </div>
 
-      {/* Top HUD: Current Galaxy Info */}
+      {/* Top HUD: Current Domain Header */}
       <div className={`w-full flex items-center justify-between px-2 pt-1 pb-1 z-10 transition-all duration-500 ${
         animStep >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
       }`}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <div
-            className="w-2.5 h-2.5 rounded-full animate-pulse"
+            className="w-2.5 h-2.5 rounded-full animate-pulse shadow-xs"
             style={{ backgroundColor: currentDomain.color }}
           />
-          <span className="text-[15px] sm:text-[15.5px] font-mono tracking-wide font-bold text-stone-900 flex items-center gap-1.5">
+          <span className="text-[14.5px] sm:text-[15px] font-mono tracking-wide font-bold text-stone-900">
             <span style={{ color: currentDomain.color }}>{currentDomain.name}领域</span>
           </span>
         </div>
-
-        {selectedTags.length > 0 && (
-          <div className="flex items-center gap-1 bg-white border border-[#E2D8C6] rounded-full px-2.5 py-1 text-[13px] font-mono shadow-xs">
-            <span className="text-amber-600 font-bold">{selectedTags.length}</span>
-            <span className="text-stone-400 text-[11px]">/10</span>
-            <span className="text-stone-600">已选</span>
-          </div>
-        )}
       </div>
 
-      {/* Floating Secondary Tags - 2 rows x 3 tags */}
-      <div className="w-full z-20 py-2 px-1">
-        <div className="grid grid-cols-3 gap-2 w-full max-w-sm sm:max-w-md mx-auto">
+      {/* Top Content Tags (上方的内容标签): 2 rows x 3 tags */}
+      <div className="w-full z-20 py-1.5 px-1">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 w-full max-w-sm sm:max-w-md mx-auto">
           {visibleTags.map((tag, i) => {
             const isSelected = selectedTags.includes(tag);
             const isVisible = animStep >= 4;
@@ -211,22 +220,22 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                 key={tag}
                 onClick={() => handleTagClick(tag)}
                 style={{
-                  transitionDelay: animStep < 5 ? `${i * 50}ms` : '0ms',
+                  transitionDelay: animStep < 5 ? `${i * 45}ms` : '0ms',
                   borderColor: isSelected ? currentDomain.color : '#E2D8C6',
                   backgroundColor: isSelected ? currentDomain.color : '#FFFFFF',
                   color: isSelected ? '#FFFFFF' : '#1C1E24',
                   boxShadow: isSelected
-                    ? `0 4px 14px ${currentDomain.color}50`
+                    ? `0 3px 12px ${currentDomain.color}45`
                     : '0 1px 3px rgba(0,0,0,0.04)'
                 }}
-                className={`relative group px-2 py-2 sm:py-2.5 rounded-full text-[13.5px] sm:text-[14.5px] font-medium tracking-normal transition-all duration-300 flex items-center justify-center gap-1.5 active:scale-95 border cursor-pointer ${
+                className={`relative group px-2 py-2 sm:py-2.5 rounded-xl text-[13px] sm:text-[13.5px] font-medium tracking-normal transition-all duration-300 flex items-center justify-center gap-1.5 active:scale-95 border cursor-pointer ${
                   isVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-75 translate-y-2'
                 } ${
-                  isSelected ? 'font-bold scale-102 shadow-sm' : 'hover:scale-102 hover:bg-[#FDFBF7]'
+                  isSelected ? 'font-bold scale-102 shadow-xs' : 'hover:scale-102 hover:bg-[#FDFBF7]'
                 }`}
               >
                 {isSelected ? (
-                  <Check size={13} className="stroke-[3] shrink-0" />
+                  <Check size={12.5} className="stroke-[3] shrink-0" />
                 ) : (
                   <span
                     className="w-1.5 h-1.5 rounded-full opacity-70 group-hover:opacity-100 transition-opacity shrink-0"
@@ -238,7 +247,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                 {/* Subtle gravity ping ring when selected */}
                 {isSelected && (
                   <span
-                    className="absolute inset-0 rounded-full animate-ping opacity-25 pointer-events-none"
+                    className="absolute inset-0 rounded-xl animate-ping opacity-25 pointer-events-none"
                     style={{ backgroundColor: currentDomain.color }}
                   />
                 )}
@@ -246,52 +255,109 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             );
           })}
         </div>
+
+        {/* Left-bottom hint below content tag buttons */}
+        <div className={`w-full max-w-sm sm:max-w-md mx-auto mt-5 mb-1 px-0.5 flex items-center justify-start transition-opacity duration-500 ${
+          animStep >= 4 ? 'opacity-100' : 'opacity-0'
+        }`}>
+          <span className="text-[11px] sm:text-[11.5px] text-stone-500 font-medium tracking-wide">
+            试试点击星盘
+          </span>
+        </div>
       </div>
 
-      {/* 360° ORBITAL GALAXY ASTROLABE COMPASS (Interactive Touch / Drag Area) */}
+      {/* 360° PRECISION ASTROLABE (星盘设计：细腻黄铜刻度光轨与星尘微光粒子流) */}
       <div
-        className="relative w-full flex items-center justify-center my-3 touch-none select-none cursor-grab active:cursor-grabbing"
+        className="relative w-full flex items-center justify-center my-2 sm:my-3 touch-none select-none cursor-grab active:cursor-grabbing"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        {/* Top Alignment Focus Reticle Pointer */}
-        <div className={`absolute -top-3.5 z-30 flex flex-col items-center pointer-events-none transition-all duration-500 ${
+        {/* Top Alignment Focus Reticle Needle with Brass Shimmer */}
+        <div className={`absolute -top-4 z-30 flex flex-col items-center pointer-events-none transition-all duration-500 ${
           animStep >= 3 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
         }`}>
+          {/* Luminous beacon dot */}
           <div
-            className="w-2.5 h-2.5 rotate-45 border-t-2 border-l-2 shadow-sm transition-colors duration-300"
+            className="w-2 h-2 rounded-full mb-0.5 animate-pulse shadow-xs"
+            style={{ backgroundColor: currentDomain.color, boxShadow: `0 0 8px ${currentDomain.color}` }}
+          />
+          {/* Brass Needle Arrow */}
+          <div
+            className="w-3 h-3 rotate-45 border-t-2 border-l-2 shadow-sm transition-colors duration-300"
             style={{
               borderColor: currentDomain.color,
               backgroundColor: '#FAF6ED'
             }}
           />
           <div
-            className="w-0.5 h-3 shadow-md transition-colors duration-300"
-            style={{ backgroundColor: currentDomain.color }}
+            className="w-1 h-3.5 shadow-md transition-colors duration-300 rounded-b-xs"
+            style={{
+              backgroundColor: currentDomain.color,
+              boxShadow: `0 2px 6px ${currentDomain.color}66`
+            }}
           />
         </div>
 
-        {/* Outer Orbital Disc / Compass SVG Ring (Enlarged to 300px) */}
+        {/* Astrolabe Wheel Container (290px x 290px) */}
         <div
           ref={wheelRef}
-          className={`relative w-[300px] h-[300px] flex items-center justify-center transition-all duration-700 ease-out ${
+          className={`relative w-[290px] h-[290px] flex items-center justify-center transition-all duration-700 ease-out ${
             animStep >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-85'
           }`}
         >
-          {/* Static Concentric Grid & Cosmic Ticks */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-55">
-            <circle cx="150" cy="150" r="145" stroke="#D5CBB9" strokeWidth="1" fill="none" strokeDasharray="3 4" />
-            <circle cx="150" cy="150" r="105" stroke="#E2D8C6" strokeWidth="1" fill="none" />
-            <circle cx="150" cy="150" r="68" stroke="#D5CBB9" strokeWidth="0.8" fill="none" strokeDasharray="2 3" />
-            {/* Compass degree ticks */}
-            {Array.from({ length: 24 }).map((_, i) => {
-              const a = (i * 15 * Math.PI) / 180;
-              const x1 = 150 + 138 * Math.cos(a);
-              const y1 = 150 + 138 * Math.sin(a);
-              const x2 = 150 + 145 * Math.cos(a);
-              const y2 = 150 + 145 * Math.sin(a);
+          {/* Real-time Dynamic Stardust Particle Field (星尘微光粒子流) */}
+          <StardustCanvas
+            active={isDragging}
+            intensity={isDragging ? 'vibrant' : 'gentle'}
+            emitterPos={dragPos}
+            className="absolute inset-0 z-10 pointer-events-none rounded-full overflow-hidden"
+          />
+
+          {/* Delicate Brass Graduation Rings & 48 Precision Astronomical Ticks (细腻黄铜刻度光轨) */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+            <defs>
+              <linearGradient id="astrolabeBrassOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#DFD1B8" />
+                <stop offset="35%" stopColor="#C4AA7A" />
+                <stop offset="50%" stopColor="#F5E7CA" />
+                <stop offset="75%" stopColor="#BA9D6B" />
+                <stop offset="100%" stopColor="#DFD1B8" />
+              </linearGradient>
+              <linearGradient id="astrolabeBrassInner" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#C4AA7A" stopOpacity="0.4" />
+                <stop offset="50%" stopColor="#EAD8B8" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#B3935E" stopOpacity="0.4" />
+              </linearGradient>
+            </defs>
+
+            {/* Heavy outer brass bevel rim */}
+            <circle cx="145" cy="145" r="141" stroke="url(#astrolabeBrassOuter)" strokeWidth="2.5" fill="none" opacity="0.9" />
+            <circle cx="145" cy="145" r="138" stroke="#D1C3AB" strokeWidth="0.8" fill="none" opacity="0.6" />
+            <circle cx="145" cy="145" r="130" stroke="url(#astrolabeBrassInner)" strokeWidth="1" fill="none" opacity="0.75" />
+
+            {/* Constellation planetary orbit track */}
+            <circle cx="145" cy="145" r="100" stroke="#E5DAC7" strokeWidth="1.2" fill="none" opacity="0.85" strokeDasharray="4 3" />
+            
+            {/* Inner focal core astrolabe rings */}
+            <circle cx="145" cy="145" r="65" stroke="url(#astrolabeBrassOuter)" strokeWidth="1.2" fill="none" opacity="0.75" />
+            <circle cx="145" cy="145" r="61" stroke="#D9CCA8" strokeWidth="0.6" fill="none" opacity="0.5" strokeDasharray="3 2" />
+
+            {/* 48 Precision Brass Astronomical Degree Ticks */}
+            {Array.from({ length: 48 }).map((_, i) => {
+              const a = (i * 7.5 * Math.PI) / 180;
+              const isMajor = i % 8 === 0; // Every 60 degrees (Domain alignments)
+              const isMedium = i % 4 === 0 && !isMajor; // Every 30 degrees
+              const tickLength = isMajor ? 10 : isMedium ? 6 : 3.5;
+              const rInner = 140 - tickLength;
+              const rOuter = 140;
+
+              const x1 = 145 + rInner * Math.cos(a);
+              const y1 = 145 + rInner * Math.sin(a);
+              const x2 = 145 + rOuter * Math.cos(a);
+              const y2 = 145 + rOuter * Math.sin(a);
+
               return (
                 <line
                   key={i}
@@ -299,8 +365,24 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={i % 6 === 0 ? '#9C8E79' : '#C5B9A5'}
-                  strokeWidth={i % 6 === 0 ? '1.5' : '1'}
+                  stroke={isMajor ? '#A0804D' : isMedium ? '#BFA981' : '#D6C8B2'}
+                  strokeWidth={isMajor ? '2' : isMedium ? '1.2' : '0.8'}
+                  strokeLinecap="round"
+                />
+              );
+            })}
+
+            {/* 4 Cardinal Brass Diamonds (N, E, S, W) */}
+            {[0, 90, 180, 270].map((deg) => {
+              const a = (deg * Math.PI) / 180;
+              const cx = 145 + 125 * Math.cos(a);
+              const cy = 145 + 125 * Math.sin(a);
+              return (
+                <polygon
+                  key={deg}
+                  points={`${cx},${cy - 2.5} ${cx + 2.5},${cy} ${cx},${cy + 2.5} ${cx - 2.5},${cy}`}
+                  fill="#B3935E"
+                  opacity="0.8"
                 />
               );
             })}
@@ -315,16 +397,16 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
               transform: `rotate(${rotationDeg}deg)`
             }}
           >
-            {/* Compass Orbit Circle */}
-            <div className="absolute inset-2 rounded-full border border-[#DCD2C1] shadow-xs" />
+            {/* Astrolabe Orbit Circle Track */}
+            <div className="absolute inset-2 rounded-full border border-[#DCD2C1] shadow-2xs" />
 
-            {/* 6 Galaxy Nodes - without emoji, with larger font consistent with chat */}
+            {/* 6 Planetary Domain Nodes */}
             {domains.map((dom, idx) => {
               const nodeAngleDeg = idx * stepAngle;
               const nodeAngleRad = (nodeAngleDeg * Math.PI) / 180;
-              const radius = 105; // distance from center (scaled for 300px disc)
-              const x = 150 + radius * Math.cos(nodeAngleRad);
-              const y = 150 + radius * Math.sin(nodeAngleRad);
+              const radius = 100; // distance from center
+              const x = 145 + radius * Math.cos(nodeAngleRad);
+              const y = 145 + radius * Math.sin(nodeAngleRad);
               const isCurrent = idx === activeDomainIndex;
 
               return (
@@ -332,7 +414,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                   key={dom.id}
                   onClick={(e) => {
                     e.stopPropagation();
-                    rotateToDomain(idx);
+                    rotateToDomain(idx, true);
                   }}
                   style={{
                     left: `${x}px`,
@@ -344,16 +426,16 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                       : '0 2px 6px rgba(0,0,0,0.06)',
                     backgroundColor: '#FFFFFF'
                   }}
-                  className={`absolute -translate-x-1/2 -translate-y-1/2 w-13 h-13 rounded-full flex flex-col items-center justify-center transition-all duration-500 z-20 border-2 cursor-pointer ${
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all duration-500 z-20 border-2 cursor-pointer ${
                     animStep >= 3 ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
                   } ${
                     isCurrent ? 'scale-115 ring-2 ring-amber-400/40' : 'hover:scale-105 opacity-85 hover:opacity-100'
                   }`}
                   title={`转动至${dom.name}领域`}
                 >
-                  {/* Clean text without emoji, prominently sized and counter-rotated */}
+                  {/* Clean domain name counter-rotated so it always stays right-side up */}
                   <span
-                    className="text-[15px] sm:text-[15.5px] font-bold leading-none tracking-wide text-center"
+                    className="text-[14px] sm:text-[14.5px] font-bold leading-none tracking-tight text-center"
                     style={{
                       transform: `rotate(${-rotationDeg}deg)`,
                       color: isCurrent ? dom.color : '#374151'
@@ -366,7 +448,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             })}
           </div>
 
-          {/* CENTRAL CORE (换为“兴趣” · Centered Interest Singularity) */}
+          {/* Golden Astrolabe Core (星盘亮黄焦点核心：与萌宠星盘一致的明亮金黄) */}
           <div className={`absolute z-20 flex flex-col items-center justify-center pointer-events-none transition-all duration-500 ${
             animStep >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
           }`}>
@@ -374,42 +456,40 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             {coreRipple > 0 && (
               <div
                 key={coreRipple}
-                className="absolute w-32 h-32 rounded-full border-2 border-white animate-ping opacity-60 pointer-events-none"
-                style={{ borderColor: currentDomain.color }}
+                className="absolute w-28 h-28 rounded-full border-2 border-amber-400 animate-ping opacity-60 pointer-events-none"
               />
             )}
 
-            {/* Glowing Singularity Core */}
+            {/* Glowing Celestial Bright Yellow Core */}
             <div
-              className="w-20 h-20 rounded-full flex flex-col items-center justify-center shadow-lg relative transition-all duration-500 border"
+              className="w-16 h-16 rounded-full flex flex-col items-center justify-center shadow-lg relative transition-all duration-500 border-2"
               style={{
-                backgroundColor: '#FFFFFF',
-                borderColor: currentDomain.color,
-                boxShadow: `0 4px 20px ${currentDomain.color}35, inset 0 0 10px ${currentDomain.color}15`
+                background: 'radial-gradient(circle at 35% 30%, #FFFBEB 0%, #FEF08A 35%, #FDE047 65%, #F59E0B 100%)',
+                borderColor: '#F59E0B',
+                boxShadow: '0 0 22px rgba(245, 158, 11, 0.55), 0 4px 12px rgba(217, 119, 6, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.9)'
               }}
             >
-              {/* Internal Pulsing Halo */}
+              {/* Internal Pulsing Bright Yellow Halo */}
               <div
-                className="absolute inset-1.5 rounded-full opacity-30 animate-pulse"
-                style={{ backgroundColor: currentDomain.color }}
+                className="absolute inset-1 rounded-full opacity-35 animate-pulse bg-amber-300"
               />
 
-              {/* Orbiting miniature light beads for already absorbed tags */}
+              {/* Orbiting miniature light beads for absorbed tags */}
               {selectedTags.length > 0 && (
-                <div className="absolute inset-0 w-full h-full animate-spin" style={{ animationDuration: '8s' }}>
+                <div className="absolute inset-0 w-full h-full animate-spin" style={{ animationDuration: '9s' }}>
                   {selectedTags.slice(0, 4).map((_, i) => {
                     const beadAngle = (i * (360 / Math.min(selectedTags.length, 4)) * Math.PI) / 180;
-                    const bx = 40 + 32 * Math.cos(beadAngle);
-                    const by = 40 + 32 * Math.sin(beadAngle);
+                    const bx = 32 + 25 * Math.cos(beadAngle);
+                    const by = 32 + 25 * Math.sin(beadAngle);
                     return (
                       <span
                         key={i}
-                        className="absolute w-2 h-2 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-xs"
+                        className="absolute w-1.5 h-1.5 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-xs"
                         style={{
                           left: `${bx}px`,
                           top: `${by}px`,
-                          backgroundColor: companionAccent,
-                          boxShadow: `0 0 6px ${companionAccent}`
+                          backgroundColor: '#B45309',
+                          boxShadow: '0 0 6px #F59E0B'
                         }}
                       />
                     );
@@ -417,37 +497,40 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                 </div>
               )}
 
-              {/* Center "兴趣" Label cleanly centered without any icon or emoji */}
-              <span className="text-[16px] font-bold tracking-wider text-stone-800 relative z-10 select-none">
-                兴趣
+              {/* Core Domain Indicator */}
+              <span className="text-[13px] font-black tracking-tight text-amber-950 relative z-10 select-none font-mono">
+                {currentDomain.name}
+              </span>
+              <span className="text-[8.5px] text-amber-900/80 font-bold font-mono -mt-0.5 relative z-10 select-none">
+                星盘焦点
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Selected Tags Preview & Action Button */}
-      <div className={`w-full px-2 pt-2 z-10 transition-all duration-500 ${
+      {/* Selected Tags Preview Chips & Bright Yellow Confirm Action Button */}
+      <div className={`w-full px-2 pt-1 z-10 transition-all duration-500 ${
         animStep >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
       }`}>
         {selectedTags.length > 0 && (
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-            <span className="text-[13px] text-stone-600 shrink-0 font-medium">已选:</span>
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <span className="text-xs text-stone-600 shrink-0 font-medium">已选:</span>
             {selectedTags.map((t) => (
               <span
                 key={t}
                 onClick={() => onToggleTag(t)}
-                className="inline-flex items-center gap-1.5 text-[14px] px-3 py-1 rounded-full bg-white border border-[#E2D8C6] text-amber-700 shrink-0 cursor-pointer hover:bg-[#F4ECE0] transition-colors shadow-xs font-medium"
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-white border border-[#E2D8C6] text-amber-800 shrink-0 cursor-pointer hover:bg-[#F4ECE0] transition-colors shadow-2xs font-medium"
                 title="点击移出"
               >
                 <span>{t}</span>
-                <span className="text-[13px] text-stone-400 hover:text-stone-700">×</span>
+                <span className="text-stone-400 hover:text-stone-700 ml-0.5">×</span>
               </span>
             ))}
           </div>
         )}
 
-        {/* Departure Warp Action Button */}
+        {/* Departure Warp Action Button in Bright Yellow */}
         <button
           onClick={() => {
             if (selectedTags.length > 0) {
@@ -457,15 +540,14 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             }
           }}
           style={{
-            backgroundColor: companionAccent || '#D97706',
-            color: '#FFFFFF',
-            boxShadow: `0 6px 20px rgba(180, 100, 20, 0.25)`
+            background: 'linear-gradient(135deg, #FCD34D 0%, #F59E0B 50%, #D97706 100%)',
+            boxShadow: '0 6px 20px rgba(245, 158, 11, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6)'
           }}
-          className="w-full mt-2.5 py-3.5 px-4 rounded-xl font-bold text-[16px] sm:text-[16.5px] flex items-center justify-center gap-2 transition-all duration-300 hover:brightness-105 active:scale-[0.98] cursor-pointer shadow-md"
+          className="w-full mt-2 py-3.5 px-4 rounded-xl font-black text-stone-950 text-[15.5px] sm:text-[16px] flex items-center justify-center gap-2 transition-all duration-300 hover:brightness-105 active:scale-[0.98] cursor-pointer shadow-md"
         >
-          <Sparkles size={17} />
-          <span>{selectedTags.length > 0 ? `兴趣罗盘已就绪 (${selectedTags.length})` : '兴趣罗盘已就绪'}</span>
-          <ArrowRight size={17} />
+          <Sparkles size={16} className="text-stone-950" />
+          <span>{selectedTags.length > 0 ? `兴趣星盘已就绪 (${selectedTags.length})` : '兴趣星盘已就绪'}</span>
+          <ArrowRight size={16} className="text-stone-950" />
         </button>
       </div>
     </div>

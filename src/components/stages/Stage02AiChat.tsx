@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowRight, Sparkles, Send, Volume2, CheckCircle2, ChevronRight, BookOpen, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles, Send, Volume2, CheckCircle2, ChevronRight, BookOpen, RotateCcw, Compass } from 'lucide-react';
 import { Companion } from '../../types';
+import { CONTENT_DOMAINS } from '../../data';
 import { GalaxyCompassPicker } from '../GalaxyCompassPicker';
 
 export type CefrLevelKey = 'A1-' | 'A2' | 'B1' | 'B2+';
@@ -161,6 +162,106 @@ interface ChatMessage {
   summaryCard?: FullSummaryCardData;
 }
 
+// 智能意图映射算法：严格限定在系统现有的 81 个官方内容标签内（零新增标签）
+const matchIntentionTo81Tags = (query: string) => {
+  const q = query.trim().toLowerCase();
+  if (!q) return null;
+
+  // 1. 直接精确或包含匹配 81 个标签原名
+  for (let dIdx = 0; dIdx < CONTENT_DOMAINS.length; dIdx++) {
+    const dom = CONTENT_DOMAINS[dIdx];
+    const matched = dom.tags.filter((t) => q.includes(t.toLowerCase()) || t.toLowerCase().includes(q));
+    if (matched.length > 0) {
+      return {
+        domainIndex: dIdx,
+        domainName: dom.name,
+        matchedTags: matched.slice(0, 3)
+      };
+    }
+  }
+
+  // 2. 深度热门语义与书名/作者封闭映射（所有结果 100% 对应现有 81 标签）
+  // 特斯拉与新能源创新（优先对应 科学 领域的前沿科技）
+  if (q.includes('特斯拉') || q.includes('tesla') || q.includes('马斯克') || q.includes('新能源') || q.includes('电动车')) {
+    return {
+      domainIndex: 1, // 科学
+      domainName: '科学',
+      matchedTags: ['前沿科技']
+    };
+  }
+  // 人工智能与前沿科技 (科学)
+  if (q.includes('ai') || q.includes('人工智能') || q.includes('智能') || q.includes('大模型') || q.includes('算力') || q.includes('chatgpt') || q.includes('算法')) {
+    return {
+      domainIndex: 1, // 科学
+      domainName: '科学',
+      matchedTags: ['人工智能', '前沿科技']
+    };
+  }
+  // 中国文化与名家（如曾仕强、南怀瑾、道德经、易经等）
+  if (q.includes('中国文化') || q.includes('文化') || q.includes('曾仕强') || q.includes('南怀瑾') || q.includes('易经') || q.includes('道德经') || q.includes('国学') || q.includes('老子') || q.includes('孔子') || q.includes('哲学')) {
+    return {
+      domainIndex: 2, // 文化
+      domainName: '文化',
+      matchedTags: ['中国文化', '历史故事']
+    };
+  }
+  // 宇宙深空与天文航天
+  if (q.includes('宇宙') || q.includes('太空') || q.includes('星际') || q.includes('黑洞') || q.includes('航天') || q.includes('天文')) {
+    return {
+      domainIndex: 1, // 科学
+      domainName: '科学',
+      matchedTags: ['宇宙太空', '自然地理']
+    };
+  }
+  // 科幻故事与经典名著（如三体、刘慈欣等）
+  if (q.includes('三体') || q.includes('刘慈欣') || q.includes('科幻') || q.includes('流浪地球') || q.includes('名著') || q.includes('小说')) {
+    return {
+      domainIndex: 5, // 故事
+      domainName: '故事',
+      matchedTags: ['科幻故事', '经典名著']
+    };
+  }
+  // 商业、管理与投资（如乔布斯、巴菲特、创业等）
+  if (q.includes('商业') || q.includes('创业') || q.includes('投资') || q.includes('理财') || q.includes('乔布斯') || q.includes('巴菲特') || q.includes('管理') || q.includes('职场')) {
+    return {
+      domainIndex: 3, // 商业
+      domainName: '商业',
+      matchedTags: ['商业故事', '创业故事', '职场生存']
+    };
+  }
+  // 心理、沟通与自我成长
+  if (q.includes('心理') || q.includes('习惯') || q.includes('沟通') || q.includes('自控') || q.includes('焦虑') || q.includes('情绪') || q.includes('情商') || q.includes('人际') || q.includes('成长')) {
+    return {
+      domainIndex: 4, // 成长
+      domainName: '成长',
+      matchedTags: ['习惯养成', '沟通表达', '心理探索']
+    };
+  }
+  // 自然、动物与生态
+  if (q.includes('自然') || q.includes('动物') || q.includes('植物') || q.includes('海洋') || q.includes('生物') || q.includes('地理') || q.includes('环境')) {
+    return {
+      domainIndex: 1, // 科学
+      domainName: '科学',
+      matchedTags: ['动物世界', '自然地理', '科普冷知识']
+    };
+  }
+  // 国际局势与社会热点
+  if (q.includes('热点') || q.includes('国际') || q.includes('全球') || q.includes('社会') || q.includes('新闻') || q.includes('世界')) {
+    return {
+      domainIndex: 0, // 世界
+      domainName: '世界',
+      matchedTags: ['全球热点', '国际局势', '社会观察']
+    };
+  }
+
+  // 默认：归纳为科学领域的前两个官方合法标签
+  return {
+    domainIndex: 1,
+    domainName: '科学',
+    matchedTags: ['前沿科技', '科普冷知识']
+  };
+};
+
 export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   companion,
   onBack,
@@ -179,6 +280,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   // 7: Reading evaluation complete, final level locked, ready for Stage 8
   const [step, setStep] = useState<number>(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [astrolabeTargetDomain, setAstrolabeTargetDomain] = useState<number | null>(null);
   const [currentLevel, setCurrentLevel] = useState<CefrLevelKey>('A2'); // Initial difficulty is A2
   const [isAiTyping, setIsAiTyping] = useState<boolean>(true);
   const [typedText, setTypedText] = useState<string>('');
@@ -284,7 +386,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
 
   // Turn 1: AI companion types out initial greeting
   useEffect(() => {
-    const q1 = `嗨！我是${companion.name}。初次见面，你平时最对什么领域的知识或故事感兴趣呢？`;
+    const q1 = `嗨！我是${companion.name}。初次见面，你最近想读点什么呢？`;
     runTypewriter(q1, 'm1', 260, 36, () => {
       setStep(1); // Reveal 360° compass
     });
@@ -388,7 +490,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       {
         id: `u-tags-${Date.now()}`,
         sender: 'user',
-        text: `兴趣罗盘已就绪 · ${confirmedTags.join(' · ')}`
+        text: `兴趣星盘已就绪 · ${confirmedTags.join(' · ')}`
       }
     ]);
 
@@ -457,6 +559,29 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       setSentenceFeedbacks({});
       presentSentenceWithRhythm(0, initialLevel, transitionMsg, 'm-read-intro', 3);
     }
+  };
+
+  // Return from Habit Exploration Q1 back to Step 1 (Galaxy Astrolabe) to reselect interests
+  const handleReturnToCompass = () => {
+    if (isBusy) return;
+
+    // Terminate any ongoing typing or delay timers
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    setIsAiTyping(false);
+    setTypedText('');
+    setIsBusy(false);
+
+    // Roll back chat messages to before user tags confirmation
+    setMessages((prev) => {
+      const idx = prev.findIndex((m) => m.id.startsWith('u-tags-'));
+      return idx !== -1 ? prev.slice(0, idx) : prev;
+    });
+
+    setSurveyAnswers({});
+    setAstrolabeTargetDomain(null);
+    setStep(1);
   };
 
   // Return to previous survey question (allows user to reselect if picked wrong)
@@ -633,9 +758,33 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     setInputText('');
 
     if (step === 1) {
-      // User typed interest keyword
-      const customTag = trimmed.slice(0, 10);
-      handleConfirmTags([customTag, '前沿科技']);
+      // User typed interest topic/book/keyword in the bottom chat input box
+      const match = matchIntentionTo81Tags(trimmed);
+      if (match) {
+        // 1. Add user message
+        setMessages((prev) => [
+          ...prev,
+          { id: `u-${Date.now()}`, sender: 'user', text: trimmed }
+        ]);
+
+        // 2. Select matched official tags (strictly from the 81 tags, max 10)
+        setSelectedTags((prev) => {
+          const next = [...prev];
+          match.matchedTags.forEach((t) => {
+            if (!next.includes(t) && next.length < 10) {
+              next.push(t);
+            }
+          });
+          return next;
+        });
+
+        // 3. Smoothly rotate the astrolabe to the matched domain
+        setAstrolabeTargetDomain(match.domainIndex);
+
+        // 4. Companion friendly acknowledgment
+        const replyMsg = `收到！已为你锁定【${match.domainName}】领域的【${match.matchedTags.join('、')}】～ 星盘已自动调准，可以直接点击下方就绪，也可以继续挑选其他标签哦！`;
+        runTypewriter(replyMsg, `ai-match-${Date.now()}`, 100, 24);
+      }
     } else if (step >= 11 && step <= 14) {
       handleAnswerSurvey(step, trimmed);
     } else if (step === 3) {
@@ -866,13 +1015,17 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         )}
 
         {/* STEP 1: 360° Galaxy Compass for Picking Interests */}
-        {step === 1 && !isAiTyping && !isBusy && (
+        {step === 1 && (
           <div className="w-full pt-0.5 animate-in fade-in slide-in-from-bottom-2 duration-400">
             <GalaxyCompassPicker
               selectedTags={selectedTags}
               onToggleTag={handleToggleTag}
               onConfirm={handleConfirmTags}
               companionAccent={companion.accentColor}
+              targetDomainIndex={astrolabeTargetDomain}
+              onDomainChange={() => {
+                setAstrolabeTargetDomain(null);
+              }}
             />
           </div>
         )}
@@ -885,6 +1038,19 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                 <Sparkles size={13} />
                 第 {step - 10}/4 题
               </span>
+
+              {/* In Q1 (step === 11), provide direct button to return to interest selection / astrolabe */}
+              {step === 11 && (
+                <button
+                  type="button"
+                  onClick={handleReturnToCompass}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-amber-800 hover:text-amber-950 bg-[#FFFFFF] hover:bg-amber-50/90 border border-amber-300 hover:border-amber-400 transition-all cursor-pointer active:scale-95 shadow-2xs group"
+                  title="返回星盘重新选择兴趣"
+                >
+                  <Compass size={12} className="text-amber-600 group-hover:rotate-45 transition-transform" />
+                  <span>返回重选星盘</span>
+                </button>
+              )}
 
               {/* Lightweight "上一题" Action in Top-Right of Options (displayed for Q2, Q3, Q4; Q1 is the initial survey question) */}
               {step > 11 && (
@@ -1304,7 +1470,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                 isAiTyping || isBusy
                   ? '伴读互动中...'
                   : step === 1
-                  ? '或直接输入你感兴趣的主题...'
+                  ? '特斯拉、人工智能、中国文化'
                   : step === 11
                   ? '输入你的目标，或点击上方选项...'
                   : step === 12

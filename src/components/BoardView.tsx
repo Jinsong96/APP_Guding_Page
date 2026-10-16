@@ -31,7 +31,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
     { num: 1, label: '01', title: '选择旅伴', desc: '选一只合拍的萌宠搭子，陪你轻松读英语吧' },
     { num: 2, label: '02', title: '对话定级', desc: '星盘吸纳兴趣 + 4句自适应微定级 + 底部对话框' },
     { num: 8, label: '03', title: '定制画像', desc: '智能匹配计算，动态切换为建议起点与阅读画像' },
-    { num: 10, label: '04', title: '阅读首页', desc: '今日精选、专属推荐书架与三大导航' },
+    { num: 10, label: '04', title: '阅读首页', desc: '今日精选、专属推荐书架与三大导航' }
   ];
 
   return (

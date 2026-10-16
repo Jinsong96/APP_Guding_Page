@@ -136,8 +136,8 @@ export const COMPANIONS: Companion[] = [
     avatarUrl: '/assets/light_v2.png',
     celebrateActionName: '喜悦欢呼跃动',
     celebrateQuote: '“太棒啦！小鹿准备好啦，我们开读吧！🐾”',
-    accentColor: '#A855F7',
-    bgGlow: 'rgba(168, 85, 247, 0.15)',
+    accentColor: '#F59E0B',
+    bgGlow: 'rgba(245, 158, 11, 0.25)',
     description: '温和细腻的节奏大师，总能帮你找到恰到好处的阅读速度。'
   },
   {
@@ -149,8 +149,8 @@ export const COMPANIONS: Companion[] = [
     avatarUrl: '/assets/pal.png',
     celebrateActionName: '机智跃动致意',
     celebrateQuote: '“完美定级！走，看我带你拆解长难句～🦊”',
-    accentColor: '#F59E0B',
-    bgGlow: 'rgba(245, 158, 11, 0.15)',
+    accentColor: '#EA580C',
+    bgGlow: 'rgba(234, 88, 12, 0.2)',
     description: '对复杂从句有本能的幽默感，会在关键处给你机智提示。'
   },
   {

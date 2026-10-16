@@ -1,6 +1,6 @@
 {
-  "summary": "旅伴（小鹿/帕利/灯芯/努波）定级庆祝动作与动效升级方案已完成：\n1. 原生造型基础上为所有旅伴定制了庆祝姿势（欢呼举蹄跳跃、高举书本致意、脱帽礼赞转圈、双臂冲天欢呼），保留专属蠢萌特质；\n2. 定级达成瞬间实现姿态切换、欢欣弹跳动效与软萌对白气泡；\n3. 保留舒缓呼吸底光与柔和星芒，实现惊喜感与舒适度的完美平衡。",
-  "updatedAt": "2026-10-15T06:23:36.269659824Z",
+  "summary": "Revised implementation plan replacing input bar examples and chips with trending hot topics like 人工智能, 特斯拉, etc., strictly mapped to the 81 official content tags.",
+  "updatedAt": "2026-10-16T04:52:46.440617148Z",
   "requestFeedback": true,
   "userFacing": true
 }
