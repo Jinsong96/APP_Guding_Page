@@ -73,11 +73,29 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
               </div>
             </div>
 
-            <h1 className="text-2xl font-bold tracking-tight text-stone-900 mt-3 mb-1">
+            {/* Companion Context-Aware Guidance Bubble */}
+            <div className="w-full my-3 p-3 rounded-2xl bg-white border border-[#E8DFC8] shadow-xs flex items-center gap-2.5 text-xs animate-in fade-in duration-300">
+              <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 text-sm">
+                {preferences.profile.goalTrack?.category === 'exam' ? '🎯' :
+                 preferences.profile.goalTrack?.category === 'workplace' ? '💼' :
+                 preferences.profile.goalTrack?.category === 'original' ? '🌟' : '🌱'}
+              </div>
+              <p className="text-stone-700 leading-snug">
+                {preferences.profile.goalTrack?.category === 'exam'
+                  ? `针对【${preferences.profile.goalTrack?.targetFocus || '备考冲刺'}】，今天特别推荐一篇长难句典型篇章，一起攻坚突破！`
+                  : preferences.profile.goalTrack?.category === 'workplace'
+                  ? `契合【${preferences.profile.goalTrack?.targetFocus || '实战应用'}】，今天为你挑选了高频商务实景短文，积累地道表达～`
+                  : preferences.profile.goalTrack?.category === 'original'
+                  ? `针对【${preferences.profile.goalTrack?.targetFocus || '原版探索'}】，为你准备了原汁原味的深度外媒纪实短篇！`
+                  : `今天我们轻松读一段有趣好懂的故事，微步积累纯粹语感～`}
+              </p>
+            </div>
+
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-900 mt-2 mb-1">
               今天，想读点什么？
             </h1>
-            <p className="text-xs text-stone-500 mb-4">
-              根据你的 {preferences.profile?.startingLevel || 'L4'} 起点，为你精编的趣味沉浸读物。
+            <p className="text-xs text-stone-500 mb-3.5">
+              根据你的 {preferences.profile?.startingLevel || 'L4'} 起点与 {preferences.profile?.goalTrack?.targetFocus || '个性化'} 目标定制。
             </p>
 
             {/* Featured Hero Story Card */}
@@ -118,6 +136,13 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                   <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-medium">
                     {mainStory.mood}
                   </span>
+                  {preferences.profile.goalTrack?.targetFocus && (
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-300 font-medium flex items-center gap-1">
+                      <span>{preferences.profile.goalTrack.category === 'exam' ? '🎯 考点精选' :
+                             preferences.profile.goalTrack.category === 'workplace' ? '💼 职场实战' :
+                             preferences.profile.goalTrack.category === 'original' ? '🌟 原版前瞻' : '🌱 轻松拾光'}</span>
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-base font-bold text-stone-900 group-hover:text-amber-700 transition-colors">
                   {mainStory.title}
@@ -300,6 +325,29 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                 <span className="text-stone-500">已点亮主题大陆</span>
                 <span className="text-amber-700 font-semibold">科学大陆第 1 段海岸线</span>
               </div>
+
+              {preferences.profile.goalTrack?.targetFocus && (
+                <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-300/80 flex items-center justify-between shadow-xs">
+                  <span className="text-amber-900 font-medium flex items-center gap-1.5">
+                    <span>{preferences.profile.goalTrack.category === 'exam' ? '🎯' :
+                           preferences.profile.goalTrack.category === 'workplace' ? '💼' :
+                           preferences.profile.goalTrack.category === 'original' ? '🌟' : '🌱'}</span>
+                    <span>细分目标专项</span>
+                  </span>
+                  <span className="font-bold text-amber-900 truncate max-w-[170px]">
+                    {preferences.profile.goalTrack.targetFocus}
+                  </span>
+                </div>
+              )}
+
+              {preferences.profile.goalTrack?.targetHurdle && (
+                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] flex items-center justify-between shadow-xs">
+                  <span className="text-stone-500">重点突破卡点</span>
+                  <span className="text-stone-800 font-medium truncate max-w-[170px]">
+                    {preferences.profile.goalTrack.targetHurdle}
+                  </span>
+                </div>
+              )}
 
               {preferences.profile.goal && (
                 <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] flex items-center justify-between shadow-xs">

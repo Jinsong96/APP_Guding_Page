@@ -230,8 +230,12 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
                 >
                   <Check size={12} />
                 </span>
-                <p className="text-xs">
-                  <strong className="text-stone-900 font-medium">已生成专属阅读画像与路线</strong>
+                <p className="text-xs truncate">
+                  <strong className="text-stone-900 font-medium">
+                    {preferences?.profile?.goalTrack?.targetFocus
+                      ? `已锁定【${preferences.profile.goalTrack.targetFocus}】专项画像`
+                      : '已生成专属阅读画像与路线'}
+                  </strong>
                 </p>
               </div>
             </div>
@@ -240,49 +244,97 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
           /* Phase 2: Calibrated Stage 09 Content */
           <div className="w-full max-w-xs flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
             {/* Centered Starting Level Anchor Badge with Dynamic Pop Animation */}
-            <div className="relative mb-3.5 flex flex-col items-center justify-center animate-in zoom-in-75 fade-in duration-700 ease-out">
+            <div className="relative mb-2.5 flex flex-col items-center justify-center animate-in zoom-in-75 fade-in duration-700 ease-out">
               {/* Dynamic light pulse glow */}
               <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-md animate-pulse opacity-40 pointer-events-none" />
 
               {/* Centered Pill Badge - perfectly balanced vertically and horizontally */}
-              <div className="relative inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-2 border-emerald-500 shadow-md shadow-emerald-700/10 transition-transform duration-300 hover:scale-102">
+              <div className="relative inline-flex items-center justify-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-2 border-emerald-500 shadow-md shadow-emerald-700/10 transition-transform duration-300 hover:scale-102">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                <span className="text-[14px] sm:text-[14.5px] font-bold text-stone-800 tracking-wider">
+                <span className="text-[13.5px] font-bold text-stone-800 tracking-wider">
                   建议阅读起点
                 </span>
-                <strong className="text-2xl sm:text-2xl font-black font-mono text-emerald-700 leading-none tracking-tight">
+                <strong className="text-2xl font-black font-mono text-emerald-700 leading-none tracking-tight">
                   {resolvedStartingLevel}
                 </strong>
               </div>
             </div>
 
             {/* Headline */}
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-900 mb-4">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-stone-900 mb-2.5">
               从这里开始，刚刚好
             </h1>
 
-            {/* Two Core Pillars Cards */}
-            <div className="w-full grid grid-cols-2 gap-2.5 text-left mb-4">
-              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-sm flex flex-col justify-between">
-                <div>
-                  <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
-                    <Sparkles size={14} />
+            {/* Goal Track Personalized Badge */}
+            {preferences?.profile?.goalTrack?.targetFocus && (
+              <div className="w-full mb-3 p-2.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-[#FFFDF8] to-emerald-50/90 border border-amber-300/80 shadow-xs flex items-center justify-between text-left">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-7 h-7 rounded-xl bg-amber-500/15 text-amber-700 flex items-center justify-center shrink-0 text-sm">
+                    {preferences.profile.goalTrack.category === 'exam' ? '🎯' :
+                     preferences.profile.goalTrack.category === 'workplace' ? '💼' :
+                     preferences.profile.goalTrack.category === 'original' ? '🌟' : '🌱'}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[12px] font-bold text-stone-900 truncate">
+                        {preferences.profile.goalTrack.targetFocus}
+                      </span>
+                      <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 font-medium">
+                        专属靶向
+                      </span>
+                    </div>
+                    {preferences.profile.goalTrack.targetHurdle && (
+                      <div className="text-[11px] text-stone-500 truncate mt-0.5">
+                        突破卡点：{preferences.profile.goalTrack.targetHurdle}
+                      </div>
+                    )}
                   </div>
-                  <h3 className="text-xs font-bold text-stone-900 mb-1">难度更适合</h3>
-                  <p className="text-[11px] text-stone-500 leading-relaxed">
-                    绕过过易与过繁冗长语篇，聚焦核心高频长句。
+                </div>
+              </div>
+            )}
+
+            {/* Two Core Pillars Cards */}
+            <div className="w-full grid grid-cols-2 gap-2 text-left mb-3.5">
+              <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-xs flex flex-col justify-between">
+                <div>
+                  <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1.5 text-xs">
+                    <Sparkles size={13} />
+                  </div>
+                  <h3 className="text-xs font-bold text-stone-900 mb-0.5">
+                    {preferences?.profile?.goalTrack?.category === 'exam'
+                      ? '真题级语篇'
+                      : preferences?.profile?.goalTrack?.category === 'workplace'
+                      ? '实战语感积累'
+                      : '难度更适合'}
+                  </h3>
+                  <p className="text-[10.5px] text-stone-500 leading-snug">
+                    {preferences?.profile?.goalTrack?.category === 'exam'
+                      ? '精准攻坚长难句，阅读做题更自信'
+                      : preferences?.profile?.goalTrack?.category === 'workplace'
+                      ? '储备高频地道表达与敏捷速读'
+                      : '聚焦核心高频长句，零挫败感'}
                   </p>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-sm flex flex-col justify-between">
+              <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-xs flex flex-col justify-between">
                 <div>
-                  <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
-                    <Compass size={14} />
+                  <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-1.5 text-xs">
+                    <Compass size={13} />
                   </div>
-                  <h3 className="text-xs font-bold text-stone-900 mb-1">随阅读调整</h3>
-                  <p className="text-[11px] text-stone-500 leading-relaxed">
-                    越读越懂你的节奏，随时一键自适应换档。
+                  <h3 className="text-xs font-bold text-stone-900 mb-0.5">
+                    {preferences?.profile?.goalTrack?.category === 'exam'
+                      ? '攻克薄弱卡点'
+                      : preferences?.profile?.goalTrack?.category === 'workplace'
+                      ? '专业场景转化'
+                      : '随阅读调整'}
+                  </h3>
+                  <p className="text-[10.5px] text-stone-500 leading-snug">
+                    {preferences?.profile?.goalTrack?.category === 'exam'
+                      ? `针对${preferences?.profile?.goalTrack?.targetHurdle || '考点'}伴读实时点拨`
+                      : preferences?.profile?.goalTrack?.category === 'workplace'
+                      ? '外刊与跨境场景即读即用'
+                      : '越读越懂你节奏，随时自适应'}
                   </p>
                 </div>
               </div>

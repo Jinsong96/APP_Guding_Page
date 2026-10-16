@@ -137,7 +137,8 @@ export default function App() {
                         challenge: surveyData?.challenge || prev.profile.challenge,
                         durationPreference: surveyData?.duration || prev.profile.durationPreference,
                         companionStyle: surveyData?.companionStyle || prev.profile.companionStyle,
-                        sessionDuration: surveyData?.duration?.includes('5') ? 5 : prev.profile.sessionDuration
+                        sessionDuration: surveyData?.duration?.includes('5') ? 5 : prev.profile.sessionDuration,
+                        goalTrack: surveyData?.goalTrack || prev.profile.goalTrack
                       }
                     }));
                     // Complete dialogue rating and jump directly to Stage 8

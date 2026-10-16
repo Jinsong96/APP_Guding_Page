@@ -65,6 +65,13 @@ export interface Story {
   };
 }
 
+export interface GoalTrackDetails {
+  category: 'exam' | 'workplace' | 'original' | 'interest';
+  categoryLabel: string;
+  targetFocus: string;
+  targetHurdle: string;
+}
+
 export interface UserPreferences {
   companionId: CompanionId;
   interestTheme: string;
@@ -85,7 +92,9 @@ export interface UserPreferences {
     challenge?: string;
     durationPreference?: string;
     companionStyle?: string;
+    goalTrack?: GoalTrackDetails;
   };
   bookmarkedWords: string[];
   streakDays: number;
 }
+

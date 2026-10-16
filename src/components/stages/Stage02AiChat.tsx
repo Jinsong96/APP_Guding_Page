@@ -1,55 +1,142 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, ArrowRight, Sparkles, Send, Volume2, CheckCircle2, ChevronRight, BookOpen, RotateCcw, Compass } from 'lucide-react';
-import { Companion } from '../../types';
+import { Companion, GoalTrackDetails } from '../../types';
 import { CONTENT_DOMAINS } from '../../data';
 import { GalaxyCompassPicker } from '../GalaxyCompassPicker';
 
 export type CefrLevelKey = 'A1-' | 'A2' | 'B1' | 'B2+';
+
+export type GoalCategory = 'exam' | 'workplace' | 'original' | 'interest';
 
 export interface SurveyAnswers {
   goal?: string;
   challenge?: string;
   duration?: string;
   companionStyle?: string;
+  goalTrack?: GoalTrackDetails;
+}
+
+export interface SurveyOptionItem {
+  label: string;
+  desc: string;
+  icon: string;
+  category?: GoalCategory;
 }
 
 export interface SurveyQuestionDef {
-  step: number; // 11, 12, 13, 14
-  number: number; // 1, 2, 3, 4
+  step: number; // 11: Q1, 12: Q2 (focus), 15: Q3 (hurdle), 13: Q4 (duration), 14: Q5 (style)
+  number: number;
+  total: number;
+  stageName: string;
   title: string;
-  options: {
-    label: string;
-    desc: string;
-    icon: string;
-  }[];
+  options: SurveyOptionItem[];
 }
 
-export const getSurveyQuestions = (companionName: string): SurveyQuestionDef[] => [
+export const getSurveyQuestions = (companionName: string, goalCat: GoalCategory = 'exam'): SurveyQuestionDef[] => [
   {
     step: 11,
     number: 1,
+    total: 5,
+    stageName: '核心目标',
     title: '平时你读英语，最想达成什么目标呢？',
     options: [
-      { label: '拓展视野看原版', desc: '看懂英文原版资讯、前沿科技与外媒故事', icon: '🌟' },
-      { label: '职场与专业应用', desc: '提升工作商务沟通、邮件撰写与文献阅读', icon: '💼' },
-      { label: '升学与备考冲刺', desc: '四六级、雅思、托福或考研考证高效提分', icon: '🎯' },
-      { label: '兴趣充能重拾语感', desc: '零压力轻松读，找回学英语的纯粹乐趣', icon: '🌱' }
+      { label: '升学与备考冲刺', desc: '中考高考、四六级、考研、雅思托福或 KET/PET 考级', icon: '🎯', category: 'exam' },
+      { label: '职场与专业应用', desc: '跨境电商、外刊精读、跨国协作与海外客户谈判', icon: '💼', category: 'workplace' },
+      { label: '拓展视野看原版', desc: '看懂前沿科技、外媒时事评析与原版社科人文', icon: '🌟', category: 'original' },
+      { label: '兴趣充能重拾语感', desc: '零压力轻松读，告别死记硬背，重拾英语好感', icon: '🌱', category: 'interest' }
     ]
   },
   {
     step: 12,
     number: 2,
-    title: '遇到全英文或长难句时，你通常觉得最大的阻碍是？',
-    options: [
-      { label: '生词较多断节奏', desc: '频繁查词打断阅读连贯感与心流体验', icon: '🧩' },
-      { label: '读得较慢容易累', desc: '信息密度大，句子需要反复回读多次才懂', icon: '⏳' },
-      { label: '复杂句式理不清', desc: '从句套从句，容易抓不住核心主干逻辑', icon: '🧭' },
-      { label: '感觉顺畅想进阶', desc: '大体能看懂，希望能掌握更多地道纯正表达', icon: '☕' }
-    ]
+    total: 5,
+    stageName: '重点场景',
+    title:
+      goalCat === 'exam'
+        ? '针对备考冲刺，你当前重点攻坚哪项考试呢？'
+        : goalCat === 'workplace'
+        ? '针对职场实战，你目前最关心的核心应用场景是？'
+        : goalCat === 'original'
+        ? '看原版拓视野，你平时更想看哪一类英文内容？'
+        : '轻松读找回好感，你更期待哪种阅读体验？',
+    options:
+      goalCat === 'exam'
+        ? [
+            { label: '中考与初中培优', desc: '夯实语法基础，中考完形与阅读冲刺满分', icon: '🎒' },
+            { label: '高考与高中拔高', desc: '攻克长难句与七选五，高效提升阅读速度与语感', icon: '🏫' },
+            { label: '大学英语四六级', desc: 'CET-4 / CET-6 核心词汇突击与真题技巧', icon: '🎓' },
+            { label: '考研英语一/二', desc: '真题阅读长难句精析，精准拆解命题逻辑', icon: '📚' },
+            { label: '雅思 / 托福留学', desc: 'IELTS / TOEFL 学术长篇快速泛读与逻辑论证', icon: '✈️' },
+            { label: 'KET / PET 剑桥五级', desc: 'MSE 剑桥通用英语等级冲刺，原版英语能力奠基', icon: '🏅' }
+          ]
+        : goalCat === 'workplace'
+        ? [
+            { label: '跨境与境外电商实务', desc: 'Listing 优质文案、海外社媒投放与买家精准沟通', icon: '🛍️' },
+            { label: '外刊精读提升', desc: '经济学人、金融时报 FT、纽约时报等深度原刊时评', icon: '📰' },
+            { label: '外企跨国协作与沟通', desc: '地道跨文化表达、全英文会议汇报与日常业务协同', icon: '🤝' },
+            { label: '海外客户与商务谈判', desc: '专业商务条款磋商、询盘答复与海外项目推进', icon: '💼' }
+          ]
+        : goalCat === 'original'
+        ? [
+            { label: '前沿科技与 AI 资讯', desc: '一手海外科技速递、AI 发展动态与前瞻科技长文', icon: '🤖' },
+            { label: '国际时评与外媒纪实', desc: '全球要闻第一手视角、文化观察与深度特稿纪实', icon: '🌍' },
+            { label: '商业传记与领袖故事', desc: '大师传记、商业巨头创业史与行业领袖深度思想', icon: '💡' },
+            { label: '社科人文与经典著作', desc: '哲学心理、历史原著与经典英文随笔散文', icon: '📖' }
+          ]
+        : [
+            { label: '探索趣味冷知识与奇闻', desc: '新奇百科、动物世界与不可思议的自然地理', icon: '🔍' },
+            { label: '告别死记硬背无痛输入', desc: '从故事短句中自然吸纳词汇，不查词也能懂大意', icon: '🍃' },
+            { label: '零压力碎片微习惯打卡', desc: '每天几分钟不累不卷，循序渐进重建英语信心', icon: '☕' },
+            { label: '影视动漫与流行文化', desc: '流行文化梗、剧集电影地道台词与艺术灵感', icon: '🎬' }
+          ]
+  },
+  {
+    step: 15,
+    number: 3,
+    total: 5,
+    stageName: '攻坚瓶颈',
+    title:
+      goalCat === 'exam'
+        ? '备考阅读中，你觉得目前最需要突破的薄弱卡点是？'
+        : goalCat === 'workplace'
+        ? '日常英文实操中，你通常觉得最大的进阶瓶颈是？'
+        : goalCat === 'original'
+        ? '阅读全英文原版时，你觉得最大的阻力通常是？'
+        : '培养英语阅读习惯，你此前最容易遇到的困扰是？',
+    options:
+      goalCat === 'exam'
+        ? [
+            { label: '长难句主干理不清', desc: '从句套从句，容易抓不住句子核心骨架', icon: '🧭' },
+            { label: '做题与阅读速度慢', desc: '长篇阅读耗时太长，往往来不及答完全部题目', icon: '⏳' },
+            { label: '真题高频核心词短板', desc: '生词卡壳频次多，反复查词严重打断节奏', icon: '🧩' },
+            { label: '选项逻辑易被陷阱误导', desc: '看似看懂文章，但做选择题时容易选偏', icon: '🎯' }
+          ]
+        : goalCat === 'workplace'
+        ? [
+            { label: '缺乏地道生动的实操表达', desc: '容易掉入中式生硬翻译，用词不够地道精炼', icon: '💬' },
+            { label: '长篇外刊专业术语吃力', desc: '信息密度高，遇到陌生行业专业术语需要反复咀嚼', icon: '📚' },
+            { label: '快速扫读提炼事实较慢', desc: '无法迅速从大篇幅英文中抓取核心关键数据', icon: '⚡' },
+            { label: '难以自如应对海外实战场景', desc: '阅读勉强看懂，但临场难以自然转化与输出', icon: '🌐' }
+          ]
+        : goalCat === 'original'
+        ? [
+            { label: '生词较多打断节奏', desc: '频繁查词打断阅读连贯感与心流沉浸', icon: '🧩' },
+            { label: '复杂句式结构理不清', desc: '主从复合句层次多，容易迷失修饰关系', icon: '🧭' },
+            { label: '文化背景与俚语不熟悉', desc: '字面看懂了，但不太了解西方社会历史与双关梗', icon: '🌏' },
+            { label: '读得较慢容易疲劳', desc: '专注力容易耗散，长篇读完略显吃力', icon: '⏳' }
+          ]
+        : [
+            { label: '容易三天打鱼难以坚持', desc: '缺乏即时正向反馈，几天不读就容易搁置', icon: '⏳' },
+            { label: '怕生词长句劝退挫败', desc: '一遇到硬核长篇就容易产生畏难心理', icon: '🍃' },
+            { label: '缺少及时正向成就感', desc: '读完不知道自己进步在哪里，缺乏里程碑激励', icon: '🎉' },
+            { label: '找不到合拍有趣的好读物', desc: '网上的素材要么过难要么枯燥，提不起兴趣', icon: '🔍' }
+          ]
   },
   {
     step: 13,
-    number: 3,
+    number: 4,
+    total: 5,
+    stageName: '专注节奏',
     title: '每天如果留一段专注阅读时间，你更习惯哪种时长节奏？',
     options: [
       { label: '5-8 分钟', desc: '碎片化微阅读，随时随地零负担打卡', icon: '⚡' },
@@ -59,7 +146,9 @@ export const getSurveyQuestions = (companionName: string): SurveyQuestionDef[] =
   },
   {
     step: 14,
-    number: 4,
+    number: 5,
+    total: 5,
+    stageName: '伴读风格',
     title: `在接下来的阅读过程中，你希望${companionName}怎样陪伴你？`,
     options: [
       { label: '智能点拨', desc: '遇到难词长句，主动支招点拨与语法拆解', icon: '💡' },
@@ -266,7 +355,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   companion,
   onBack,
   onComplete,
-  onSkip
+  onSkip: _onSkip
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   // Flow steps:
@@ -289,6 +378,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const [playingSentenceIdx, setPlayingSentenceIdx] = useState<number | null>(null);
   const [isBusy, setIsBusy] = useState<boolean>(false);
   const [surveyAnswers, setSurveyAnswers] = useState<SurveyAnswers>({});
+  const [goalCategory, setGoalCategory] = useState<GoalCategory>('exam');
   const [sentenceLevelHistory, setSentenceLevelHistory] = useState<Record<number, CefrLevelKey>>({ 0: 'A2' });
   const [sentenceFeedbacks, setSentenceFeedbacks] = useState<Record<number, { text: string; direction: 'up' | 'down' | 'keep' }>>({});
 
@@ -479,7 +569,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     });
   };
 
-  // Step 1 -> Survey: Confirm tags, then introduce 4 friendly profiling questions to understand user better
+  // Step 1 -> Survey: Confirm tags, then introduce 5 friendly profiling questions to understand user better
   const handleConfirmTags = (tags: string[]) => {
     if (isBusy) return;
     const confirmedTags = tags.length > 0 ? tags : (selectedTags.length > 0 ? selectedTags : ['前沿科技', '天文探索']);
@@ -498,7 +588,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     setStep(-1);
 
     const topTags = confirmedTags.slice(0, 2).join('与');
-    const introMsg = `【${topTags}】收到啦！在开始试读前，想先了解你 4 个阅读小习惯，这样能让${companion.name}在以后的阅读里更懂你的节奏～`;
+    const introMsg = `【${topTags}】收到啦！在开始试读前，想先了解你几个阅读小习惯，这样能让${companion.name}在以后的阅读里更懂你的节奏～`;
 
     runTypewriter(introMsg, 'm-intro-survey', 180, 26, () => {
       const q1Msg = `第 1 问：你平时读英语，最想达成什么目标呢？`;
@@ -509,8 +599,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     });
   };
 
-  // Handle answering any of the 4 profiling questions (Q1: 11, Q2: 12, Q3: 13, Q4: 14)
-  const handleAnswerSurvey = (currentStep: number, answerText: string) => {
+  // Handle answering any of the 5 profiling questions (Q1: 11, Q2: 12, Q3: 15, Q4: 13, Q5: 14)
+  const handleAnswerSurvey = (currentStep: number, answerText: string, optItem?: SurveyOptionItem) => {
     if (isBusy) return;
     setIsBusy(true);
     setStep(-1);
@@ -520,39 +610,84 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       { id: `u-q${currentStep}-${Date.now()}`, sender: 'user', text: answerText }
     ]);
 
+    const cleanText = optItem ? optItem.label : answerText.replace(/^[^\w\u4e00-\u9fa5]+/, '').trim();
+
     if (currentStep === 11) {
-      setSurveyAnswers((prev) => ({ ...prev, goal: answerText }));
-      const companionReaction = `很棒的目标！一步一步来，${companion.name}会陪你走得很稳～`;
-      runTypewriter(companionReaction, 'm-react-q1', 160, 24, () => {
-        const q2Msg = `第 2 问：遇到全英文或长难句时，你通常觉得最大的阻碍是？`;
-        runTypewriter(q2Msg, 'm-q2', 120, 24, () => {
-          setStep(12);
-          setIsBusy(false);
-        });
+      const detectedCategory: GoalCategory = optItem?.category || (
+        cleanText.includes('升学') || cleanText.includes('备考') ? 'exam' :
+        cleanText.includes('职场') || cleanText.includes('电商') || cleanText.includes('外刊') ? 'workplace' :
+        cleanText.includes('原版') || cleanText.includes('视野') ? 'original' : 'interest'
+      );
+      setGoalCategory(detectedCategory);
+
+      setSurveyAnswers((prev) => ({
+        ...prev,
+        goal: cleanText,
+        goalTrack: {
+          category: detectedCategory,
+          categoryLabel: cleanText,
+          targetFocus: '',
+          targetHurdle: ''
+        }
+      }));
+
+      const companionReaction =
+        detectedCategory === 'exam'
+          ? `收到！备考冲刺贵在靶向精准～你当前重点攻坚哪项考试呢？`
+          : detectedCategory === 'workplace'
+          ? `太棒啦！实战应用讲究学以致用，你目前最关心的核心应用场景是？`
+          : detectedCategory === 'original'
+          ? `原版能带来第一手前沿视野！你平时更想看哪一类英文内容？`
+          : `轻松出发最重要！零压力培养纯粹好感，你更期待哪种阅读体验？`;
+
+      runTypewriter(companionReaction, 'm-q2', 150, 24, () => {
+        setStep(12);
+        setIsBusy(false);
       });
     } else if (currentStep === 12) {
-      setSurveyAnswers((prev) => ({ ...prev, challenge: answerText }));
-      const companionReaction = `记在心里了！以后的阅读里${companion.name}会主动帮你拆解长句，不让生词打断心流～`;
-      runTypewriter(companionReaction, 'm-react-q2', 160, 24, () => {
-        const q3Msg = `第 3 问：每天如果留一段专注阅读时间，你更习惯哪种时长节奏？`;
-        runTypewriter(q3Msg, 'm-q3', 120, 24, () => {
-          setStep(13);
-          setIsBusy(false);
-        });
+      setSurveyAnswers((prev) => ({
+        ...prev,
+        goalTrack: {
+          category: prev.goalTrack?.category || goalCategory,
+          categoryLabel: prev.goalTrack?.categoryLabel || prev.goal || '目标冲刺',
+          targetFocus: cleanText,
+          targetHurdle: prev.goalTrack?.targetHurdle || ''
+        }
+      }));
+
+      const companionReaction = `记下来啦，针对【${cleanText}】，我们把关口摸透～日常阅读中最想突破的卡点是？`;
+      runTypewriter(companionReaction, 'm-q15', 150, 24, () => {
+        setStep(15);
+        setIsBusy(false);
+      });
+    } else if (currentStep === 15) {
+      setSurveyAnswers((prev) => ({
+        ...prev,
+        challenge: cleanText,
+        goalTrack: {
+          category: prev.goalTrack?.category || goalCategory,
+          categoryLabel: prev.goalTrack?.categoryLabel || prev.goal || '目标冲刺',
+          targetFocus: prev.goalTrack?.targetFocus || '核心专项',
+          targetHurdle: cleanText
+        }
+      }));
+
+      const companionReaction = `收到！针对【${cleanText}】，以后的阅读里${companion.name}会特别为你标注破解要点。那每天专注阅读，你更习惯哪种时长节奏？`;
+      runTypewriter(companionReaction, 'm-q3', 150, 24, () => {
+        setStep(13);
+        setIsBusy(false);
       });
     } else if (currentStep === 13) {
-      setSurveyAnswers((prev) => ({ ...prev, duration: answerText }));
-      const companionReaction = `收到！微步前行聚沙成塔，这个时长非常舒适～`;
-      runTypewriter(companionReaction, 'm-react-q3', 160, 24, () => {
-        const q4Msg = `第 4 问：在接下来的阅读过程中，你希望${companion.name}怎样陪伴你？`;
-        runTypewriter(q4Msg, 'm-q4', 120, 24, () => {
-          setStep(14);
-          setIsBusy(false);
-        });
+      setSurveyAnswers((prev) => ({ ...prev, duration: cleanText }));
+      const companionReaction = `微步前行聚沙成塔！在接下来的阅读过程中，你希望${companion.name}怎样陪伴你？`;
+      runTypewriter(companionReaction, 'm-q4', 150, 24, () => {
+        setStep(14);
+        setIsBusy(false);
       });
     } else if (currentStep === 14) {
-      setSurveyAnswers((prev) => ({ ...prev, companionStyle: answerText }));
-      const transitionMsg = `太好啦！${companion.name}现在已经越来越懂你的阅读习惯与偏好了✨ 接下来我们通过 4 句微试读来为你精准定级。先看第 1 句：`;
+      setSurveyAnswers((prev) => ({ ...prev, companionStyle: cleanText }));
+      const targetFocusLabel = surveyAnswers.goalTrack?.targetFocus || '个性化';
+      const transitionMsg = `太好啦！${companion.name}已经全方位掌握你的阅读偏好与【${targetFocusLabel}】目标✨ 接下来我们通过 4 句微试读来为你精准定级。先看第 1 句：`;
       const initialLevel: CefrLevelKey = 'A2';
       setCurrentLevel(initialLevel);
       setSentenceLevelHistory({ 0: initialLevel });
@@ -565,7 +700,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const handleReturnToCompass = () => {
     if (isBusy) return;
 
-    // Terminate any ongoing typing or delay timers
     if (timerRef.current) clearInterval(timerRef.current);
     if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
     if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
@@ -573,7 +707,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     setTypedText('');
     setIsBusy(false);
 
-    // Roll back chat messages to before user tags confirmation
     setMessages((prev) => {
       const idx = prev.findIndex((m) => m.id.startsWith('u-tags-'));
       return idx !== -1 ? prev.slice(0, idx) : prev;
@@ -588,7 +721,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const handlePrevSurveyQuestion = () => {
     if (isBusy || step <= 11) return;
 
-    // Terminate any ongoing typing or delay timers
     if (timerRef.current) clearInterval(timerRef.current);
     if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
     if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
@@ -597,7 +729,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     setIsBusy(false);
 
     if (step === 12) {
-      // Return from Q2 to Q1 (user's latest choice will be used upon re-selection)
       setMessages((prev) => {
         const idx = prev.findIndex((m) => m.id === 'm-q1');
         return idx !== -1 ? prev.slice(0, idx + 1) : prev;
@@ -606,8 +737,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       return;
     }
 
-    if (step === 13) {
-      // Return from Q3 to Q2
+    if (step === 15) {
       setMessages((prev) => {
         const idx = prev.findIndex((m) => m.id === 'm-q2');
         return idx !== -1 ? prev.slice(0, idx + 1) : prev;
@@ -616,8 +746,16 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       return;
     }
 
+    if (step === 13) {
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === 'm-q15');
+        return idx !== -1 ? prev.slice(0, idx + 1) : prev;
+      });
+      setStep(15);
+      return;
+    }
+
     if (step === 14) {
-      // Return from Q4 to Q3
       setMessages((prev) => {
         const idx = prev.findIndex((m) => m.id === 'm-q3');
         return idx !== -1 ? prev.slice(0, idx + 1) : prev;
@@ -643,7 +781,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     setPlayingSentenceIdx(null);
 
     if (step === 4) {
-      // Return from Sentence 2 to Sentence 1
       const prevLevel = sentenceLevelHistory[0] || 'A2';
       setCurrentLevel(prevLevel);
       setMessages((prev) => {
@@ -655,7 +792,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     }
 
     if (step === 5) {
-      // Return from Sentence 3 to Sentence 2
       const prevLevel = sentenceLevelHistory[1] || 'A2';
       setCurrentLevel(prevLevel);
       setMessages((prev) => {
@@ -667,7 +803,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     }
 
     if (step === 6) {
-      // Return from Sentence 4 to Sentence 3
       const prevLevel = sentenceLevelHistory[2] || 'A2';
       setCurrentLevel(prevLevel);
       setMessages((prev) => {
@@ -701,13 +836,11 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     }));
     setCurrentLevel(nextLvl);
 
-    // Record user message
     setMessages((prev) => [
       ...prev,
       { id: `u-fb-${nextSentenceIdx}-${Date.now()}`, sender: 'user', text: feedbackText }
     ]);
 
-    // AI companion bridge answer
     let bridge = '';
     if (direction === 'up') {
       bridge = `实力很强！为你加深句式与地道表达，来看第 ${nextSentenceIdx + 1}/4 句：`;
@@ -743,7 +876,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       { id: `u-final-${Date.now()}`, sender: 'user', text: feedbackText }
     ]);
 
-    // Directly reveal "开启专属定制" button without extra AI text dialogue
     setTimeout(() => {
       setStep(7);
       setIsBusy(false);
@@ -758,16 +890,13 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     setInputText('');
 
     if (step === 1) {
-      // User typed interest topic/book/keyword in the bottom chat input box
       const match = matchIntentionTo81Tags(trimmed);
       if (match) {
-        // 1. Add user message
         setMessages((prev) => [
           ...prev,
           { id: `u-${Date.now()}`, sender: 'user', text: trimmed }
         ]);
 
-        // 2. Select matched official tags (strictly from the 81 tags, max 10)
         setSelectedTags((prev) => {
           const next = [...prev];
           match.matchedTags.forEach((t) => {
@@ -778,17 +907,14 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
           return next;
         });
 
-        // 3. Smoothly rotate the astrolabe to the matched domain
         setAstrolabeTargetDomain(match.domainIndex);
 
-        // 4. Companion friendly acknowledgment
         const replyMsg = `收到！已为你锁定【${match.domainName}】领域的【${match.matchedTags.join('、')}】～ 星盘已自动调准，可以直接点击下方就绪，也可以继续挑选其他标签哦！`;
         runTypewriter(replyMsg, `ai-match-${Date.now()}`, 100, 24);
       }
-    } else if (step >= 11 && step <= 14) {
+    } else if (step >= 11 && step <= 15) {
       handleAnswerSurvey(step, trimmed);
     } else if (step === 3) {
-      // Sentence 1 feedback
       if (trimmed.includes('难') || trimmed.includes('吃力') || trimmed.includes('生词') || trimmed.includes('慢')) {
         advanceToSentence(1, trimmed, 'down');
       } else if (trimmed.includes('简单') || trimmed.includes('容易') || trimmed.includes('高') || trimmed.includes('挑战')) {
@@ -797,7 +923,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         advanceToSentence(1, trimmed, 'keep');
       }
     } else if (step === 4) {
-      // Sentence 2 feedback
       if (trimmed.includes('难') || trimmed.includes('吃力') || trimmed.includes('生词') || trimmed.includes('慢')) {
         advanceToSentence(2, trimmed, 'down');
       } else if (trimmed.includes('简单') || trimmed.includes('容易') || trimmed.includes('高') || trimmed.includes('挑战')) {
@@ -806,7 +931,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         advanceToSentence(2, trimmed, 'keep');
       }
     } else if (step === 5) {
-      // Sentence 3 feedback
       if (trimmed.includes('难') || trimmed.includes('吃力') || trimmed.includes('生词') || trimmed.includes('慢')) {
         advanceToSentence(3, trimmed, 'down');
       } else if (trimmed.includes('简单') || trimmed.includes('容易') || trimmed.includes('高') || trimmed.includes('挑战')) {
@@ -815,7 +939,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         advanceToSentence(3, trimmed, 'keep');
       }
     } else if (step === 6) {
-      // Sentence 4 final feedback
       if (trimmed.includes('难') || trimmed.includes('吃力') || trimmed.includes('生词') || trimmed.includes('慢')) {
         completeEvaluation(trimmed, 'down');
       } else if (trimmed.includes('简单') || trimmed.includes('容易') || trimmed.includes('高') || trimmed.includes('挑战')) {
@@ -1030,98 +1153,107 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
           </div>
         )}
 
-        {/* STEPS 11-14: 4 Interactive Survey Questions to Understand the User Better */}
-        {step >= 11 && step <= 14 && !isAiTyping && !isBusy && (
+        {/* STEPS 11-15: 5 Dynamic Interactive Survey Questions to Understand the User Better */}
+        {(step === 11 || step === 12 || step === 15 || step === 13 || step === 14) && !isAiTyping && !isBusy && (
           <div className="pl-9 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center justify-between px-1 text-xs text-stone-500">
-              <span className="font-mono text-amber-700 flex items-center gap-1.5 font-semibold text-[13px]">
-                <Sparkles size={13} />
-                第 {step - 10}/4 题
-              </span>
+            {(() => {
+              const currentQ = getSurveyQuestions(companion.name, goalCategory).find((q) => q.step === step);
+              if (!currentQ) return null;
 
-              {/* In Q1 (step === 11), provide direct button to return to interest selection / astrolabe */}
-              {step === 11 && (
-                <button
-                  type="button"
-                  onClick={handleReturnToCompass}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-amber-800 hover:text-amber-950 bg-[#FFFFFF] hover:bg-amber-50/90 border border-amber-300 hover:border-amber-400 transition-all cursor-pointer active:scale-95 shadow-2xs group"
-                  title="返回星盘重新选择兴趣"
-                >
-                  <Compass size={12} className="text-amber-600 group-hover:rotate-45 transition-transform" />
-                  <span>返回重选星盘</span>
-                </button>
-              )}
+              return (
+                <>
+                  <div className="flex items-center justify-between px-1 text-xs text-stone-500">
+                    <span className="font-mono text-amber-700 flex items-center gap-1.5 font-semibold text-[13px]">
+                      <Sparkles size={13} />
+                      第 {currentQ.number}/{currentQ.total} 问 · {currentQ.stageName}
+                    </span>
 
-              {/* Lightweight "上一题" Action in Top-Right of Options (displayed for Q2, Q3, Q4; Q1 is the initial survey question) */}
-              {step > 11 && (
-                <button
-                  type="button"
-                  onClick={handlePrevSurveyQuestion}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-stone-600 hover:text-amber-800 bg-[#FFFFFF] hover:bg-amber-50/80 border border-[#E4DAC5] hover:border-amber-300 transition-all cursor-pointer active:scale-95 shadow-2xs group"
-                  title="返回上一题重新选择"
-                >
-                  <RotateCcw size={11.5} className="text-stone-400 group-hover:text-amber-600 transition-transform group-hover:-rotate-45" />
-                  <span>上一题</span>
-                </button>
-              )}
-            </div>
+                    {/* In Q1 (step === 11), provide direct button to return to interest selection / astrolabe */}
+                    {step === 11 && (
+                      <button
+                        type="button"
+                        onClick={handleReturnToCompass}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-amber-800 hover:text-amber-950 bg-[#FFFFFF] hover:bg-amber-50/90 border border-amber-300 hover:border-amber-400 transition-all cursor-pointer active:scale-95 shadow-2xs group"
+                        title="返回星盘重新选择兴趣"
+                      >
+                        <Compass size={12} className="text-amber-600 group-hover:rotate-45 transition-transform" />
+                        <span>返回重选星盘</span>
+                      </button>
+                    )}
 
-            <div className="grid grid-cols-1 gap-2">
-              {getSurveyQuestions(companion.name)
-                .find((q) => q.step === step)
-                ?.options.map((opt) => {
-                  const currentSavedAnswer =
-                    step === 11
-                      ? surveyAnswers.goal
-                      : step === 12
-                      ? surveyAnswers.challenge
-                      : step === 13
-                      ? surveyAnswers.duration
-                      : surveyAnswers.companionStyle;
-                  const isPreviouslySelected = currentSavedAnswer ? currentSavedAnswer.includes(opt.label) : false;
+                    {/* Lightweight "上一题" Action in Top-Right of Options (displayed for steps other than Q1) */}
+                    {step !== 11 && (
+                      <button
+                        type="button"
+                        onClick={handlePrevSurveyQuestion}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-stone-600 hover:text-amber-800 bg-[#FFFFFF] hover:bg-amber-50/80 border border-[#E4DAC5] hover:border-amber-300 transition-all cursor-pointer active:scale-95 shadow-2xs group"
+                        title="返回上一题重新选择"
+                      >
+                        <RotateCcw size={11.5} className="text-stone-400 group-hover:text-amber-600 transition-transform group-hover:-rotate-45" />
+                        <span>上一题</span>
+                      </button>
+                    )}
+                  </div>
 
-                  return (
-                    <button
-                      key={opt.label}
-                      onClick={() => handleAnswerSurvey(step, `${opt.icon} ${opt.label}`)}
-                      className={`w-full p-3 rounded-xl text-left transition-all active:scale-[0.98] cursor-pointer group flex items-center justify-between gap-2 shadow-xs ${
-                        isPreviouslySelected
-                          ? 'bg-amber-50/70 border-2 border-amber-500/80 hover:bg-amber-50 hover:border-amber-600'
-                          : 'bg-[#FFFFFF] hover:bg-[#FFFDF8] border border-[#E8DFC8] hover:border-amber-500/70'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="text-lg shrink-0">{opt.icon}</span>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`text-[14px] sm:text-[14.5px] font-semibold transition-colors ${
-                                isPreviouslySelected ? 'text-amber-900 font-bold' : 'text-stone-900 group-hover:text-amber-700'
-                              }`}
-                            >
-                              {opt.label}
-                            </span>
-                            {isPreviouslySelected && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200/80 text-amber-900 font-medium font-sans">
-                                上次所选
-                              </span>
-                            )}
+                  <div className="grid grid-cols-1 gap-2 max-h-[350px] overflow-y-auto no-scrollbar pr-0.5">
+                    {currentQ.options.map((opt) => {
+                      const currentSavedAnswer =
+                        step === 11
+                          ? surveyAnswers.goal
+                          : step === 12
+                          ? surveyAnswers.goalTrack?.targetFocus
+                          : step === 15
+                          ? surveyAnswers.goalTrack?.targetHurdle || surveyAnswers.challenge
+                          : step === 13
+                          ? surveyAnswers.duration
+                          : surveyAnswers.companionStyle;
+                      const isPreviouslySelected = currentSavedAnswer ? currentSavedAnswer.includes(opt.label) : false;
+
+                      return (
+                        <button
+                          key={opt.label}
+                          onClick={() => handleAnswerSurvey(step, `${opt.icon} ${opt.label}`, opt)}
+                          className={`w-full p-3 rounded-xl text-left transition-all active:scale-[0.98] cursor-pointer group flex items-center justify-between gap-2 shadow-xs ${
+                            isPreviouslySelected
+                              ? 'bg-amber-50/70 border-2 border-amber-500/80 hover:bg-amber-50 hover:border-amber-600'
+                              : 'bg-[#FFFFFF] hover:bg-[#FFFDF8] border border-[#E8DFC8] hover:border-amber-500/70'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="text-lg shrink-0">{opt.icon}</span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`text-[14px] sm:text-[14.5px] font-semibold transition-colors ${
+                                    isPreviouslySelected ? 'text-amber-900 font-bold' : 'text-stone-900 group-hover:text-amber-700'
+                                  }`}
+                                >
+                                  {opt.label}
+                                </span>
+                                {isPreviouslySelected && (
+                                  <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200/80 text-amber-900 font-medium font-sans">
+                                    上次所选
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[11.5px] sm:text-[12px] text-stone-500 truncate mt-0.5">
+                                {opt.desc}
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-[11.5px] sm:text-[12px] text-stone-500 truncate mt-0.5">
-                            {opt.desc}
-                          </div>
-                        </div>
-                      </div>
-                      <ChevronRight
-                        size={15}
-                        className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                          isPreviouslySelected ? 'text-amber-600' : 'text-stone-400 group-hover:text-amber-600'
-                        }`}
-                      />
-                    </button>
-                  );
-                })}
-            </div>
+                          <ChevronRight
+                            size={15}
+                            className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${
+                              isPreviouslySelected ? 'text-amber-600' : 'text-stone-400 group-hover:text-amber-600'
+                            }`}
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         )}
 
