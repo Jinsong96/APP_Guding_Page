@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowRight, Sparkles, Send, Volume2, CheckCircle2, ChevronRight, BookOpen } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles, Send, Volume2, CheckCircle2, ChevronRight, BookOpen, RotateCcw } from 'lucide-react';
 import { Companion } from '../../types';
 import { GalaxyCompassPicker } from '../GalaxyCompassPicker';
 
@@ -187,6 +187,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const [playingSentenceIdx, setPlayingSentenceIdx] = useState<number | null>(null);
   const [isBusy, setIsBusy] = useState<boolean>(false);
   const [surveyAnswers, setSurveyAnswers] = useState<SurveyAnswers>({});
+  const [sentenceLevelHistory, setSentenceLevelHistory] = useState<Record<number, CefrLevelKey>>({ 0: 'A2' });
+  const [sentenceFeedbacks, setSentenceFeedbacks] = useState<Record<number, { text: string; direction: 'up' | 'down' | 'keep' }>>({});
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -428,7 +430,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       });
     } else if (currentStep === 12) {
       setSurveyAnswers((prev) => ({ ...prev, challenge: answerText }));
-      const companionReaction = `记在心里了！以后的阅读里我会主动帮你拆解长句，不让生词打断心流～`;
+      const companionReaction = `记在心里了！以后的阅读里${companion.name}会主动帮你拆解长句，不让生词打断心流～`;
       runTypewriter(companionReaction, 'm-react-q2', 160, 24, () => {
         const q3Msg = `第 3 问：每天如果留一段专注阅读时间，你更习惯哪种时长节奏？`;
         runTypewriter(q3Msg, 'm-q3', 120, 24, () => {
@@ -451,7 +453,104 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       const transitionMsg = `太好啦！${companion.name}现在已经越来越懂你的阅读习惯与偏好了✨ 接下来我们通过 4 句微试读来为你精准定级。先看第 1 句：`;
       const initialLevel: CefrLevelKey = 'A2';
       setCurrentLevel(initialLevel);
+      setSentenceLevelHistory({ 0: initialLevel });
+      setSentenceFeedbacks({});
       presentSentenceWithRhythm(0, initialLevel, transitionMsg, 'm-read-intro', 3);
+    }
+  };
+
+  // Return to previous survey question (allows user to reselect if picked wrong)
+  const handlePrevSurveyQuestion = () => {
+    if (isBusy || step <= 11) return;
+
+    // Terminate any ongoing typing or delay timers
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    setIsAiTyping(false);
+    setTypedText('');
+    setIsBusy(false);
+
+    if (step === 12) {
+      // Return from Q2 to Q1 (user's latest choice will be used upon re-selection)
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === 'm-q1');
+        return idx !== -1 ? prev.slice(0, idx + 1) : prev;
+      });
+      setStep(11);
+      return;
+    }
+
+    if (step === 13) {
+      // Return from Q3 to Q2
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === 'm-q2');
+        return idx !== -1 ? prev.slice(0, idx + 1) : prev;
+      });
+      setStep(12);
+      return;
+    }
+
+    if (step === 14) {
+      // Return from Q4 to Q3
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === 'm-q3');
+        return idx !== -1 ? prev.slice(0, idx + 1) : prev;
+      });
+      setStep(13);
+      return;
+    }
+  };
+
+  // Return to previous sentence (supported for sentences 2, 3, 4)
+  const handlePrevSentence = () => {
+    if (isBusy || step <= 3 || step > 6) return;
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    setIsAiTyping(false);
+    setTypedText('');
+    setIsBusy(false);
+    setPlayingSentenceIdx(null);
+
+    if (step === 4) {
+      // Return from Sentence 2 to Sentence 1
+      const prevLevel = sentenceLevelHistory[0] || 'A2';
+      setCurrentLevel(prevLevel);
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === 'm-ask-s1');
+        return idx !== -1 ? prev.slice(0, idx + 1) : prev;
+      });
+      setStep(3);
+      return;
+    }
+
+    if (step === 5) {
+      // Return from Sentence 3 to Sentence 2
+      const prevLevel = sentenceLevelHistory[1] || 'A2';
+      setCurrentLevel(prevLevel);
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === 'm-ask-s2');
+        return idx !== -1 ? prev.slice(0, idx + 1) : prev;
+      });
+      setStep(4);
+      return;
+    }
+
+    if (step === 6) {
+      // Return from Sentence 4 to Sentence 3
+      const prevLevel = sentenceLevelHistory[2] || 'A2';
+      setCurrentLevel(prevLevel);
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === 'm-ask-s3');
+        return idx !== -1 ? prev.slice(0, idx + 1) : prev;
+      });
+      setStep(5);
+      return;
     }
   };
 
@@ -464,7 +563,17 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     if (isBusy) return;
     setIsBusy(true);
 
+    const prevSentIdx = nextSentenceIdx - 1; // 0 for Sentence 1, 1 for Sentence 2, 2 for Sentence 3
+    setSentenceFeedbacks((prev) => ({
+      ...prev,
+      [prevSentIdx]: { text: feedbackText, direction }
+    }));
+
     const nextLvl = getNextLevel(currentLevel, direction);
+    setSentenceLevelHistory((prev) => ({
+      ...prev,
+      [nextSentenceIdx]: nextLvl
+    }));
     setCurrentLevel(nextLvl);
 
     // Record user message
@@ -492,6 +601,11 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     if (isBusy) return;
     setIsBusy(true);
     setStep(-1);
+
+    setSentenceFeedbacks((prev) => ({
+      ...prev,
+      3: { text: feedbackText, direction: finalAdjustment || 'keep' }
+    }));
 
     let finalLvl = currentLevel;
     if (finalAdjustment) {
@@ -766,36 +880,81 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         {/* STEPS 11-14: 4 Interactive Survey Questions to Understand the User Better */}
         {step >= 11 && step <= 14 && !isAiTyping && !isBusy && (
           <div className="pl-9 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center px-1 text-xs text-stone-500">
+            <div className="flex items-center justify-between px-1 text-xs text-stone-500">
               <span className="font-mono text-amber-700 flex items-center gap-1.5 font-semibold text-[13px]">
                 <Sparkles size={13} />
-                阅读习惯探索 · 第 {step - 10}/4 题
+                第 {step - 10}/4 题
               </span>
+
+              {/* Lightweight "上一题" Action in Top-Right of Options (displayed for Q2, Q3, Q4; Q1 is the initial survey question) */}
+              {step > 11 && (
+                <button
+                  type="button"
+                  onClick={handlePrevSurveyQuestion}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-stone-600 hover:text-amber-800 bg-[#FFFFFF] hover:bg-amber-50/80 border border-[#E4DAC5] hover:border-amber-300 transition-all cursor-pointer active:scale-95 shadow-2xs group"
+                  title="返回上一题重新选择"
+                >
+                  <RotateCcw size={11.5} className="text-stone-400 group-hover:text-amber-600 transition-transform group-hover:-rotate-45" />
+                  <span>上一题</span>
+                </button>
+              )}
             </div>
 
             <div className="grid grid-cols-1 gap-2">
               {getSurveyQuestions(companion.name)
                 .find((q) => q.step === step)
-                ?.options.map((opt) => (
-                  <button
-                    key={opt.label}
-                    onClick={() => handleAnswerSurvey(step, `${opt.icon} ${opt.label}`)}
-                    className="w-full p-3 rounded-xl bg-[#FFFFFF] hover:bg-[#FFFDF8] border border-[#E8DFC8] hover:border-amber-500/70 text-left transition-all active:scale-[0.98] cursor-pointer group flex items-center justify-between gap-2 shadow-xs"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="text-lg shrink-0">{opt.icon}</span>
-                      <div className="min-w-0">
-                        <div className="text-[14px] sm:text-[14.5px] font-semibold text-stone-900 group-hover:text-amber-700 transition-colors">
-                          {opt.label}
-                        </div>
-                        <div className="text-[11.5px] sm:text-[12px] text-stone-500 truncate mt-0.5">
-                          {opt.desc}
+                ?.options.map((opt) => {
+                  const currentSavedAnswer =
+                    step === 11
+                      ? surveyAnswers.goal
+                      : step === 12
+                      ? surveyAnswers.challenge
+                      : step === 13
+                      ? surveyAnswers.duration
+                      : surveyAnswers.companionStyle;
+                  const isPreviouslySelected = currentSavedAnswer ? currentSavedAnswer.includes(opt.label) : false;
+
+                  return (
+                    <button
+                      key={opt.label}
+                      onClick={() => handleAnswerSurvey(step, `${opt.icon} ${opt.label}`)}
+                      className={`w-full p-3 rounded-xl text-left transition-all active:scale-[0.98] cursor-pointer group flex items-center justify-between gap-2 shadow-xs ${
+                        isPreviouslySelected
+                          ? 'bg-amber-50/70 border-2 border-amber-500/80 hover:bg-amber-50 hover:border-amber-600'
+                          : 'bg-[#FFFFFF] hover:bg-[#FFFDF8] border border-[#E8DFC8] hover:border-amber-500/70'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-lg shrink-0">{opt.icon}</span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-[14px] sm:text-[14.5px] font-semibold transition-colors ${
+                                isPreviouslySelected ? 'text-amber-900 font-bold' : 'text-stone-900 group-hover:text-amber-700'
+                              }`}
+                            >
+                              {opt.label}
+                            </span>
+                            {isPreviouslySelected && (
+                              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200/80 text-amber-900 font-medium font-sans">
+                                上次所选
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[11.5px] sm:text-[12px] text-stone-500 truncate mt-0.5">
+                            {opt.desc}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <ChevronRight size={15} className="text-stone-400 group-hover:text-amber-600 shrink-0 transition-transform group-hover:translate-x-0.5" />
-                  </button>
-                ))}
+                      <ChevronRight
+                        size={15}
+                        className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${
+                          isPreviouslySelected ? 'text-amber-600' : 'text-stone-400 group-hover:text-amber-600'
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
             </div>
           </div>
         )}
@@ -803,26 +962,65 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         {/* STEP 3: Rating for Sentence 1 (A2 initial) -> Leads to Sentence 2 */}
         {step === 3 && !isAiTyping && !isBusy && (
           <div className="pl-9 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center justify-between px-1 text-xs text-stone-500 mb-0.5">
+              <span className="font-mono text-amber-700 flex items-center gap-1.5 font-semibold text-[13px]">
+                <BookOpen size={13} />
+                第 1/4 句
+              </span>
+            </div>
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(1, '🟢 刚刚好，理解顺畅，继续保持', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                  sentenceFeedbacks[0]?.direction === 'keep'
+                    ? 'bg-emerald-100/90 border-emerald-400 text-emerald-900'
+                    : 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-300 text-emerald-800'
+                }`}
               >
-                <span>🟢 刚刚好，理解顺畅</span>
+                <div className="flex items-center gap-2">
+                  <span>🟢 刚刚好，理解顺畅</span>
+                  {sentenceFeedbacks[0]?.direction === 'keep' && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-200 text-emerald-900 font-medium font-sans">
+                      上次所选
+                    </span>
+                  )}
+                </div>
                 <CheckCircle2 size={15} />
               </button>
               <button
                 onClick={() => advanceToSentence(1, '🔴 稍显吃力，想降为轻盈基础版', 'down')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                  sentenceFeedbacks[0]?.direction === 'down'
+                    ? 'bg-amber-50/70 border-amber-400 text-stone-900'
+                    : 'bg-[#FFFFFF] hover:bg-[#F9F5EC] border-[#E8DFC8] text-stone-800'
+                }`}
               >
-                <span>🔴 偏难吃力，降为更轻盈基础版</span>
+                <div className="flex items-center gap-2">
+                  <span>🔴 偏难吃力，降为更轻盈基础版</span>
+                  {sentenceFeedbacks[0]?.direction === 'down' && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-medium font-sans">
+                      上次所选
+                    </span>
+                  )}
+                </div>
                 <ChevronRight size={15} className="text-stone-400" />
               </button>
               <button
                 onClick={() => advanceToSentence(1, '🔵 太简单了，想要更地道有挑战', 'up')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                  sentenceFeedbacks[0]?.direction === 'up'
+                    ? 'bg-amber-50/70 border-amber-400 text-stone-900'
+                    : 'bg-[#FFFFFF] hover:bg-[#F9F5EC] border-[#E8DFC8] text-stone-800'
+                }`}
               >
-                <span>🔵 太简单，想更有挑战感</span>
+                <div className="flex items-center gap-2">
+                  <span>🔵 太简单，想更有挑战感</span>
+                  {sentenceFeedbacks[0]?.direction === 'up' && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-medium font-sans">
+                      上次所选
+                    </span>
+                  )}
+                </div>
                 <ChevronRight size={15} className="text-stone-400" />
               </button>
             </div>
@@ -832,29 +1030,77 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         {/* STEP 4: Rating for Sentence 2 -> Leads to Sentence 3 */}
         {step === 4 && !isAiTyping && !isBusy && (
           <div className="pl-9 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center justify-between px-1 text-xs text-stone-500 mb-0.5">
+              <span className="font-mono text-amber-700 flex items-center gap-1.5 font-semibold text-[13px]">
+                <BookOpen size={13} />
+                第 2/4 句
+              </span>
+              <button
+                type="button"
+                onClick={handlePrevSentence}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-stone-600 hover:text-amber-800 bg-[#FFFFFF] hover:bg-amber-50/80 border border-[#E4DAC5] hover:border-amber-300 transition-all cursor-pointer active:scale-95 shadow-2xs group"
+                title="返回上一句重新选择"
+              >
+                <RotateCcw size={11.5} className="text-stone-400 group-hover:text-amber-600 transition-transform group-hover:-rotate-45" />
+                <span>上一句</span>
+              </button>
+            </div>
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(2, '🟢 刚刚好，这个难度很舒服', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                  sentenceFeedbacks[1]?.direction === 'keep'
+                    ? 'bg-emerald-100/90 border-emerald-400 text-emerald-900'
+                    : 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-300 text-emerald-800'
+                }`}
               >
-                <span>🟢 刚刚好，保持当前难度节奏</span>
+                <div className="flex items-center gap-2">
+                  <span>🟢 刚刚好，保持当前难度节奏</span>
+                  {sentenceFeedbacks[1]?.direction === 'keep' && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-200 text-emerald-900 font-medium font-sans">
+                      上次所选
+                    </span>
+                  )}
+                </div>
                 <CheckCircle2 size={15} />
               </button>
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => advanceToSentence(2, '🔵 读起来轻松，想继续往上挑战！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                  className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                    sentenceFeedbacks[1]?.direction === 'up'
+                      ? 'bg-amber-50/70 border-amber-400 text-stone-900'
+                      : 'bg-[#FFFFFF] hover:bg-[#F9F5EC] border-[#E8DFC8] text-stone-800'
+                  }`}
                 >
-                  <span>🔵 读起来轻松，往上加点挑战</span>
+                  <div className="flex items-center gap-2">
+                    <span>🔵 读起来轻松，往上加点挑战</span>
+                    {sentenceFeedbacks[1]?.direction === 'up' && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-medium font-sans">
+                        上次所选
+                      </span>
+                    )}
+                  </div>
                   <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => advanceToSentence(2, '🔴 略有阻碍，稍微降低一点点', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                  className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                    sentenceFeedbacks[1]?.direction === 'down'
+                      ? 'bg-amber-50/70 border-amber-400 text-stone-900'
+                      : 'bg-[#FFFFFF] hover:bg-[#F9F5EC] border-[#E8DFC8] text-stone-800'
+                  }`}
                 >
-                  <span>🔴 略有阻碍，稍降一点更稳</span>
+                  <div className="flex items-center gap-2">
+                    <span>🔴 略有阻碍，稍降一点更稳</span>
+                    {sentenceFeedbacks[1]?.direction === 'down' && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-medium font-sans">
+                        上次所选
+                      </span>
+                    )}
+                  </div>
                   <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
@@ -865,29 +1111,77 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         {/* STEP 5: Rating for Sentence 3 -> Leads to Sentence 4 */}
         {step === 5 && !isAiTyping && !isBusy && (
           <div className="pl-9 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center justify-between px-1 text-xs text-stone-500 mb-0.5">
+              <span className="font-mono text-amber-700 flex items-center gap-1.5 font-semibold text-[13px]">
+                <BookOpen size={13} />
+                第 3/4 句
+              </span>
+              <button
+                type="button"
+                onClick={handlePrevSentence}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-stone-600 hover:text-amber-800 bg-[#FFFFFF] hover:bg-amber-50/80 border border-[#E4DAC5] hover:border-amber-300 transition-all cursor-pointer active:scale-95 shadow-2xs group"
+                title="返回上一句重新选择"
+              >
+                <RotateCcw size={11.5} className="text-stone-400 group-hover:text-amber-600 transition-transform group-hover:-rotate-45" />
+                <span>上一句</span>
+              </button>
+            </div>
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => advanceToSentence(3, '🟢 刚刚好，很有阅读代入感', 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                  sentenceFeedbacks[2]?.direction === 'keep'
+                    ? 'bg-emerald-100/90 border-emerald-400 text-emerald-900'
+                    : 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-300 text-emerald-800'
+                }`}
               >
-                <span>🟢 刚刚好，契合当前阅读心流</span>
+                <div className="flex items-center gap-2">
+                  <span>🟢 刚刚好，契合当前阅读心流</span>
+                  {sentenceFeedbacks[2]?.direction === 'keep' && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-200 text-emerald-900 font-medium font-sans">
+                      上次所选
+                    </span>
+                  )}
+                </div>
                 <CheckCircle2 size={15} />
               </button>
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => advanceToSentence(3, '🔵 游刃有余，第 4 句想冲刺高阶！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                  className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                    sentenceFeedbacks[2]?.direction === 'up'
+                      ? 'bg-amber-50/70 border-amber-400 text-stone-900'
+                      : 'bg-[#FFFFFF] hover:bg-[#F9F5EC] border-[#E8DFC8] text-stone-800'
+                  }`}
                 >
-                  <span>🔵 游刃有余，冲刺更高阶</span>
+                  <div className="flex items-center gap-2">
+                    <span>🔵 游刃有余，冲刺更高阶</span>
+                    {sentenceFeedbacks[2]?.direction === 'up' && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-medium font-sans">
+                        上次所选
+                      </span>
+                    )}
+                  </div>
                   <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => advanceToSentence(3, '🔴 有点吃力，第 4 句微调更基础', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                  className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                    sentenceFeedbacks[2]?.direction === 'down'
+                      ? 'bg-amber-50/70 border-amber-400 text-stone-900'
+                      : 'bg-[#FFFFFF] hover:bg-[#F9F5EC] border-[#E8DFC8] text-stone-800'
+                  }`}
                 >
-                  <span>🔴 有点吃力，微调更基础一点</span>
+                  <div className="flex items-center gap-2">
+                    <span>🔴 有点吃力，微调更基础一点</span>
+                    {sentenceFeedbacks[2]?.direction === 'down' && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-medium font-sans">
+                        上次所选
+                      </span>
+                    )}
+                  </div>
                   <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
@@ -898,29 +1192,77 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         {/* STEP 6: Rating for Sentence 4 -> Concludes Reading Level */}
         {step === 6 && !isAiTyping && !isBusy && (
           <div className="pl-9 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center justify-between px-1 text-xs text-stone-500 mb-0.5">
+              <span className="font-mono text-amber-700 flex items-center gap-1.5 font-semibold text-[13px]">
+                <BookOpen size={13} />
+                第 4/4 句
+              </span>
+              <button
+                type="button"
+                onClick={handlePrevSentence}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-medium text-stone-600 hover:text-amber-800 bg-[#FFFFFF] hover:bg-amber-50/80 border border-[#E4DAC5] hover:border-amber-300 transition-all cursor-pointer active:scale-95 shadow-2xs group"
+                title="返回上一句重新选择"
+              >
+                <RotateCcw size={11.5} className="text-stone-400 group-hover:text-amber-600 transition-transform group-hover:-rotate-45" />
+                <span>上一句</span>
+              </button>
+            </div>
             <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => completeEvaluation(`🟢 完美契合！就锁定为【${LEVEL_METAS[currentLevel].levelLabel}】`, 'keep')}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-semibold flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                  sentenceFeedbacks[3]?.direction === 'keep'
+                    ? 'bg-emerald-100/90 border-emerald-400 text-emerald-900'
+                    : 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-300 text-emerald-800'
+                }`}
               >
-                <span>🟢 完美契合！锁定【{LEVEL_METAS[currentLevel].levelLabel}】</span>
+                <div className="flex items-center gap-2">
+                  <span>🟢 完美契合！锁定【{LEVEL_METAS[currentLevel].levelLabel}】</span>
+                  {sentenceFeedbacks[3]?.direction === 'keep' && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-200 text-emerald-900 font-medium font-sans">
+                      上次所选
+                    </span>
+                  )}
+                </div>
                 <CheckCircle2 size={15} />
               </button>
               {currentLevel !== 'B2+' && (
                 <button
                   onClick={() => completeEvaluation('🔵 感觉还能再挑战高一阶！', 'up')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                  className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                    sentenceFeedbacks[3]?.direction === 'up'
+                      ? 'bg-amber-50/70 border-amber-400 text-stone-900'
+                      : 'bg-[#FFFFFF] hover:bg-[#F9F5EC] border-[#E8DFC8] text-stone-800'
+                  }`}
                 >
-                  <span>🔵 还能更强，加档一阶挑战</span>
+                  <div className="flex items-center gap-2">
+                    <span>🔵 还能更强，加档一阶挑战</span>
+                    {sentenceFeedbacks[3]?.direction === 'up' && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-medium font-sans">
+                        上次所选
+                      </span>
+                    )}
+                  </div>
                   <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}
               {currentLevel !== 'A1-' && (
                 <button
                   onClick={() => completeEvaluation('🔴 整体有点难，稳妥降一阶起步', 'down')}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F9F5EC] border border-[#E8DFC8] text-stone-800 text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+                  className={`w-full py-2.5 px-3.5 rounded-xl border text-[14px] sm:text-[14.5px] font-medium flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer shadow-xs ${
+                    sentenceFeedbacks[3]?.direction === 'down'
+                      ? 'bg-amber-50/70 border-amber-400 text-stone-900'
+                      : 'bg-[#FFFFFF] hover:bg-[#F9F5EC] border-[#E8DFC8] text-stone-800'
+                  }`}
                 >
-                  <span>🔴 稳妥起步，降一阶更轻松</span>
+                  <div className="flex items-center gap-2">
+                    <span>🔴 稳妥起步，降一阶更轻松</span>
+                    {sentenceFeedbacks[3]?.direction === 'down' && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-medium font-sans">
+                        上次所选
+                      </span>
+                    )}
+                  </div>
                   <ChevronRight size={15} className="text-stone-400" />
                 </button>
               )}

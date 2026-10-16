@@ -133,7 +133,7 @@ export const COMPANIONS: Companion[] = [
     nameEn: 'Light',
     type: '引路型旅伴',
     quote: '“慢慢来，我在。”',
-    avatarUrl: '/assets/light.png',
+    avatarUrl: '/assets/light_v2.png',
     celebrateActionName: '喜悦欢呼跃动',
     celebrateQuote: '“太棒啦！小鹿准备好啦，我们开读吧！🐾”',
     accentColor: '#A855F7',
