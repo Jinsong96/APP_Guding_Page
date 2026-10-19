@@ -91,6 +91,7 @@ export interface UserPreferences {
     goal?: string;
     challenge?: string;
     durationPreference?: string;
+    readingState?: string;
     companionStyle?: string;
     goalTrack?: GoalTrackDetails;
   };

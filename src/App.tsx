@@ -101,7 +101,6 @@ export default function App() {
                   onSelectCompanion={handleSelectCompanion}
                   onNext={() => {
                     setCurrentStage(2);
-                    showToast(`${currentCompanion.name} 正在和你初次打招呼...`);
                   }}
                 />
               )}
@@ -136,14 +135,15 @@ export default function App() {
                         goal: surveyData?.goal || prev.profile.goal,
                         challenge: surveyData?.challenge || prev.profile.challenge,
                         durationPreference: surveyData?.duration || prev.profile.durationPreference,
+                        readingState: surveyData?.readingState || prev.profile.readingState,
                         companionStyle: surveyData?.companionStyle || prev.profile.companionStyle,
-                        sessionDuration: surveyData?.duration?.includes('5') ? 5 : prev.profile.sessionDuration,
+                        sessionDuration: surveyData?.duration?.includes('3-5') || surveyData?.duration?.includes('5') ? 5 : prev.profile.sessionDuration,
                         goalTrack: surveyData?.goalTrack || prev.profile.goalTrack
                       }
                     }));
                     // Complete dialogue rating and jump directly to Stage 8
                     setCurrentStage(8);
-                    showToast(`已确定【${themes.slice(0, 2).join('、')}】与 ${cefrLevel} (${startingLevelCode}) 定级，正在定制专属世界`);
+                    showToast(`已确定【${themes.slice(0, 2).join('、')}】与 ${startingLevelCode} 起点，正在生成专属阅读画像`);
                   }}
                   onSkip={() => {
                     setCurrentStage(8);
@@ -165,7 +165,7 @@ export default function App() {
                   onBack={() => setCurrentStage(2)}
                   onNext={() => {
                     setCurrentStage(10);
-                    showToast('欢迎来到阅读世界！');
+                    showToast('欢迎开启阅读体验！');
                   }}
                 />
               )}

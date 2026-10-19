@@ -73,25 +73,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
               </div>
             </div>
 
-            {/* Companion Context-Aware Guidance Bubble */}
-            <div className="w-full my-3 p-3 rounded-2xl bg-white border border-[#E8DFC8] shadow-xs flex items-center gap-2.5 text-xs animate-in fade-in duration-300">
-              <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 text-sm">
-                {preferences.profile.goalTrack?.category === 'exam' ? '🎯' :
-                 preferences.profile.goalTrack?.category === 'workplace' ? '💼' :
-                 preferences.profile.goalTrack?.category === 'original' ? '🌟' : '🌱'}
-              </div>
-              <p className="text-stone-700 leading-snug">
-                {preferences.profile.goalTrack?.category === 'exam'
-                  ? `针对【${preferences.profile.goalTrack?.targetFocus || '备考冲刺'}】，今天特别推荐一篇长难句典型篇章，一起攻坚突破！`
-                  : preferences.profile.goalTrack?.category === 'workplace'
-                  ? `契合【${preferences.profile.goalTrack?.targetFocus || '实战应用'}】，今天为你挑选了高频商务实景短文，积累地道表达～`
-                  : preferences.profile.goalTrack?.category === 'original'
-                  ? `针对【${preferences.profile.goalTrack?.targetFocus || '原版探索'}】，为你准备了原汁原味的深度外媒纪实短篇！`
-                  : `今天我们轻松读一段有趣好懂的故事，微步积累纯粹语感～`}
-              </p>
-            </div>
-
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-900 mt-2 mb-1">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-900 mt-3 mb-1">
               今天，想读点什么？
             </h1>
             <p className="text-xs text-stone-500 mb-3.5">

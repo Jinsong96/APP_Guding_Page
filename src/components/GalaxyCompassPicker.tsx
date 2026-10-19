@@ -183,7 +183,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
   return (
     <div
       ref={containerRef}
-      className="w-full relative select-none flex flex-col items-center justify-between min-h-[430px] bg-transparent font-sans"
+      className="w-full relative select-none flex flex-col items-center justify-start bg-transparent font-sans"
     >
       {/* Subtle pinpoint floating stardust particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
@@ -195,22 +195,22 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
       </div>
 
       {/* Top HUD: Current Domain Header */}
-      <div className={`w-full flex items-center justify-between px-2 pt-1 pb-1 z-10 transition-all duration-500 ${
+      <div className={`w-full flex items-center justify-between px-2 pt-0 pb-1 z-10 transition-all duration-500 ${
         animStep >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
       }`}>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <div
-            className="w-2.5 h-2.5 rounded-full animate-pulse shadow-xs"
+            className="w-2.5 h-2.5 rounded-full shadow-xs"
             style={{ backgroundColor: currentDomain.color }}
           />
-          <span className="text-[14.5px] sm:text-[15px] font-mono tracking-wide font-bold text-stone-900">
-            <span style={{ color: currentDomain.color }}>{currentDomain.name}领域</span>
+          <span className="text-[14.5px] sm:text-[15px] font-bold tracking-tight text-stone-900">
+            {currentDomain.name}领域
           </span>
         </div>
       </div>
 
       {/* Top Content Tags (上方的内容标签): 2 rows x 3 tags */}
-      <div className="w-full z-20 py-1.5 px-1">
+      <div className="w-full z-20 py-1 px-1">
         <div className="grid grid-cols-3 gap-1.5 sm:gap-2 w-full max-w-sm sm:max-w-md mx-auto">
           {visibleTags.map((tag, i) => {
             const isSelected = selectedTags.includes(tag);
@@ -257,7 +257,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
         </div>
 
         {/* Left-bottom hint below content tag buttons */}
-        <div className={`w-full max-w-sm sm:max-w-md mx-auto mt-5 mb-1 px-0.5 flex items-center justify-start transition-opacity duration-500 ${
+        <div className={`w-full max-w-sm sm:max-w-md mx-auto mt-2 mb-0.5 px-0.5 flex items-center justify-start transition-opacity duration-500 ${
           animStep >= 4 ? 'opacity-100' : 'opacity-0'
         }`}>
           <span className="text-[11px] sm:text-[11.5px] text-stone-500 font-medium tracking-wide">
@@ -268,7 +268,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
 
       {/* 360° PRECISION ASTROLABE (星盘设计：细腻黄铜刻度光轨与星尘微光粒子流) */}
       <div
-        className="relative w-full flex items-center justify-center my-2 sm:my-3 touch-none select-none cursor-grab active:cursor-grabbing"
+        className="relative w-full flex items-center justify-center my-1 sm:my-2 touch-none select-none cursor-grab active:cursor-grabbing"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -435,10 +435,11 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                 >
                   {/* Clean domain name counter-rotated so it always stays right-side up */}
                   <span
-                    className="text-[14px] sm:text-[14.5px] font-bold leading-none tracking-tight text-center"
+                    className={`text-[14px] sm:text-[14.5px] leading-none tracking-tight text-center ${
+                      isCurrent ? 'font-black text-stone-900' : 'font-semibold text-stone-600'
+                    }`}
                     style={{
-                      transform: `rotate(${-rotationDeg}deg)`,
-                      color: isCurrent ? dom.color : '#374151'
+                      transform: `rotate(${-rotationDeg}deg)`
                     }}
                   >
                     {dom.name}

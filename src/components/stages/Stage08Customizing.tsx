@@ -139,8 +139,8 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
             {/* Companion Avatar Image: keeps 100% of the original 3D character design, style, and details */}
             <img
               key={isCalibrated ? `${companion.id}-celebrate-${celebrateBounces}` : `${companion.id}-normal`}
-              src={companion.avatarUrl}
-              alt={`${companion.name}${isCalibrated ? ' · 庆祝完成定级' : ''}`}
+              src={isCalibrated && companion.id === 'light' ? '/assets/light_happy.png' : companion.avatarUrl}
+              alt={companion.name}
               className={`w-20 h-20 sm:w-24 sm:h-24 object-contain relative z-10 drop-shadow-md select-none transition-transform duration-300 ${
                 isCalibrated
                   ? 'animate-celebrate-action hover:scale-105 active:scale-95 cursor-pointer'
@@ -158,213 +158,153 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
 
         {/* Phase 1: Generating & Customizing (Before 100%) */}
         {!isCalibrated ? (
-          <div className="w-full max-w-xs flex flex-col items-center text-center animate-in fade-in duration-300">
-            <h1 className="text-lg sm:text-xl font-bold text-stone-900 mb-4">
-              {companion.name} 在读你的兴趣与水平
-            </h1>
+          <div className="w-full max-w-sm sm:max-w-md px-1 flex flex-col items-center text-center animate-in fade-in duration-300">
+            {/* Centered Title matching homepage '选一只合拍的萌宠搭子' typography and animated gradient */}
+            <div className="text-center mb-3 sm:mb-4 px-2 relative animate-title-entrance">
+              <div className="absolute -inset-x-4 -inset-y-1.5 bg-gradient-to-r from-amber-200/20 via-orange-100/30 to-amber-200/20 blur-md pointer-events-none rounded-full -z-10" />
+              <h1 className="text-lg sm:text-xl font-black tracking-tight text-stone-900 leading-snug animate-title-gradient">
+                {companion.name}在读你的兴趣与水平
+              </h1>
+            </div>
 
-            {/* Progress Track */}
-            <div className="w-full bg-[#E8DFC8] h-2 rounded-full overflow-hidden p-0.5 border border-[#DDD3BC] mb-2">
+            {/* Clean Warm Progress Track */}
+            <div className="w-full bg-amber-100/70 h-2 rounded-full overflow-hidden p-0.5 border border-amber-200/80 mb-5 shadow-2xs">
               <div
-                className="h-full bg-gradient-to-r from-amber-600 to-emerald-600 rounded-full transition-all duration-200"
+                className="h-full bg-gradient-to-r from-amber-500 to-amber-600 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
 
-            <div className="w-full flex items-center justify-between text-[11px] text-stone-500 font-mono mb-5">
-              <span>已匹配 {progress}%</span>
-              <span>{progress >= 100 ? '匹配完成' : '细致调适难度坡度中...'}</span>
-            </div>
-
-            {/* 3 Step Ticks */}
-            <div className="w-full space-y-2 text-left">
+            {/* 3 Step Cards - Unified with Duolingo & Next Screen Typography */}
+            <div className="w-full space-y-3 text-left">
+              {/* Card 1: 锁定兴趣领域 */}
               <div
-                className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 ${
+                className={`p-3.5 sm:p-4 rounded-2xl border-2 flex items-center justify-between transition-all duration-300 shadow-xs ${
                   activeStep >= 1
-                    ? 'bg-emerald-50 border-emerald-300 text-stone-800 shadow-xs'
-                    : 'bg-white/80 border-[#E8DFC8] text-stone-400'
+                    ? 'bg-gradient-to-r from-amber-50 via-white to-amber-50/80 border-amber-400/90 shadow-sm shadow-amber-900/5'
+                    : 'bg-white/70 border-[#E8DFC8]/70 text-stone-400 opacity-60'
                 }`}
               >
-                <span
-                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 font-bold ${
-                    activeStep >= 1 ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-400'
-                  }`}
-                >
-                  <Check size={12} />
-                </span>
-                <p className="text-xs truncate">
-                  <strong className="text-stone-900 font-medium">锁定兴趣领域：</strong> {displayThemes}
-                </p>
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 font-bold transition-colors ${
+                      activeStep >= 1
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-xs'
+                        : 'bg-stone-200 text-stone-400'
+                    }`}
+                  >
+                    <Check size={14} className="stroke-[2.5]" />
+                  </span>
+                  <span className="text-[14.5px] sm:text-[15px] font-bold text-stone-800 tracking-wider">
+                    锁定兴趣领域
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="px-2.5 py-1 rounded-full bg-amber-100/90 text-amber-900 border border-amber-300/80 font-bold text-xs sm:text-[13px] shadow-2xs">
+                    {displayThemes}
+                  </span>
+                </div>
               </div>
 
+              {/* Card 2: 阅读偏好搜集 */}
               <div
-                className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 ${
+                className={`p-3.5 sm:p-4 rounded-2xl border-2 flex items-center justify-between transition-all duration-300 shadow-xs ${
                   activeStep >= 2
-                    ? 'bg-emerald-50 border-emerald-300 text-stone-800 shadow-xs'
-                    : 'bg-white/80 border-[#E8DFC8] text-stone-400'
+                    ? 'bg-gradient-to-r from-amber-50 via-white to-amber-50/80 border-amber-400/90 shadow-sm shadow-amber-900/5'
+                    : 'bg-white/70 border-[#E8DFC8]/70 text-stone-400 opacity-60'
                 }`}
               >
-                <span
-                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 font-bold ${
-                    activeStep >= 2 ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-400'
-                  }`}
-                >
-                  <Check size={12} />
-                </span>
-                <p className="text-xs">
-                  <strong className="text-stone-900 font-medium">微试读自适应定级：</strong>建议起点 {resolvedStartingLevel}
-                </p>
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 font-bold transition-colors ${
+                      activeStep >= 2
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-xs'
+                        : 'bg-stone-200 text-stone-400'
+                    }`}
+                  >
+                    <Check size={14} className="stroke-[2.5]" />
+                  </span>
+                  <span className="text-[14.5px] sm:text-[15px] font-bold text-stone-800 tracking-wider">
+                    阅读偏好搜集
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="px-2.5 py-1 rounded-full bg-amber-100/90 text-amber-900 border border-amber-300/80 font-bold text-xs sm:text-[13px] shadow-2xs">
+                    习惯与节奏已同步
+                  </span>
+                </div>
               </div>
 
+              {/* Card 3: 已生成专属画像 */}
               <div
-                className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 ${
+                className={`p-3.5 sm:p-4 rounded-2xl border-2 flex items-center justify-between transition-all duration-300 shadow-xs ${
                   activeStep >= 3
-                    ? 'bg-emerald-50 border-emerald-300 text-stone-800 shadow-xs'
-                    : 'bg-white/80 border-[#E8DFC8] text-stone-400'
+                    ? 'bg-gradient-to-r from-amber-50 via-white to-amber-50/80 border-amber-400/90 shadow-sm shadow-amber-900/5'
+                    : 'bg-white/70 border-[#E8DFC8]/70 text-stone-400 opacity-60'
                 }`}
               >
-                <span
-                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 font-bold ${
-                    activeStep >= 3 ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-400'
-                  }`}
-                >
-                  <Check size={12} />
-                </span>
-                <p className="text-xs truncate">
-                  <strong className="text-stone-900 font-medium">
-                    {preferences?.profile?.goalTrack?.targetFocus
-                      ? `已锁定【${preferences.profile.goalTrack.targetFocus}】专项画像`
-                      : '已生成专属阅读画像与路线'}
-                  </strong>
-                </p>
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 font-bold transition-colors ${
+                      activeStep >= 3
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-xs'
+                        : 'bg-stone-200 text-stone-400'
+                    }`}
+                  >
+                    <Check size={14} className="stroke-[2.5]" />
+                  </span>
+                  <span className="text-[14.5px] sm:text-[15px] font-bold text-stone-800 tracking-wider">
+                    已生成专属画像
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100/90 text-emerald-800 border border-emerald-300 font-bold text-xs tracking-wide">
+                    已就绪
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         ) : (
-          /* Phase 2: Calibrated Stage 09 Content */
-          <div className="w-full max-w-xs flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
-            {/* Centered Starting Level Anchor Badge with Dynamic Pop Animation */}
-            <div className="relative mb-2.5 flex flex-col items-center justify-center animate-in zoom-in-75 fade-in duration-700 ease-out">
-              {/* Dynamic light pulse glow */}
-              <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-md animate-pulse opacity-40 pointer-events-none" />
+          /* Phase 2: Calibrated Stage (Duolingo reference style, boxes removed, clean and concise) */
+          <div className="w-full max-w-sm sm:max-w-md px-1 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
+            {/* Duolingo-style Starting Level Anchor Badge */}
+            <div className="relative mb-4 flex flex-col items-center justify-center animate-in zoom-in-75 fade-in duration-700 ease-out">
+              {/* Dynamic warm light pulse glow */}
+              <div className="absolute inset-0 rounded-full bg-amber-400/20 blur-md animate-pulse opacity-50 pointer-events-none" />
 
-              {/* Centered Pill Badge - perfectly balanced vertically and horizontally */}
-              <div className="relative inline-flex items-center justify-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-2 border-emerald-500 shadow-md shadow-emerald-700/10 transition-transform duration-300 hover:scale-102">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                <span className="text-[13.5px] font-bold text-stone-800 tracking-wider">
+              {/* Centered Pill Badge */}
+              <div className="relative inline-flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-50 via-white to-amber-50 border-2 border-amber-400 shadow-md shadow-amber-900/10 transition-transform duration-300 hover:scale-102">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                <span className="text-[14.5px] sm:text-[15px] font-bold text-stone-800 tracking-wider">
                   建议阅读起点
                 </span>
-                <strong className="text-2xl font-black font-mono text-emerald-700 leading-none tracking-tight">
+                <strong className="text-2xl sm:text-3xl font-black font-mono text-amber-600 leading-none tracking-tight">
                   {resolvedStartingLevel}
                 </strong>
               </div>
             </div>
 
             {/* Headline */}
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-stone-900 mb-2.5">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-stone-900 mb-8">
               从这里开始，刚刚好
             </h1>
 
-            {/* Goal Track Personalized Badge */}
-            {preferences?.profile?.goalTrack?.targetFocus && (
-              <div className="w-full mb-3 p-2.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-[#FFFDF8] to-emerald-50/90 border border-amber-300/80 shadow-xs flex items-center justify-between text-left">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="w-7 h-7 rounded-xl bg-amber-500/15 text-amber-700 flex items-center justify-center shrink-0 text-sm">
-                    {preferences.profile.goalTrack.category === 'exam' ? '🎯' :
-                     preferences.profile.goalTrack.category === 'workplace' ? '💼' :
-                     preferences.profile.goalTrack.category === 'original' ? '🌟' : '🌱'}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[12px] font-bold text-stone-900 truncate">
-                        {preferences.profile.goalTrack.targetFocus}
-                      </span>
-                      <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 font-medium">
-                        专属靶向
-                      </span>
-                    </div>
-                    {preferences.profile.goalTrack.targetHurdle && (
-                      <div className="text-[11px] text-stone-500 truncate mt-0.5">
-                        突破卡点：{preferences.profile.goalTrack.targetHurdle}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Two Core Pillars Cards */}
-            <div className="w-full grid grid-cols-2 gap-2 text-left mb-3.5">
-              <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-xs flex flex-col justify-between">
-                <div>
-                  <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1.5 text-xs">
-                    <Sparkles size={13} />
-                  </div>
-                  <h3 className="text-xs font-bold text-stone-900 mb-0.5">
-                    {preferences?.profile?.goalTrack?.category === 'exam'
-                      ? '真题级语篇'
-                      : preferences?.profile?.goalTrack?.category === 'workplace'
-                      ? '实战语感积累'
-                      : '难度更适合'}
-                  </h3>
-                  <p className="text-[10.5px] text-stone-500 leading-snug">
-                    {preferences?.profile?.goalTrack?.category === 'exam'
-                      ? '精准攻坚长难句，阅读做题更自信'
-                      : preferences?.profile?.goalTrack?.category === 'workplace'
-                      ? '储备高频地道表达与敏捷速读'
-                      : '聚焦核心高频长句，零挫败感'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-xs flex flex-col justify-between">
-                <div>
-                  <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-1.5 text-xs">
-                    <Compass size={13} />
-                  </div>
-                  <h3 className="text-xs font-bold text-stone-900 mb-0.5">
-                    {preferences?.profile?.goalTrack?.category === 'exam'
-                      ? '攻克薄弱卡点'
-                      : preferences?.profile?.goalTrack?.category === 'workplace'
-                      ? '专业场景转化'
-                      : '随阅读调整'}
-                  </h3>
-                  <p className="text-[10.5px] text-stone-500 leading-snug">
-                    {preferences?.profile?.goalTrack?.category === 'exam'
-                      ? `针对${preferences?.profile?.goalTrack?.targetHurdle || '考点'}伴读实时点拨`
-                      : preferences?.profile?.goalTrack?.category === 'workplace'
-                      ? '外刊与跨境场景即读即用'
-                      : '越读越懂你节奏，随时自适应'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* "开启阅读体验" Button located right below the two cards */}
+            {/* Duolingo Tactile 3D Action Button */}
             <button
               onClick={onNext}
-              className="w-full py-3.5 px-4 rounded-2xl font-bold text-white text-[15px] sm:text-base flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer hover:brightness-105 animate-in fade-in slide-in-from-bottom-2 duration-300"
+              className="w-full h-13 sm:h-14 rounded-2xl font-black text-stone-950 text-base sm:text-lg flex items-center justify-center gap-2 transition-all active:translate-y-1 active:shadow-none cursor-pointer"
               style={{
-                backgroundColor: companion.accentColor || '#D97706',
-                boxShadow: `0 6px 20px rgba(180, 100, 20, 0.25)`
+                background: 'linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%)',
+                boxShadow: '0 4px 0 #D97706'
               }}
             >
               <span>开启阅读体验</span>
-              <ArrowRight size={17} />
+              <ArrowRight size={19} className="stroke-[2.5]" />
             </button>
           </div>
         )}
       </div>
-
-      {/* Bottom Area - shown during calibration */}
-      {!isCalibrated && (
-        <div className="pt-2 shrink-0 z-20">
-          <div className="w-full py-3 flex items-center justify-center gap-2 text-xs text-stone-500 font-mono">
-            <span className="w-2 h-2 rounded-full bg-amber-600 animate-ping" />
-            <span>细致调适难度坡度与画像中...</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
