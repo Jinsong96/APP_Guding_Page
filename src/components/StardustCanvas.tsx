@@ -30,10 +30,10 @@ export const StardustCanvas: React.FC<StardustCanvasProps> = ({
   const animFrameRef = useRef<number | null>(null);
 
   const colors = [
-    '#F59E0B', // Warm Amber
-    '#FBBF24', // Golden
-    '#D97706', // Deep Brass Gold
-    '#FEF3C7', // Stardust White Gold
+    '#A3E635', // Warm Amber
+    '#BDE65C', // Golden
+    '#65A30D', // Deep Brass Gold
+    '#EFF8D8', // Stardust White Gold
     '#E0E7FF'  // Ethereal Starlight
   ];
 

@@ -20,7 +20,7 @@ export const CONTENT_DOMAINS: ContentCategory[] = [
     dotColor: '#22D3EE',
     bgColor: 'rgba(6, 182, 212, 0.12)',
     borderColor: 'rgba(6, 182, 212, 0.35)',
-    tags: ['全球热点', '国际局势', '社会观察', '法律法规', '公平权利', '战争冲突', '灾难救援', '城市出行', '慈善公益', '环境环保']
+    tags: ['全球热点', '社会观察', '法律法规', '公平权利', '战争冲突', '灾难救援', '城市出行', '慈善公益', '环境环保']
   },
   {
     id: 'science',
@@ -81,7 +81,7 @@ export interface BubbleSeed {
 
 export const INITIAL_12_BUBBLES: BubbleSeed[] = [
   { tag: '全球热点', categoryId: 'world' },
-  { tag: '国际局势', categoryId: 'world' },
+  { tag: '社会观察', categoryId: 'world' },
   { tag: '前沿科技', categoryId: 'science' },
   { tag: '人工智能', categoryId: 'science' },
   { tag: '影视娱乐', categoryId: 'culture' },
@@ -133,11 +133,11 @@ export const COMPANIONS: Companion[] = [
     nameEn: 'Light',
     type: '引路型旅伴',
     quote: '“慢慢来，我在。”',
-    avatarUrl: '/assets/light_v2.png',
+    avatarUrl: '/assets/light_character.png',
     celebrateActionName: '喜悦欢呼跃动',
     celebrateQuote: '“太棒啦！小鹿准备好啦，我们开读吧！🐾”',
-    accentColor: '#F59E0B',
-    bgGlow: 'rgba(245, 158, 11, 0.25)',
+    accentColor: '#558B2F',
+    bgGlow: 'rgba(85, 139, 47, 0.2)',
     description: '温和细腻的节奏大师，总能帮你找到恰到好处的阅读速度。'
   },
   {

@@ -29,7 +29,7 @@ const CURATED_BATCHES: { tag: string; catId: string }[][] = [
     { tag: '经典名著', catId: 'story' },
     { tag: '旅行故事', catId: 'culture' },
     { tag: '习惯养成', catId: 'growth' },
-    { tag: '国际局势', catId: 'world' },
+    { tag: '法律法规', catId: 'world' },
     { tag: '数码科技', catId: 'science' },
     { tag: '饮食文化', catId: 'culture' },
     { tag: '悬疑推理', catId: 'story' }
@@ -94,7 +94,7 @@ export const ElasticBubblePond: React.FC<ElasticBubblePondProps> = ({
       {/* Top Controls Bar - Minimal, transparent, no card background */}
       <div className="flex items-center justify-between pb-2 mb-2 px-1">
         <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
-          <Sparkles size={12} className="text-amber-400" />
+          <Sparkles size={12} className="text-emerald-400" />
           <span>戳任意气泡，随心选 1~4 个：</span>
         </span>
 
@@ -102,7 +102,7 @@ export const ElasticBubblePond: React.FC<ElasticBubblePondProps> = ({
           {/* Quick random pick */}
           <button
             onClick={handleRandomPickOne}
-            className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-amber-300 transition-colors py-0.5 px-2 rounded-full hover:bg-slate-800"
+            className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-emerald-300 transition-colors py-0.5 px-2 rounded-full hover:bg-slate-800"
             title="帮我随性挑一个"
           >
             <Dices size={12} />
@@ -112,7 +112,7 @@ export const ElasticBubblePond: React.FC<ElasticBubblePondProps> = ({
           {/* Flick / refresh button */}
           <button
             onClick={handleFlickNext}
-            className="flex items-center gap-1 text-[11px] text-amber-400 hover:text-amber-300 transition-colors py-0.5 px-2.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 active:scale-95"
+            className="flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 transition-colors py-0.5 px-2.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 active:scale-95"
             title="轻弹换一批气泡"
           >
             <span>换一批 ✦</span>
@@ -185,7 +185,7 @@ export const ElasticBubblePond: React.FC<ElasticBubblePondProps> = ({
           disabled={!hasSelected}
           className={`w-full py-3.5 px-4 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
             hasSelected
-              ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-xl shadow-amber-500/20 hover:brightness-105'
+              ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-slate-950 shadow-xl shadow-emerald-500/20 hover:brightness-105'
               : 'bg-slate-800/60 text-slate-500 border border-slate-750 cursor-not-allowed opacity-60'
           }`}
         >

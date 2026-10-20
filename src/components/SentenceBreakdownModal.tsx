@@ -26,7 +26,7 @@ export const SentenceBreakdownModal: React.FC<SentenceBreakdownModalProps> = ({
       case '宾语/状语':
         return 'bg-purple-50 text-purple-800 border-purple-200';
       case '修饰分句':
-        return 'bg-amber-50 text-amber-800 border-amber-200';
+        return 'bg-emerald-50 text-emerald-800 border-emerald-200';
       default:
         return 'bg-stone-100 text-stone-700 border-stone-300';
     }
@@ -35,25 +35,25 @@ export const SentenceBreakdownModal: React.FC<SentenceBreakdownModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-md bg-[#FAF6ED] border border-[#E8DFC8] rounded-3xl p-5 shadow-2xl relative text-stone-900 max-h-[85vh] overflow-y-auto no-scrollbar"
+        className="w-full max-w-md bg-[#F0F8F4] border border-[#DCEBE5] rounded-3xl p-5 shadow-2xl relative text-stone-900 max-h-[85vh] overflow-y-auto no-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#E8DFC8]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#DCEBE5]">
           <div className="flex items-center gap-2">
             <Layers size={16} className="text-emerald-700" />
             <h3 className="text-sm font-bold text-stone-900">长难句 AI 结构拆解</h3>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white hover:bg-[#F2ECE1] flex items-center justify-center text-stone-500 hover:text-stone-900 border border-[#E2D8C6] transition-colors cursor-pointer shadow-xs"
+            className="w-8 h-8 rounded-full bg-white hover:bg-[#EAF4EF] flex items-center justify-center text-stone-500 hover:text-stone-900 border border-[#DCEBE5] transition-colors cursor-pointer shadow-xs"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Original Sentence */}
-        <div className="mt-4 p-3.5 rounded-2xl bg-white border border-[#E8DFC8] shadow-xs">
+        <div className="mt-4 p-3.5 rounded-2xl bg-white border border-[#DCEBE5] shadow-xs">
           <span className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider block mb-1.5 font-mono">
             原句 Original
           </span>
@@ -82,7 +82,7 @@ export const SentenceBreakdownModal: React.FC<SentenceBreakdownModalProps> = ({
           {sentenceData.chunks.map((chunk, idx) => (
             <div
               key={idx}
-              className="p-3 rounded-xl bg-white border border-[#E8DFC8] hover:border-amber-400/70 transition-colors shadow-xs"
+              className="p-3 rounded-xl bg-white border border-[#DCEBE5] hover:border-emerald-400/70 transition-colors shadow-xs"
             >
               <div className="flex items-center justify-between gap-2 mb-1.5">
                 <span className={`text-[11px] px-2 py-0.5 rounded-md font-mono border ${getRoleBadgeStyle(chunk.role)}`}>
@@ -101,14 +101,14 @@ export const SentenceBreakdownModal: React.FC<SentenceBreakdownModalProps> = ({
         </div>
 
         {/* Companion Tip */}
-        <div className="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200 flex gap-2.5 items-center">
+        <div className="mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex gap-2.5 items-center">
           <img
             src={companion.avatarUrl}
             alt={companion.name}
-            className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-amber-300"
+            className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-emerald-300"
           />
-          <p className="text-xs text-amber-900 leading-relaxed">
-            <strong className="text-amber-800 font-bold">{companion.name} 的避坑提示：</strong> 
+          <p className="text-xs text-emerald-900 leading-relaxed">
+            <strong className="text-emerald-800 font-bold">{companion.name} 的避坑提示：</strong>
             遇到长句子别慌，先把状语和破折号后修饰遮住，先抓出主干，再补读环境细节。
           </p>
         </div>

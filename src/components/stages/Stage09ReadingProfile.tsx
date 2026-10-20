@@ -37,18 +37,18 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#FAF6ED]">
+    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#F0F8F4]">
       {/* Top Bar */}
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-[#E8DFC8]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#DCEBE5]">
           <button
             onClick={onBack}
-            className="w-8 h-8 rounded-full bg-white hover:bg-[#F2ECE1] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E2D8C6] shadow-xs cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white hover:bg-[#EAF4EF] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#DCEBE5] shadow-xs cursor-pointer"
             aria-label="返回上一步"
           >
             <ArrowLeft size={16} />
           </button>
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#EFE7D8] text-stone-600 font-mono border border-[#E2D8C6]">
+          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#EFE7D8] text-stone-600 font-mono border border-[#DCEBE5]">
             初步阅读画像
           </span>
         </div>
@@ -95,7 +95,7 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
 
       {/* Two Pillars Cards */}
       <div className="my-auto py-2 grid grid-cols-2 gap-3">
-        <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-xs">
+        <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] shadow-xs">
           <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
             <Sparkles size={14} />
           </div>
@@ -105,8 +105,8 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
           </p>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E8DFC8] shadow-xs">
-          <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
+        <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] shadow-xs">
+          <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
             <Sliders size={14} />
           </div>
           <h3 className="text-xs font-bold text-stone-900 mb-1">随阅读调整</h3>
@@ -118,7 +118,7 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
 
       {/* Profile Edit Drawer / Floating Sheet */}
       {showEditSheet ? (
-        <div className="p-3.5 rounded-2xl bg-white border border-amber-400 shadow-md mb-3 animate-in fade-in duration-200">
+        <div className="p-3.5 rounded-2xl bg-white border border-emerald-400 shadow-md mb-3 animate-in fade-in duration-200">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-stone-900">调整“这次怎么陪你”</span>
             <span className="text-[10px] text-stone-500">提示密度与时长</span>
@@ -133,8 +133,8 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
                   onClick={() => setHintDensity('light')}
                   className={`px-2.5 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
                     hintDensity === 'light'
-                      ? 'bg-amber-600 text-white font-medium'
-                      : 'bg-[#F2ECE1] text-stone-600 hover:text-stone-900'
+                      ? 'bg-emerald-600 text-white font-medium'
+                      : 'bg-[#EAF4EF] text-stone-600 hover:text-stone-900'
                   }`}
                 >
                   轻提示
@@ -143,8 +143,8 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
                   onClick={() => setHintDensity('detailed')}
                   className={`px-2.5 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
                     hintDensity === 'detailed'
-                      ? 'bg-amber-600 text-white font-medium'
-                      : 'bg-[#F2ECE1] text-stone-600 hover:text-stone-900'
+                      ? 'bg-emerald-600 text-white font-medium'
+                      : 'bg-[#EAF4EF] text-stone-600 hover:text-stone-900'
                   }`}
                 >
                   多解释
@@ -160,8 +160,8 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
                   onClick={() => setSessionDuration(5)}
                   className={`px-2.5 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
                     sessionDuration === 5
-                      ? 'bg-amber-600 text-white font-medium'
-                      : 'bg-[#F2ECE1] text-stone-600 hover:text-stone-900'
+                      ? 'bg-emerald-600 text-white font-medium'
+                      : 'bg-[#EAF4EF] text-stone-600 hover:text-stone-900'
                   }`}
                 >
                   5 分钟
@@ -170,8 +170,8 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
                   onClick={() => setSessionDuration(10)}
                   className={`px-2.5 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
                     sessionDuration === 10
-                      ? 'bg-amber-600 text-white font-medium'
-                      : 'bg-[#F2ECE1] text-stone-600 hover:text-stone-900'
+                      ? 'bg-emerald-600 text-white font-medium'
+                      : 'bg-[#EAF4EF] text-stone-600 hover:text-stone-900'
                   }`}
                 >
                   10 分钟
@@ -182,7 +182,7 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
 
           <button
             onClick={handleSaveProfile}
-            className="w-full mt-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium cursor-pointer"
+            className="w-full mt-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium cursor-pointer"
           >
             保存画像设置
           </button>
@@ -205,7 +205,7 @@ export const Stage09ReadingProfile: React.FC<Stage09ReadingProfileProps> = ({
 
         <button
           onClick={() => setShowEditSheet(!showEditSheet)}
-          className="w-full py-2.5 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-white hover:bg-[#F2ECE1] border border-[#E2D8C6] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+          className="w-full py-2.5 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-white hover:bg-[#EAF4EF] border border-[#DCEBE5] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
         >
           <Sliders size={13} />
           <span>{showEditSheet ? '收起画像调整' : '有一点不对，调整画像'}</span>

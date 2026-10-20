@@ -8,7 +8,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Companion, GoalTrackDetails } from '../../types';
-import { GalaxyCompassPicker } from '../GalaxyCompassPicker';
+import { InterestThemePicker } from '../InterestThemePicker';
 
 export type CefrLevelKey = 'A1-' | 'A2' | 'B1' | 'B2+';
 export type GoalCategory = 'exam' | 'workplace' | 'original' | 'interest';
@@ -318,7 +318,7 @@ export const LEVEL_METAS: Record<
   'B1': {
     levelLabel: 'B1 地道流畅',
     code: 'L7',
-    color: '#FBBF24',
+    color: '#BDE65C',
     tagline: '复合从句与地道短语，畅读原版',
     description: '词汇量约 3500-4500，适应复合从句、地道成语与时事科普，可从容阅读国外主流媒体原版短文。'
   },
@@ -373,23 +373,17 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   onSkip: _onSkip
 }) => {
   // Navigation Steps:
-  // 0: Entry Welcome Animation Screen (多邻国经典角色登场视频动效)
-  // 1: 360° Galaxy Compass (兴趣星盘 · 去除顶部对话框)
-  // 2: Transition 1: 星盘 ➔ 习惯过渡动画屏 (精简文案)
+  // 1: Interest theme selection
   // 11: Q1 核心目标
   // 12: Q2 场景定位
   // 15: Q3 核心卡点
   // 13: Q4 专注节奏
   // 14: Q5 当前状态（语感自评 ➔ 决定试读起步等级）
-  // 16: Transition 2: 习惯 ➔ 语感试读过渡动画屏 (精简文案)
-  // 3: 句子 1/4 试读评测 (进度条 25%)
-  // 4: 句子 2/4 试读评测 (进度条 50%)
-  // 5: 句子 3/4 试读评测 (进度条 75%)
-  // 6: 句子 4/4 试读评测 (进度条 100%)
-  // 7: 定级达成完成屏 (直接开启专属定制按钮 ➔ 切换到 03 定制画像)
-  const [step, setStep] = useState<number>(0);
+  // 3-6: Four sentence-reading assessment questions
+  const [step, setStep] = useState<number>(1);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [astrolabeTargetDomain, setAstrolabeTargetDomain] = useState<number | null>(null);
+  const [customTopics, setCustomTopics] = useState<string[]>([]);
+  const [priorityTopics, setPriorityTopics] = useState<string[]>([]);
 
   const [currentLevel, setCurrentLevel] = useState<CefrLevelKey>('A2');
   const [surveyAnswers, setSurveyAnswers] = useState<SurveyAnswers>({});
@@ -418,19 +412,26 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   // Dynamic typewriter for companion speech bubble
   const triggerBubbleSpeech = (text: string) => {
     if (typewriterTimerRef.current) clearInterval(typewriterTimerRef.current);
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCompanionBubbleText(text);
+      setIsTyping(false);
+      return;
+    }
+
     setIsTyping(true);
+    const characters = Array.from(text);
     let idx = 0;
     setCompanionBubbleText('');
 
     typewriterTimerRef.current = setInterval(() => {
-      idx += 2;
-      setCompanionBubbleText(text.slice(0, idx));
-      if (idx >= text.length) {
+      idx += 1;
+      setCompanionBubbleText(characters.slice(0, idx).join(''));
+      if (idx >= characters.length) {
         if (typewriterTimerRef.current) clearInterval(typewriterTimerRef.current);
         typewriterTimerRef.current = null;
         setIsTyping(false);
       }
-    }, 16);
+    }, 28);
   };
 
   useEffect(() => {
@@ -455,12 +456,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
 
     const questions = getSurveyQuestions(companion.name, goalCategory);
     const q = questions.find((item) => item.step === step);
-    if (step === 0) {
-      triggerBubbleSpeech(`嗨！初次见面，我是 ${companion.name}！快挑挑你喜欢看的内容吧～`);
-    } else if (step === 2) {
-      triggerBubbleSpeech(`太棒啦，你选的兴趣我都记下啦！接下来回答 5 个阅读小问题，我们将为你定制专属学习旅程！`);
-    } else if (step === 16) {
-      triggerBubbleSpeech(`接下来进行 4 句微试读，感受一下难度，我们就能为你锁定建议起步等级！`);
+    if (step === 1) {
+      triggerBubbleSpeech('选择你感兴趣的主题');
     } else if (q) {
       triggerBubbleSpeech(q.title);
     } else if (step >= 3 && step <= 6) {
@@ -502,11 +499,22 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     });
   };
 
-  // Confirm tags from Astrolabe -> Proceed to Step 2 (Transition 1)
+  const handleApplyCustomTopics = (topics: string[], newlyCreated: string[]) => {
+    setCustomTopics((prev) => [...new Set([...newlyCreated, ...prev])]);
+    setPriorityTopics((prev) => [...new Set([...topics, ...prev])]);
+    setSelectedTags((prev) => {
+      const next = [...prev];
+      topics.forEach((topic) => {
+        if (!next.includes(topic) && next.length < 10) next.push(topic);
+      });
+      return next;
+    });
+  };
+
+  // Confirm selected themes and proceed directly to the reading-habits questions.
   const handleConfirmAstrolabe = (tags: string[]) => {
-    const finalTags = tags.length > 0 ? tags : (selectedTags.length > 0 ? selectedTags : ['前沿科技', '天文探索']);
-    setSelectedTags(finalTags);
-    setStep(2); // Transition Screen 1
+    setSelectedTags(tags);
+    setStep(11);
   };
 
   // Auto Commit Helper for Survey Options
@@ -599,7 +607,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       setCurrentLevel(determinedStartLevel);
       setSentenceLevelHistory({ 0: determinedStartLevel });
       setSentenceFeedbacks({});
-      setStep(16); // Direct to Transition 2 (语感微试读过渡动画屏)
+      setStep(3);
       return;
     }
   };
@@ -608,8 +616,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const handleSelectOption = (opt: SurveyOptionItem) => {
     setSelectedOptionLabel(opt.label);
     setSelectedOptionItem(opt);
-    // Instant companion intelligent response
-    triggerBubbleSpeech(opt.aiReasoning);
 
     // Cancel any previous timer
     if (autoAdvanceTimerRef.current) {
@@ -649,24 +655,13 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       }));
       const finalLvl = getNextLevel(currentLevel, feeling);
       setCurrentLevel(finalLvl);
-      setStep(7);
+      onComplete(selectedTags, finalLvl, surveyAnswers);
       return;
     }
   };
 
-  // Difficulty Feedback Click in 4-Sentence Placement (用户再次点击选中项直接确认进入下一句，无倒计时)
+  // Record the selected difficulty, then advance after a short confirmation pause.
   const handleSelectFeeling = (feeling: 'down' | 'keep' | 'up') => {
-    // 倘若用户再次点击已选中的同一个选项，确认选择并立即进入下一题
-    if (selectedFeeling === feeling) {
-      if (autoAdvanceTimerRef.current) {
-        clearTimeout(autoAdvanceTimerRef.current);
-        autoAdvanceTimerRef.current = null;
-      }
-      commitFeelingAndAdvance(feeling, step);
-      return;
-    }
-
-    // 首次点击：选中该选项并触发伴读反馈，等待用户再次点击确认
     setSelectedFeeling(feeling);
     if (feeling === 'down') {
       triggerBubbleSpeech(`收到！这句难度略高，为你调配更轻盈的基础句式，保证流畅理解。`);
@@ -676,11 +671,13 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       triggerBubbleSpeech(`游刃有余！感觉很轻松，为你提升句式丰富度与地道挑战。`);
     }
 
-    // 清除可能存在的遗留计时器
     if (autoAdvanceTimerRef.current) {
       clearTimeout(autoAdvanceTimerRef.current);
-      autoAdvanceTimerRef.current = null;
     }
+    autoAdvanceTimerRef.current = setTimeout(() => {
+      autoAdvanceTimerRef.current = null;
+      commitFeelingAndAdvance(feeling, step);
+    }, 2000);
   };
 
   // Level adjustment helper
@@ -705,69 +702,46 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       autoAdvanceTimerRef.current = null;
     }
 
-    // 0. From Entry Welcome (Step 0) -> 360° Astrolabe (Step 1)
-    if (step === 0) {
-      setStep(1);
-      return;
-    }
-
-    // 1. From Transition 1 (Step 2) -> Q1 (Step 11)
-    if (step === 2) {
-      setStep(11);
-      return;
-    }
-
-    // 2. From Q1 (Step 11) -> Q2 (Step 12)
+    // 1. From Q1 (Step 11) -> Q2 (Step 12)
     if (step === 11 && selectedOptionItem) {
       commitOptionAndAdvance(selectedOptionItem, 11);
       return;
     }
 
-    // 3. From Q2 (Step 12) -> Q3 (Step 15)
+    // 2. From Q2 (Step 12) -> Q3 (Step 15)
     if (step === 12 && selectedOptionItem) {
       commitOptionAndAdvance(selectedOptionItem, 12);
       return;
     }
 
-    // 4. From Q3 (Step 15) -> Q4 (Step 13)
+    // 3. From Q3 (Step 15) -> Q4 (Step 13)
     if (step === 15 && selectedOptionItem) {
       commitOptionAndAdvance(selectedOptionItem, 15);
       return;
     }
 
-    // 5. From Q4 (Step 13) -> Q5 (Step 14)
+    // 4. From Q4 (Step 13) -> Q5 (Step 14)
     if (step === 13 && selectedOptionItem) {
       commitOptionAndAdvance(selectedOptionItem, 13);
       return;
     }
 
-    // 6. From Q5 (Step 14) -> Transition 2 (Step 16) directly
+    // 5. From Q5 (Step 14) -> Sentence 1 (Step 3)
     if (step === 14 && selectedOptionItem) {
       commitOptionAndAdvance(selectedOptionItem, 14);
       return;
     }
 
-    // 7. From Transition 2 (Step 16) -> Sentence 1 (Step 3)
-    if (step === 16) {
-      setStep(3); // Start sentence 1!
-      return;
-    }
-
-    // 8. From Sentences 1, 2, 3 -> Next Sentence
+    // 6. From Sentences 1, 2, 3 -> Next Sentence
     if (step >= 3 && step <= 5 && selectedFeeling) {
       commitFeelingAndAdvance(selectedFeeling, step);
       return;
     }
 
-    // 9. From Sentence 4 (Step 6) -> Complete Step 7
+    // 7. From Sentence 4 (Step 6) -> Complete onboarding
     if (step === 6 && selectedFeeling) {
       commitFeelingAndAdvance(selectedFeeling, 6);
       return;
-    }
-
-    // 10. From Step 7 -> Complete to Stage 03 定制画像
-    if (step === 7) {
-      onComplete(selectedTags, currentLevel, surveyAnswers);
     }
   };
 
@@ -777,20 +751,12 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
     }
-    if (step === 0) {
+    if (step === 1) {
       onBack();
       return;
     }
-    if (step === 1) {
-      setStep(0);
-      return;
-    }
-    if (step === 2) {
-      setStep(1);
-      return;
-    }
     if (step === 11) {
-      setStep(2);
+      setStep(1);
       return;
     }
     if (step === 12) {
@@ -809,12 +775,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       setStep(13); // Back to Q4
       return;
     }
-    if (step === 16) {
-      setStep(14); // Back to Q5
-      return;
-    }
     if (step === 3) {
-      setStep(16);
+      setStep(14);
       return;
     }
     if (step === 4) {
@@ -835,9 +797,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       setStep(5);
       return;
     }
-    if (step === 7) {
-      setStep(6);
-    }
   };
 
   // Questions dataset
@@ -845,121 +804,81 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const currentQ = surveyQuestions.find((q) => q.step === step);
   const sentenceIdx = step >= 3 && step <= 6 ? step - 3 : -1;
 
-  // Calculate top progress percentage:
-  // During survey (Q1..Q5): 20% -> 40% -> 60% -> 80% -> 100%
-  // During reading sentence test (Sentences 1..4): 25% -> 50% -> 75% -> 100%
-  const progressPercentage =
-    step === 0 || step === 1 ? 0 :
-    step === 2 ? 5 :
-    step === 11 ? 20 :
-    step === 12 ? 40 :
-    step === 15 ? 60 :
-    step === 13 ? 80 :
-    step === 14 ? 100 :
-    step === 16 ? 10 :
-    sentenceIdx !== -1 ? Math.round(((sentenceIdx + 1) / 4) * 100) : 100;
-
-  // Show bottom sticky bar only for interstitial/welcome/completion steps (hidden during survey and sentence test)
-  const showBottomBar = step === 0 || step === 2 || step === 16 || step === 7;
-
-  // Can the bottom Continue button be clicked?
-  const canContinue =
-    step === 0 ||
-    step === 2 ||
-    step === 16 ||
-    step === 7;
+  const progressStep =
+    step === 1 ? 1 :
+    currentQ ? currentQ.number + 1 :
+    sentenceIdx !== -1 ? sentenceIdx + 7 :
+    10;
+  const progressPercentage = progressStep * 10;
+  const isHabitSurvey = Boolean(currentQ);
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#FAF6ED] text-stone-900 select-none overflow-hidden relative font-sans">
-      {/* ================= TOP HEADER (Step 0: Back Button Only) ================= */}
-      {step === 0 && (
-        <div className="shrink-0 h-14 px-4 sm:px-6 flex items-center justify-between border-b border-[#E8DFC8] bg-[#FAF6ED]/95 backdrop-blur-md z-30 max-w-xl w-full mx-auto">
-          <button
-            onClick={onBack}
-            className="p-1 -ml-1 text-stone-500 hover:text-stone-900 transition-colors cursor-pointer active:scale-95 shrink-0"
-            aria-label="返回上一页"
-          >
-            <ArrowLeft size={20} className="stroke-[2.5]" />
-          </button>
+    <div className={`w-full h-full flex flex-col ${sentenceIdx !== -1 ? 'bg-[#F1FAF6] text-[#103E39]' : isHabitSurvey ? 'bg-[#FAFBFA] text-[#252D32]' : 'bg-[#F0F8F4] text-stone-900'} select-none overflow-hidden relative font-sans`}>
+      <div className={`z-30 mx-auto flex h-14 w-full max-w-xl shrink-0 items-center gap-3 border-b px-3 sm:px-5 ${
+        isHabitSurvey
+          ? 'border-[#E0E7E3] bg-[#FAFBFA]'
+          : 'border-[#DCE7E0] bg-[#F0F8F4]'
+      }`}>
+        <button
+          onClick={handlePrevStep}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#64766B] transition-colors hover:bg-white/80 hover:text-[#29362F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] active:scale-95"
+          aria-label="返回上一页"
+        >
+          <ArrowLeft size={20} className="stroke-[2.2]" />
+        </button>
+        <div
+          className="flex flex-1 items-center gap-1.5"
+          role="progressbar"
+          aria-label="引导进度"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progressPercentage}
+          aria-valuetext={`第 ${progressStep} 步，共 10 步`}
+        >
+          {Array.from({ length: 7 }, (_, index) => {
+            const segmentSize = 100 / 7;
+            const fill = Math.max(0, Math.min(100, ((progressPercentage - index * segmentSize) / segmentSize) * 100));
+            return (
+              <span key={index} className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#D9E5DD]">
+                <span
+                  className="block h-full rounded-full bg-[#526F65] transition-[width] duration-300 ease-out"
+                  style={{ width: `${fill}%` }}
+                />
+              </span>
+            );
+          })}
         </div>
-      )}
-
-      {/* ================= TOP HEADER (Step 1: Astrolabe Clean Navigation) ================= */}
-      {step === 1 && (
-        <div className="shrink-0 h-14 px-4 sm:px-6 flex items-center justify-between border-b border-[#E8DFC8] bg-[#FAF6ED]/95 backdrop-blur-md z-30 max-w-xl w-full mx-auto">
-          <button
-            onClick={() => setStep(0)}
-            className="p-1 -ml-1 text-stone-500 hover:text-stone-900 transition-colors cursor-pointer active:scale-95 shrink-0"
-            aria-label="返回欢迎页"
-          >
-            <ArrowLeft size={20} className="stroke-[2.5]" />
-          </button>
-          <div className="w-5" />
-        </div>
-      )}
-
-      {/* ================= TOP HEADER (Step 2..16, Sentences: Duolingo Progress Bar) ================= */}
-      {step !== 0 && step !== 1 && (
-        <div className="shrink-0 h-14 px-4 sm:px-6 flex items-center gap-3.5 border-b border-[#E8DFC8] bg-[#FAF6ED]/95 backdrop-blur-md z-30 max-w-xl w-full mx-auto">
-          {/* Back Arrow */}
-          <button
-            onClick={handlePrevStep}
-            className="p-1 -ml-1 text-stone-500 hover:text-stone-900 transition-colors cursor-pointer active:scale-95 shrink-0"
-            aria-label="返回上一屏"
-          >
-            <ArrowLeft size={20} className="stroke-[2.5]" />
-          </button>
-
-          {/* Duolingo Smooth Capsule Progress Bar */}
-          <div className="flex-1 h-3 rounded-full bg-[#E5DFC8] p-0.5 overflow-hidden shadow-inner relative">
-            <div
-              className="h-full rounded-full transition-all duration-300 ease-out"
-              style={{
-                width: `${progressPercentage}%`,
-                background: 'linear-gradient(90deg, #FBBF24 0%, #F59E0B 100%)',
-                boxShadow: '0 0 8px rgba(245, 158, 11, 0.4)'
-              }}
-            />
-          </div>
-
-          {/* Step Pill */}
-          <span className="text-xs font-bold text-amber-900 font-mono shrink-0">
-            {step === 2 || step === 16 ? '准备' :
-             currentQ ? `${currentQ.number}/5` :
-             sentenceIdx !== -1 ? `${sentenceIdx + 1}/4` : '完成'}
-          </span>
-        </div>
-      )}
+      </div>
 
       {/* ================= MAIN CONTENT CANVAS ================= */}
-      <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col items-center justify-between p-4 sm:p-5 w-full max-w-xl mx-auto">
+      <div className={`flex-1 no-scrollbar flex w-full max-w-xl mx-auto ${step === 1 ? 'min-h-0 overflow-hidden p-0' : 'overflow-y-auto flex-col items-center justify-between p-4 sm:p-5'}`}>
         {/* ================= SCREEN 0: ENTRY WELCOME ANIMATION (参考用户视频) ================= */}
-        {step === 0 && (
+        {false && step === 0 && (
           <div className="w-full flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-400 my-auto">
             <div className="relative mb-6 max-w-xs sm:max-w-sm w-full">
               {/* Duolingo Speech Bubble pointing downwards to mascot */}
-              <div className="relative bg-white rounded-3xl border-2 border-[#E5E0D5] p-5 shadow-sm mb-6 inline-block text-left animate-in zoom-in-95 fade-in duration-300">
+              <div className="relative bg-white rounded-3xl border-2 border-[#DCEBE5] p-5 shadow-sm mb-6 inline-block text-left animate-in zoom-in-95 fade-in duration-300">
                 <p className="text-base sm:text-[18px] font-bold tracking-tight leading-snug animate-title-gradient">
                   {companionBubbleText}
-                  {isTyping && <span className="inline-block w-1.5 h-3.5 bg-amber-600 ml-1 animate-pulse" />}
+                  {isTyping && <span className="inline-block w-1.5 h-3.5 bg-emerald-600 ml-1 animate-pulse" />}
                 </p>
                 {/* Speech Bubble Arrow Notch pointing downward */}
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-white" />
-                <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-t-[14px] border-t-[#E5E0D5] -z-10" />
+                <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-t-[14px] border-t-[#DCEBE5] -z-10" />
               </div>
 
               {/* Mascot Center Glow Avatar with celebratory wave */}
               <div className="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-amber-400/20 blur-xl animate-pulse" />
+                <div className="absolute inset-0 rounded-full bg-emerald-400/20 blur-xl animate-pulse" />
                 {/* Floating Soft Sparkles */}
                 <div className="absolute inset-0 pointer-events-none">
-                  <span className="absolute -top-1 -right-2 text-amber-500 animate-sparkle-soft-1">
+                  <span className="absolute -top-1 -right-2 text-emerald-500 animate-sparkle-soft-1">
                     <Sparkles size={18} />
                   </span>
-                  <span className="absolute top-1/2 -left-3 text-amber-400 animate-sparkle-soft-2">
-                    <Sparkle size={14} className="fill-amber-400" />
+                  <span className="absolute top-1/2 -left-3 text-emerald-400 animate-sparkle-soft-2">
+                    <Sparkle size={14} className="fill-emerald-400" />
                   </span>
-                  <span className="absolute -bottom-1 right-2 text-amber-500 animate-sparkle-soft-1">
+                  <span className="absolute -bottom-1 right-2 text-emerald-500 animate-sparkle-soft-1">
                     <Sparkles size={16} />
                   </span>
                 </div>
@@ -973,159 +892,98 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
           </div>
         )}
 
-        {/* ================= SCREEN 1: GALAXY COMPASS (往上移适配整体布局，去除大片空白) ================= */}
+        {/* ================= SCREEN 1: INTEREST THEME PICKER ================= */}
         {step === 1 && (
-          <div className="w-full flex-1 flex flex-col items-center justify-start pt-1 sm:pt-2 animate-in fade-in zoom-in-95 duration-300">
-            {/* Galaxy Compass Wheel Clean */}
-            <div className="w-full">
-              <GalaxyCompassPicker
-                selectedTags={selectedTags}
-                onToggleTag={handleToggleTag}
-                onConfirm={handleConfirmAstrolabe}
-                companionAccent={companion.accentColor}
-                targetDomainIndex={astrolabeTargetDomain}
-                onDomainChange={() => setAstrolabeTargetDomain(null)}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ================= TRANSITION 1: 星盘 ➔ 阅读习惯过渡动画屏 (精简文案，呈现小灯happy形态) ================= */}
-        {step === 2 && (
-          <div className="w-full flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-400 my-auto">
-            <div className="relative mb-6 max-w-xs sm:max-w-sm w-full">
-              {/* Duolingo Speech Bubble pointing downwards to mascot */}
-              <div className="relative bg-white rounded-3xl border-2 border-[#E5E0D5] p-5 shadow-sm mb-6 inline-block text-left animate-in zoom-in-95 fade-in duration-300">
-                <p className="text-base sm:text-[17px] font-bold tracking-tight leading-snug animate-title-gradient">
-                  {companionBubbleText || '太棒啦，你选的兴趣我都记下啦！接下来回答 5 个阅读小问题，我们将为你定制专属学习旅程！'}
-                  {isTyping && <span className="inline-block w-1.5 h-3.5 bg-amber-600 ml-1 animate-pulse" />}
-                </p>
-                {/* Speech Bubble Arrow Notch pointing downward */}
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-white" />
-                <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-t-[14px] border-t-[#E5E0D5] -z-10" />
-              </div>
-
-              {/* Mascot Center Glow Avatar with celebratory action (Happy Form) */}
-              <div className="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-amber-400/25 blur-xl animate-pulse" />
-                {/* Floating Soft Sparkles */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <span className="absolute -top-1 -right-2 text-amber-500 animate-sparkle-soft-1">
-                    <Sparkles size={18} />
-                  </span>
-                  <span className="absolute top-1/2 -left-3 text-amber-400 animate-sparkle-soft-2">
-                    <Sparkle size={14} className="fill-amber-400" />
-                  </span>
-                  <span className="absolute -bottom-1 right-2 text-amber-500 animate-sparkle-soft-1">
-                    <Sparkles size={16} />
-                  </span>
-                </div>
-                <img
-                  src={companion.id === 'light' ? '/assets/light_happy.png' : companion.avatarUrl}
-                  alt={companion.name}
-                  className="w-full h-full object-contain relative z-10 animate-celebrate-action drop-shadow-md select-none cursor-pointer"
-                />
-              </div>
-            </div>
-          </div>
+          <InterestThemePicker
+            companion={companion}
+            bubbleText={companionBubbleText}
+            bubbleIsTyping={isTyping}
+            selectedTags={selectedTags}
+            customTopics={customTopics}
+            priorityTopics={priorityTopics}
+            onToggleTag={handleToggleTag}
+            onApplyCustomTopics={handleApplyCustomTopics}
+            onConfirm={handleConfirmAstrolabe}
+          />
         )}
 
         {/* ================= SCREENS 3..7: SURVEY QUESTIONS (Duolingo Vertical Stack Cards, Zero Truncation) ================= */}
         {currentQ && (
-          <div className="w-full flex-1 flex flex-col justify-start animate-in fade-in slide-in-from-right-4 duration-300">
+        <div className="w-full flex-1 flex flex-col justify-start animate-in fade-in slide-in-from-right-4 duration-300">
             {/* Duolingo Companion Speech Header (Mascot left + Speech bubble right) */}
-            <div className="flex items-start gap-3 mb-4 sm:mb-5 w-full">
-              <div className="relative shrink-0 mt-0.5">
-                <img
-                  src={companion.avatarUrl}
-                  alt={companion.name}
-                  className="w-13 h-13 rounded-full object-cover ring-2 ring-amber-300 shadow-sm"
-                />
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white bg-emerald-500" />
-              </div>
+            <div className="flex items-center gap-3 mb-3 w-full">
+              <img
+                src={companion.avatarUrl}
+                alt={companion.name}
+                className="h-[48px] w-[48px] shrink-0 object-contain"
+              />
 
               {/* Pointing Speech Bubble with Notch */}
-              <div className="relative flex-1 bg-white rounded-2xl border-2 border-[#E5E0D5] p-3.5 sm:p-4 shadow-sm">
-                <div className="absolute top-4 -left-2.5 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[10px] border-r-white z-10" />
-                <div className="absolute top-3.5 -left-3.5 w-0 h-0 border-t-[7px] border-t-transparent border-b-[7px] border-b-transparent border-r-[12px] border-r-[#E5E0D5]" />
+              <div className="relative flex-1 rounded-[14px] border border-[#D8E2DD] bg-white px-4 py-3.5">
+                <div className="absolute top-5 -left-2 w-0 h-0 border-y-[7px] border-y-transparent border-r-[9px] border-r-white z-10" />
+                <div className="absolute top-[19px] -left-[10px] w-0 h-0 border-y-[8px] border-y-transparent border-r-[10px] border-r-[#D8E2DD]" />
 
-                <div className="text-[15px] sm:text-[16px] font-bold text-stone-900 leading-snug">
-                  {companionBubbleText}
-                  {isTyping && <span className="inline-block w-1.5 h-3 bg-amber-600 ml-1 animate-pulse" />}
+                <div className="text-[16px] font-semibold text-[#252D32] leading-snug">
+                  {currentQ.title}
                 </div>
               </div>
             </div>
 
-            {/* Vertical Stack List (Duolingo Reference: Full Width, Complete Text, Zero Ellipsis) */}
-            <div className="flex flex-col gap-2.5 sm:gap-3 w-full">
+            <p className="min-h-6 mb-2 text-[13px] leading-5 text-[#7B8984]">
+              选一个最接近的就好，之后也可以调整
+            </p>
+
+            {/* Quiet single-choice rows keep the question and all options easy to scan. */}
+            <div className="w-full" role="radiogroup" aria-label={currentQ.title}>
               {currentQ.options.map((opt, idx) => {
                 const isSelected = selectedOptionLabel === opt.label;
-                const isRecommended = opt.isRecommended;
 
                 return (
                   <button
                     key={opt.label}
+                    type="button"
                     onClick={() => handleSelectOption(opt)}
-                    className={`group relative w-full rounded-2xl px-4 py-3.5 sm:py-4 text-left transition-all duration-150 cursor-pointer flex items-center justify-between border-2 active:scale-[0.99] ${
-                      isSelected
-                        ? 'border-amber-500 bg-[#FFFDF7] shadow-[0_3px_0_#D97706] ring-2 ring-amber-400/20 translate-y-0.5'
-                        : 'border-[#E5E0D5] bg-white hover:border-amber-400/80 hover:bg-[#FFFDF9] shadow-[0_3px_0_#E0D9C8] hover:shadow-[0_1px_0_#E0D9C8] hover:translate-y-0.5 active:translate-y-1 active:shadow-none'
+                    role="radio"
+                    aria-checked={isSelected}
+                    className={`group w-full min-h-[68px] px-1 text-left transition-colors duration-150 cursor-pointer flex items-center justify-between border-b border-[#E1E8E4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#176B57] ${
+                      isSelected ? 'text-[#173D34]' : 'text-[#252D32] hover:bg-white/60'
                     }`}
                   >
-                    {/* RECOMMENDED Badge (Visual hierarchy & priority) */}
-                    {isRecommended && (
-                      <span className="absolute -top-2.5 right-4 px-2 py-0.5 rounded-full bg-amber-400 text-stone-950 text-[10px] font-black tracking-wider uppercase shadow-xs flex items-center gap-1 font-mono">
-                        <Sparkle size={10} className="fill-stone-950" />
-                        <span>推荐</span>
-                      </span>
-                    )}
-
-                    {/* Left: Number + Complete Label (Never truncated!) */}
-                    <div className="flex items-center gap-3 min-w-0 pr-3 flex-1">
-                      <span className="text-xs font-mono font-bold text-stone-400 shrink-0">
+                    <div className="flex items-center gap-4 min-w-0 pr-3 flex-1">
+                      <span className="w-6 text-[12px] font-semibold tabular-nums text-[#9AA7A1] shrink-0">
                         0{idx + 1}
                       </span>
                       <span
-                        className={`text-[15px] sm:text-[16px] font-bold leading-normal break-words transition-colors ${
-                          isSelected ? 'text-amber-950 font-black' : 'text-stone-900 group-hover:text-amber-900'
+                        className={`text-[15px] font-semibold leading-snug break-words transition-colors ${
+                          isSelected ? 'text-[#173D34]' : 'text-[#252D32] group-hover:text-[#176B57]'
                         }`}
                       >
                         {opt.label}
                       </span>
                     </div>
 
-                    {/* Right: Tactile Selection Circle */}
                     <span
-                      className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center transition-all ${
+                      className={`w-[22px] h-[22px] rounded-full shrink-0 flex items-center justify-center transition-all ${
                         isSelected
-                          ? 'bg-amber-500 text-stone-950 shadow-xs scale-105'
-                          : 'border-2 border-[#DCD3C0] bg-[#FAF6ED] text-transparent group-hover:border-amber-400'
+                          ? 'border-[6px] border-[#08735D] bg-white'
+                          : 'border-[1.5px] border-[#C9D5CF] bg-transparent group-hover:border-[#7A9A8D]'
                       }`}
-                    >
-                      <Check size={14} className="stroke-[3]" />
-                    </span>
+                      aria-hidden="true"
+                    />
                   </button>
                 );
               })}
             </div>
 
-            {/* Continue Button placed right below the options list (avoiding large empty space) */}
-            <div className="mt-4 sm:mt-5 w-full">
+            <div className="mt-7 w-full pb-4">
               <button
+                type="button"
                 onClick={handleContinue}
                 disabled={!selectedOptionItem}
-                style={
+                className={`w-full h-14 rounded-[9px] font-semibold text-[15px] flex items-center justify-center gap-2 transition-colors duration-150 ${
                   selectedOptionItem
-                    ? {
-                        background: 'linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%)',
-                        boxShadow: '0 4px 0 #D97706'
-                      }
-                    : undefined
-                }
-                className={`w-full h-12 sm:h-13 rounded-2xl font-black text-[15px] sm:text-base flex items-center justify-center gap-2 transition-all duration-150 ${
-                  selectedOptionItem
-                    ? 'text-stone-950 cursor-pointer active:translate-y-0.5 active:shadow-none'
-                    : 'bg-[#E5DFC8] text-stone-400 cursor-not-allowed shadow-none'
+                    ? 'bg-[#08735D] text-white cursor-pointer hover:bg-[#06634F] active:bg-[#055642] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#08735D] focus-visible:ring-offset-2'
+                    : 'bg-[#E3EBE7] text-[#96A49E] cursor-not-allowed'
                 }`}
               >
                 <span>继续</span>
@@ -1135,270 +993,98 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
           </div>
         )}
 
-        {/* ================= TRANSITION 2: 习惯完成 ➔ 语感试读过渡动画屏 (去除下方标签) ================= */}
-        {step === 16 && (
-          <div className="w-full flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-400 my-auto">
-            <div className="relative mb-6 max-w-xs sm:max-w-sm w-full">
-              {/* Duolingo Speech Bubble pointing downwards to mascot */}
-              <div className="relative bg-white rounded-3xl border-2 border-[#E5E0D5] p-5 shadow-sm mb-6 inline-block text-left animate-in zoom-in-95 fade-in duration-300">
-                <p className="text-base sm:text-[17px] font-bold tracking-tight leading-snug animate-title-gradient">
-                  接下来进行 4 句微试读，感受一下难度，我们就能为你锁定建议起步等级！
-                </p>
-                {/* Speech Bubble Arrow Notch pointing downward */}
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-white" />
-                <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-t-[14px] border-t-[#E5E0D5] -z-10" />
-              </div>
-
-              {/* Mascot Center Glow Avatar with celebratory action */}
-              <div className="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-amber-400/20 blur-xl animate-pulse" />
-                {/* Floating Soft Sparkles */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <span className="absolute -top-1 -right-2 text-amber-500 animate-sparkle-soft-1">
-                    <Sparkles size={18} />
-                  </span>
-                  <span className="absolute top-1/2 -left-3 text-amber-400 animate-sparkle-soft-2">
-                    <Sparkle size={14} className="fill-amber-400" />
-                  </span>
-                  <span className="absolute -bottom-1 right-2 text-amber-500 animate-sparkle-soft-1">
-                    <Sparkles size={16} />
-                  </span>
-                </div>
-                <img
-                  src={companion.avatarUrl}
-                  alt={companion.name}
-                  className="w-full h-full object-contain relative z-10 animate-celebrate-action drop-shadow-md select-none"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* ================= SCREENS 8..11: 4-SENTENCE PLACEMENT TEST (选项整体上移，去除中空缝隙) ================= */}
         {sentenceIdx !== -1 && (
-          <div className="w-full flex-1 flex flex-col justify-start gap-2.5 sm:gap-3.5 py-1 animate-in fade-in slide-in-from-right-4 duration-300">
-            {/* TIER 1: TOP IS THE SENTENCE (扬声器icon移至右下角) */}
-            <div className="w-full bg-white rounded-3xl border-2 border-[#E7DFC8] p-3.5 sm:p-4 shadow-xs shrink-0 relative flex flex-col justify-between min-h-[95px] sm:min-h-[105px]">
-              {/* The Sentence Text */}
-              <p className="text-[16px] sm:text-[18px] font-serif leading-relaxed text-stone-900 tracking-wide selection:bg-amber-200">
-                "{SENTENCES_BY_LEVEL[currentLevel][sentenceIdx]}"
-              </p>
-
-              {/* Speaker icon only (Bottom Right) */}
-              <div className="flex items-center justify-end mt-1.5 pt-0.5">
+          <div className="w-full flex-1 flex flex-col justify-start gap-2.5 py-1 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="relative w-full min-h-[190px] max-h-[245px] flex-1">
+              <div
+                aria-hidden="true"
+                className="absolute top-5 right-0 bottom-5 w-7 rounded-r-[26px] bg-[#E6F4ED] border border-[#D2E9DD]"
+              />
+              <article className="absolute inset-y-0 left-0 right-3 rounded-[28px] bg-white border border-[#E5F0EB] shadow-[0_9px_0_#BCE8D8,0_16px_24px_rgba(17,72,61,0.08)] overflow-hidden">
+                <div className="absolute inset-0 overflow-y-auto px-5 py-5">
+                  <p className="pr-2 pb-[76px] text-[21px] leading-[1.5] font-medium text-[#103E39] selection:bg-emerald-200">
+                    {SENTENCES_BY_LEVEL[currentLevel][sentenceIdx]}
+                  </p>
+                </div>
                 <button
+                  type="button"
                   onClick={() => handlePlayAudio(SENTENCES_BY_LEVEL[currentLevel][sentenceIdx], sentenceIdx)}
-                  className="w-7.5 h-7.5 rounded-full bg-[#FAF6ED] hover:bg-amber-50 text-stone-700 border border-[#E2D8C6] hover:border-amber-400 transition-all cursor-pointer flex items-center justify-center active:scale-95 shadow-2xs"
+                  className="absolute bottom-3 left-4 z-20 w-10 h-10 rounded-full bg-[#F1FAF6] border border-[#DCEDE5] flex items-center justify-center text-[#315A50] shadow-sm transition-colors hover:bg-[#EAF5EF]"
                   title="播放发音"
                   aria-label="播放发音"
                 >
                   <Volume2
-                    size={15}
-                    className={playingSentenceIdx === sentenceIdx ? 'text-amber-600 animate-pulse scale-110' : 'text-stone-600'}
+                    size={18}
+                    className={playingSentenceIdx === sentenceIdx ? 'text-emerald-700 animate-pulse' : 'text-[#315A50]'}
                   />
                 </button>
-              </div>
-            </div>
-
-            {/* TIER 2: MIDDLE IS THE MASCOT (紧密衔接，去除大空白) + SPEECH BUBBLE */}
-            <div className="w-full py-0.5 sm:py-1 flex items-center justify-center gap-3 shrink-0">
-              {/* Mascot Character without circle ring or cropping */}
-              <div className="relative shrink-0 w-20 h-20 sm:w-22 sm:h-22 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-amber-400/15 blur-lg animate-pulse pointer-events-none" />
                 <img
                   src={companion.avatarUrl}
-                  alt={companion.name}
-                  className="w-full h-full object-contain relative z-10 drop-shadow-md select-none animate-celebrate-action"
+                  alt={`${companion.name}陪你试读`}
+                  className="absolute right-0 bottom-0 z-10 w-[82px] h-[98px] object-contain pointer-events-none"
                 />
-              </div>
-
-              {/* Mascot Pointing Speech Bubble */}
-              <div className="relative flex-1 max-w-sm bg-white rounded-2xl border-2 border-[#E5E0D5] p-3 sm:p-3.5 shadow-xs">
-                {/* Speech bubble notch pointing left */}
-                <div className="absolute top-1/2 -translate-y-1/2 -left-2.5 w-0 h-0 border-t-[7px] border-t-transparent border-b-[7px] border-b-transparent border-r-[10px] border-r-white z-10" />
-                <div className="absolute top-1/2 -translate-y-1/2 -left-3.5 w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[12px] border-r-[#E5E0D5]" />
-
-                <div className="text-[13.5px] sm:text-[14px] font-bold text-stone-900 leading-snug">
-                  {companionBubbleText}
-                  {isTyping && <span className="inline-block w-1.5 h-3 bg-amber-600 ml-1 animate-pulse" />}
-                </div>
-              </div>
+              </article>
             </div>
 
-            {/* TIER 3: USER INTERACTION OPTIONS (上移紧贴萌宠下方，无间隙断层) */}
-            <div className="w-full shrink-0 mt-0 sm:mt-0.5">
-              <div className="flex flex-col gap-2 sm:gap-2.5 w-full">
-                {/* 1. 顺畅适中 */}
-                <button
-                  onClick={() => handleSelectFeeling('keep')}
-                  className={`group relative w-full rounded-2xl px-4 py-2.5 sm:py-3 text-left transition-all duration-150 cursor-pointer flex items-center justify-between border-2 active:scale-[0.99] ${
-                    selectedFeeling === 'keep'
-                      ? 'border-amber-500 bg-[#FFFDF7] shadow-[0_3px_0_#D97706] ring-2 ring-amber-400/20 translate-y-0.5'
-                      : 'border-[#E5E0D5] bg-white hover:border-amber-400 hover:bg-[#FFFDF9] shadow-[0_3px_0_#E0D9C8] hover:shadow-[0_1px_0_#E0D9C8] hover:translate-y-0.5 active:translate-y-1 active:shadow-none'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-[15px] sm:text-[16px] font-bold text-stone-900 group-hover:text-stone-950">
-                      顺畅适中
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs ${selectedFeeling === 'keep' ? 'font-bold text-amber-700 animate-pulse' : 'text-stone-400'}`}>
-                      {selectedFeeling === 'keep' ? '再点一次确认' : '契合心流'}
-                    </span>
-                    <span
-                      className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        selectedFeeling === 'keep'
-                          ? 'bg-amber-500 text-stone-950 font-bold'
-                          : 'border border-[#DCD3C0] bg-[#FAF6ED] text-transparent'
-                      }`}
-                    >
-                      <Check size={12} className="stroke-[3]" />
-                    </span>
-                  </div>
-                </button>
-
-                {/* 2. 偏难吃力 */}
-                <button
-                  onClick={() => handleSelectFeeling('down')}
-                  className={`group relative w-full rounded-2xl px-4 py-2.5 sm:py-3 text-left transition-all duration-150 cursor-pointer flex items-center justify-between border-2 active:scale-[0.99] ${
-                    selectedFeeling === 'down'
-                      ? 'border-amber-500 bg-amber-50/80 shadow-[0_3px_0_#D97706] ring-2 ring-amber-400/20 translate-y-0.5'
-                      : 'border-[#E5E0D5] bg-white hover:border-amber-400 hover:bg-amber-50/20 shadow-[0_3px_0_#E0D9C8] hover:shadow-[0_1px_0_#E0D9C8] hover:translate-y-0.5 active:translate-y-1 active:shadow-none'
-                  }`}
-                >
-                  <span className="text-[14.5px] sm:text-[15px] font-bold text-stone-900 group-hover:text-stone-950">
-                    偏难吃力
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs ${selectedFeeling === 'down' ? 'font-bold text-amber-700 animate-pulse' : 'text-stone-400'}`}>
-                      {selectedFeeling === 'down' ? '再点一次确认' : '降阶调轻'}
-                    </span>
-                    <span
-                      className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        selectedFeeling === 'down'
-                          ? 'bg-amber-500 text-stone-950'
-                          : 'border border-[#DCD3C0] bg-[#FAF6ED] text-transparent'
-                      }`}
-                    >
-                      <Check size={12} className="stroke-[3]" />
-                    </span>
-                  </div>
-                </button>
-
-                {/* 3. 轻松有余 */}
-                <button
-                  onClick={() => handleSelectFeeling('up')}
-                  className={`group relative w-full rounded-2xl px-4 py-2.5 sm:py-3 text-left transition-all duration-150 cursor-pointer flex items-center justify-between border-2 active:scale-[0.99] ${
-                    selectedFeeling === 'up'
-                      ? 'border-sky-500 bg-sky-50/80 shadow-[0_3px_0_#0284C7] ring-2 ring-sky-400/20 translate-y-0.5'
-                      : 'border-[#E5E0D5] bg-white hover:border-sky-400 hover:bg-sky-50/20 shadow-[0_3px_0_#E0D9C8] hover:shadow-[0_1px_0_#E0D9C8] hover:translate-y-0.5 active:translate-y-1 active:shadow-none'
-                  }`}
-                >
-                  <span className="text-[14.5px] sm:text-[15px] font-bold text-stone-900 group-hover:text-stone-950">
-                    轻松有余
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs ${selectedFeeling === 'up' ? 'font-bold text-sky-700 animate-pulse' : 'text-stone-400'}`}>
-                      {selectedFeeling === 'up' ? '再点一次确认' : '加档拔高'}
-                    </span>
-                    <span
-                      className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        selectedFeeling === 'up'
-                          ? 'bg-sky-500 text-white'
-                          : 'border border-[#DCD3C0] bg-[#FAF6ED] text-transparent'
-                      }`}
-                    >
-                      <Check size={12} className="stroke-[3]" />
-                    </span>
-                  </div>
-                </button>
-              </div>
-
-              {/* Click-to-confirm instruction indicator without 3.5s countdown */}
-              {selectedFeeling && (
-                <div className="w-full flex items-center justify-center gap-1.5 pt-1.5 text-xs font-semibold text-amber-900/90 animate-in fade-in duration-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  <span>再次点击已选选项即可确认进入下一句</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ================= SCREEN 7: PLACEMENT COMPLETE (删除冗余框，直接开启专属定制按钮) ================= */}
-        {step === 7 && (
-          <div className="w-full flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-400 my-auto">
-            <div className="relative mb-6 max-w-xs sm:max-w-sm w-full">
-              {/* Speech bubble pointing downwards to mascot */}
-              <div className="relative bg-white rounded-3xl border-2 border-[#E5E0D5] p-5 shadow-sm mb-6 inline-block text-center animate-in zoom-in-95 fade-in duration-300">
-                <p className="text-base sm:text-lg font-bold tracking-tight leading-snug animate-title-gradient">
-                  太棒了！语感试读已完成！
-                  <br />
-                  准备生成你的专属定制画像
-                </p>
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-white" />
-                <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-t-[14px] border-t-[#E5E0D5] -z-10" />
-              </div>
-
-              {/* Mascot Center Glow Avatar */}
-              <div className="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-amber-400/20 blur-xl animate-pulse" />
-                <div className="absolute inset-0 pointer-events-none">
-                  <span className="absolute -top-1 -right-2 text-amber-500 animate-sparkle-soft-1">
-                    <Sparkles size={18} />
-                  </span>
-                  <span className="absolute top-1/2 -left-3 text-amber-400 animate-sparkle-soft-2">
-                    <Sparkle size={14} className="fill-amber-400" />
-                  </span>
-                  <span className="absolute -bottom-1 right-2 text-amber-500 animate-sparkle-soft-1">
-                    <Sparkles size={16} />
-                  </span>
-                </div>
-                <img
-                  src={companion.avatarUrl}
-                  alt={companion.name}
-                  className="w-full h-full object-contain relative z-10 animate-celebrate-action drop-shadow-md select-none"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ================= STICKY BOTTOM ACTION BAR (Duolingo CONTINUE Button) ================= */}
-      {showBottomBar && (
-        <div className="shrink-0 p-4 sm:p-5 bg-[#FAF6ED]/95 backdrop-blur-md border-t border-[#E8DFC8] z-30 w-full">
-          <div className="max-w-xl mx-auto w-full">
-            <button
-              onClick={handleContinue}
-              disabled={!canContinue}
-              style={
-                canContinue
-                  ? {
-                      background: 'linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%)',
-                      boxShadow: '0 4px 0 #D97706'
-                    }
-                  : undefined
-              }
-              className={`w-full h-13 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all duration-150 ${
-                canContinue
-                  ? 'text-stone-950 cursor-pointer active:translate-y-0.5 active:shadow-none'
-                  : 'bg-[#E5DFC8] text-stone-400 cursor-not-allowed shadow-none'
-              }`}
+            <div
+              className="min-h-[48px] shrink-0 flex items-center gap-2 px-1 text-[13px] font-medium leading-snug text-[#315A50]"
+              role="status"
+              aria-live="polite"
             >
+              <Sparkles size={16} className="shrink-0 text-emerald-700" />
               <span>
-                {step === 0 ? '继续' :
-                 step === 2 ? '开始定制' :
-                 step === 16 ? '开始试读' :
-                 step === 7 ? '开启专属定制' : '继续'}
+                {companionBubbleText}
+                {isTyping && <span className="inline-block w-1.5 h-3 bg-emerald-600 ml-1 animate-pulse" />}
               </span>
-              <ArrowRight size={17} />
-            </button>
+            </div>
+
+            <div className="w-full shrink-0">
+              <div className="flex flex-col gap-2 w-full">
+                {([
+                  ['keep', '顺畅适中', '契合心流'],
+                  ['down', '偏难吃力', '降阶调轻'],
+                  ['up', '轻松有余', '加档拔高']
+                ] as const).map(([feeling, label, hint]) => {
+                  const isSelected = selectedFeeling === feeling;
+                  return (
+                    <button
+                      key={feeling}
+                      type="button"
+                      onClick={() => handleSelectFeeling(feeling)}
+                      aria-pressed={isSelected}
+                      className={`group relative w-full min-h-[50px] rounded-2xl px-4 py-2.5 text-left transition-all duration-150 cursor-pointer flex items-center justify-between border-2 active:scale-[0.99] ${
+                        isSelected
+                          ? 'border-emerald-500 bg-[#F8FCFA] shadow-[0_3px_0_#65A30D] ring-2 ring-emerald-400/20 translate-y-0.5'
+                          : 'border-[#DCEDE5] bg-white hover:border-emerald-400 hover:bg-[#F8FCFA] shadow-[0_3px_0_#DCEBE5] hover:shadow-[0_1px_0_#DCEBE5] hover:translate-y-0.5 active:translate-y-1 active:shadow-none'
+                      }`}
+                    >
+                      <span className={`text-[14px] font-bold ${isSelected ? 'text-[#103E39]' : 'text-[#24483F]'}`}>
+                        {label}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className={`text-xs ${isSelected ? 'font-semibold text-emerald-800' : 'text-[#84958E]'}`}>
+                          {isSelected ? '已选择' : hint}
+                        </span>
+                        <span
+                          className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                            isSelected
+                              ? 'bg-emerald-500 text-white'
+                              : 'border border-[#DCEDE5] bg-[#F1FAF6] text-transparent'
+                          }`}
+                        >
+                          <Check size={12} className="stroke-[3]" />
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+      </div>
     </div>
   );
 };

@@ -47,7 +47,7 @@ export const ConstellationBubblePicker: React.FC<ConstellationBubblePickerProps>
             className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-white transition-colors py-0.5 px-2 rounded-full hover:bg-slate-800"
             title="换一批灵感气泡"
           >
-            <RotateCw size={11} className="text-amber-400" />
+            <RotateCw size={11} className="text-emerald-400" />
             <span>换一批</span>
           </button>
 
@@ -141,7 +141,7 @@ export const ConstellationBubblePicker: React.FC<ConstellationBubblePickerProps>
           disabled={!canProceed}
           className="w-full py-3 px-4 rounded-2xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed"
           style={{
-            backgroundColor: canProceed ? '#F59E0B' : '#1E2330',
+            backgroundColor: canProceed ? '#A3E635' : '#1E2330',
             color: canProceed ? '#0F172A' : '#64748B'
           }}
         >

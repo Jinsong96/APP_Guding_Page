@@ -16,7 +16,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
   selectedTags,
   onToggleTag,
   onConfirm,
-  companionAccent = '#F59E0B',
+  companionAccent = '#A3E635',
   targetDomainIndex,
   onDomainChange
 }) => {
@@ -187,9 +187,9 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
     >
       {/* Subtle pinpoint floating stardust particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-        <div className="absolute top-6 left-8 w-1 h-1 bg-amber-200 rounded-full animate-ping" />
+        <div className="absolute top-6 left-8 w-1 h-1 bg-emerald-200 rounded-full animate-ping" />
         <div className="absolute top-20 right-10 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-pulse" />
-        <div className="absolute bottom-28 left-12 w-1 h-1 bg-amber-400 rounded-full animate-pulse" />
+        <div className="absolute bottom-28 left-12 w-1 h-1 bg-emerald-400 rounded-full animate-pulse" />
         <div className="absolute top-36 left-1/4 w-0.5 h-0.5 bg-white rounded-full" />
         <div className="absolute bottom-16 right-16 w-1 h-1 bg-purple-300 rounded-full animate-pulse" />
       </div>
@@ -221,7 +221,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                 onClick={() => handleTagClick(tag)}
                 style={{
                   transitionDelay: animStep < 5 ? `${i * 45}ms` : '0ms',
-                  borderColor: isSelected ? currentDomain.color : '#E2D8C6',
+                  borderColor: isSelected ? currentDomain.color : '#DCEBE5',
                   backgroundColor: isSelected ? currentDomain.color : '#FFFFFF',
                   color: isSelected ? '#FFFFFF' : '#1C1E24',
                   boxShadow: isSelected
@@ -288,7 +288,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             className="w-3 h-3 rotate-45 border-t-2 border-l-2 shadow-sm transition-colors duration-300"
             style={{
               borderColor: currentDomain.color,
-              backgroundColor: '#FAF6ED'
+              backgroundColor: '#F0F8F4'
             }}
           />
           <div
@@ -429,7 +429,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                   className={`absolute -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all duration-500 z-20 border-2 cursor-pointer ${
                     animStep >= 3 ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
                   } ${
-                    isCurrent ? 'scale-115 ring-2 ring-amber-400/40' : 'hover:scale-105 opacity-85 hover:opacity-100'
+                    isCurrent ? 'scale-115 ring-2 ring-emerald-400/40' : 'hover:scale-105 opacity-85 hover:opacity-100'
                   }`}
                   title={`转动至${dom.name}领域`}
                 >
@@ -457,7 +457,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             {coreRipple > 0 && (
               <div
                 key={coreRipple}
-                className="absolute w-28 h-28 rounded-full border-2 border-amber-400 animate-ping opacity-60 pointer-events-none"
+                className="absolute w-28 h-28 rounded-full border-2 border-emerald-400 animate-ping opacity-60 pointer-events-none"
               />
             )}
 
@@ -465,14 +465,14 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             <div
               className="w-16 h-16 rounded-full flex flex-col items-center justify-center shadow-lg relative transition-all duration-500 border-2"
               style={{
-                background: 'radial-gradient(circle at 35% 30%, #FFFBEB 0%, #FEF08A 35%, #FDE047 65%, #F59E0B 100%)',
-                borderColor: '#F59E0B',
-                boxShadow: '0 0 22px rgba(245, 158, 11, 0.55), 0 4px 12px rgba(217, 119, 6, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.9)'
+                background: 'radial-gradient(circle at 35% 30%, #F8FCFA 0%, #EAF7BB 35%, #BDE65C 65%, #A3E635 100%)',
+                borderColor: '#A3E635',
+                boxShadow: '0 0 22px rgba(132, 204, 22, 0.55), 0 4px 12px rgba(101, 163, 13, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.9)'
               }}
             >
               {/* Internal Pulsing Bright Yellow Halo */}
               <div
-                className="absolute inset-1 rounded-full opacity-35 animate-pulse bg-amber-300"
+                className="absolute inset-1 rounded-full opacity-35 animate-pulse bg-emerald-300"
               />
 
               {/* Orbiting miniature light beads for absorbed tags */}
@@ -489,8 +489,8 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                         style={{
                           left: `${bx}px`,
                           top: `${by}px`,
-                          backgroundColor: '#B45309',
-                          boxShadow: '0 0 6px #F59E0B'
+                          backgroundColor: '#558B2F',
+                          boxShadow: '0 0 6px #A3E635'
                         }}
                       />
                     );
@@ -499,10 +499,10 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
               )}
 
               {/* Core Domain Indicator */}
-              <span className="text-[13px] font-black tracking-tight text-amber-950 relative z-10 select-none font-mono">
+              <span className="text-[13px] font-black tracking-tight text-emerald-950 relative z-10 select-none font-mono">
                 {currentDomain.name}
               </span>
-              <span className="text-[8.5px] text-amber-900/80 font-bold font-mono -mt-0.5 relative z-10 select-none">
+              <span className="text-[8.5px] text-emerald-900/80 font-bold font-mono -mt-0.5 relative z-10 select-none">
                 星盘焦点
               </span>
             </div>
@@ -521,7 +521,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
               <span
                 key={t}
                 onClick={() => onToggleTag(t)}
-                className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-white border border-[#E2D8C6] text-amber-800 shrink-0 cursor-pointer hover:bg-[#F4ECE0] transition-colors shadow-2xs font-medium"
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-white border border-[#DCEBE5] text-emerald-800 shrink-0 cursor-pointer hover:bg-[#EAF4EF] transition-colors shadow-2xs font-medium"
                 title="点击移出"
               >
                 <span>{t}</span>
@@ -541,8 +541,8 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             }
           }}
           style={{
-            background: 'linear-gradient(135deg, #FCD34D 0%, #F59E0B 50%, #D97706 100%)',
-            boxShadow: '0 6px 20px rgba(245, 158, 11, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6)'
+            background: 'linear-gradient(135deg, #D9F47D 0%, #A3E635 50%, #65A30D 100%)',
+            boxShadow: '0 6px 20px rgba(132, 204, 22, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6)'
           }}
           className="w-full mt-2 py-3.5 px-4 rounded-xl font-black text-stone-950 text-[15.5px] sm:text-[16px] flex items-center justify-center gap-2 transition-all duration-300 hover:brightness-105 active:scale-[0.98] cursor-pointer shadow-md"
         >

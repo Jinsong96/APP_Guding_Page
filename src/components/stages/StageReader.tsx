@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { Companion, ReadingLevel, Story } from '../../types';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Check, Headphones, MoreHorizontal, Sparkles, VolumeX, X } from 'lucide-react';
+import { Companion, ReadingLevel } from '../../types';
 import { FIRST_STORY } from '../../data';
 import { WordLookupModal } from '../WordLookupModal';
 
@@ -18,9 +18,37 @@ interface StageReaderProps {
   onRateDifficulty: (rating: 'hard' | 'just_right' | 'easy', selectedLevel?: ReadingLevel) => void;
 }
 
+const PARAGRAPH_TRANSLATIONS: Record<ReadingLevel, string[]> = {
+  easy: [
+    '晚上9点47分，灯光熄灭了。整座城市都停了电。高耸的玻璃大楼消失在红色尘土中。',
+    '玛拉等待救援，但没有人来。接着，一台老机器人从街道下方的黑暗隧道里走了出来。',
+    '“我知道另一条路，”机器人说。“路会更远一些，但很安全。我们不需要城市电脑。”'
+  ],
+  mid: [
+    '晚上21:47，整座城市的灯光突然熄灭。玻璃大楼消失在红色尘土中。',
+    '玛拉等着应急系统启动，但什么也没有发生。随后，一台老旧的维修机器人从街道下方的隧道里出现。',
+    '“我知道另一条路，”它说。那条路更远一些，但不依赖城市网络。'
+  ],
+  hard: [
+    '21:47，整座城市的电网突然瘫痪；那些玻璃大楼仿佛消融进了早已等候多时的红色尘土。',
+    '玛拉等着应急系统回应，却始终没有消息。随后，一台老维修机器人从街道下方的隧道里走出，神情从容，仿佛多年前就预料到了这个夜晚。',
+    '“还有另一条路，”它说。“当然会更远。但它不依赖城市网络，而今晚，只有这一点最重要。”'
+  ]
+};
+
+const VOCAB_TERMS = [
+  'emerged',
+  'came out of',
+  'walked out of',
+  'unhurried',
+  'dissolved',
+  'emergency system',
+  'grid'
+];
+
 export const StageReader: React.FC<StageReaderProps> = ({
   stageNumber,
-  progressPct,
+  stageTitle,
   timeRemaining,
   currentLevel: initialLevel,
   companion,
@@ -30,30 +58,51 @@ export const StageReader: React.FC<StageReaderProps> = ({
   onRateDifficulty
 }) => {
   const [activeLevel, setActiveLevel] = useState<ReadingLevel>(initialLevel);
+  const [paragraphIndex, setParagraphIndex] = useState(0);
   const [activeVocabWord, setActiveVocabWord] = useState<string | null>(null);
-  const [hasInteractedOnStage6, setHasInteractedOnStage6] = useState<boolean>(false);
-  const [animatingText, setAnimatingText] = useState<boolean>(false);
+  const [hasInteractedOnStage6, setHasInteractedOnStage6] = useState(false);
+  const [animatingText, setAnimatingText] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(true);
+  const [showMore, setShowMore] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const swipeStartX = useRef<number | null>(null);
 
   useEffect(() => {
     setActiveLevel(initialLevel);
   }, [initialLevel]);
 
-  const storyContent = FIRST_STORY.levels[activeLevel] || FIRST_STORY.levels.mid;
+  useEffect(() => {
+    setParagraphIndex(0);
+    setHasInteractedOnStage6(false);
+  }, [stageNumber]);
+
+  useEffect(() => () => {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }, []);
+
+  const storyContent = FIRST_STORY.levels[activeLevel];
+  const paragraphs = storyContent.paragraphs;
+  const currentParagraph = paragraphs[paragraphIndex] || paragraphs[0];
+  const currentTranslation = PARAGRAPH_TRANSLATIONS[activeLevel][paragraphIndex] || '';
+  const totalParagraphs = paragraphs.length;
+  const currentPosition = (stageNumber - 4) * totalParagraphs + paragraphIndex + 1;
+  const totalPosition = totalParagraphs * 3;
+  const stageStarts = [0, 36, 68];
+  const stageEnds = [36, 68, 100];
+  const progress = stageStarts[stageNumber - 4] +
+    (stageEnds[stageNumber - 4] - stageStarts[stageNumber - 4]) * ((paragraphIndex + 1) / totalParagraphs);
 
   const handleDifficultyClick = (rating: 'hard' | 'just_right' | 'easy') => {
-    let targetLevel: ReadingLevel = 'mid';
-    if (rating === 'hard') targetLevel = 'easy';      // A1
-    else if (rating === 'easy') targetLevel = 'hard';  // B1
-    else targetLevel = 'mid';                          // A2
+    const targetLevel: ReadingLevel =
+      rating === 'hard' ? 'easy' : rating === 'easy' ? 'hard' : 'mid';
 
     if (stageNumber === 6) {
-      // In Stage 06: instantly morph article text in-place so user directly observes CEFR adaptation
       setAnimatingText(true);
       setActiveLevel(targetLevel);
       setHasInteractedOnStage6(true);
-      setTimeout(() => setAnimatingText(false), 300);
+      window.setTimeout(() => setAnimatingText(false), 300);
     } else {
-      // In Stage 04 & 05: advance to next stage with new level
       onRateDifficulty(rating, targetLevel);
     }
   };
@@ -63,163 +112,299 @@ export const StageReader: React.FC<StageReaderProps> = ({
     onRateDifficulty(rating, activeLevel);
   };
 
-  // Helper to render readable paragraphs
-  const renderParagraph = (text: string, pIdx: number) => {
-    const terms = [
-      'emerged',
-      'came out of',
-      'walked out of',
-      'unhurried',
-      'dissolved',
-      'emergency system',
-      'grid'
-    ];
+  const handleNext = () => {
+    if (paragraphIndex < totalParagraphs - 1) {
+      setParagraphIndex((current) => current + 1);
+    } else if (stageNumber === 6) {
+      handleStage6Proceed();
+    } else {
+      onRateDifficulty('just_right', activeLevel);
+    }
+  };
 
-    const regex = new RegExp(`(${terms.join('|')})`, 'gi');
+  const handlePrevious = () => {
+    if (paragraphIndex > 0) {
+      setParagraphIndex((current) => current - 1);
+    } else {
+      onBack();
+    }
+  };
+
+  const handleCardTouchStart = (event: React.TouchEvent<HTMLElement>) => {
+    swipeStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleCardTouchEnd = (event: React.TouchEvent<HTMLElement>) => {
+    if (swipeStartX.current === null) return;
+    const deltaX = event.changedTouches[0]?.clientX - swipeStartX.current;
+    swipeStartX.current = null;
+    if (deltaX <= -52) handleNext();
+    if (deltaX >= 52) handlePrevious();
+  };
+
+  const handleListen = () => {
+    if (!('speechSynthesis' in window)) return;
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(paragraphs.join(' '));
+    utterance.lang = 'en-US';
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
+  };
+
+  const renderParagraph = (text: string) => {
+    const regex = new RegExp(`(${VOCAB_TERMS.join('|')})`, 'gi');
     const parts = text.split(regex);
 
-    return (
-      <p
-        key={pIdx}
-        className="leading-[1.85] text-stone-900 font-serif text-[16px] sm:text-[17px] mb-5 tracking-normal transition-opacity duration-300"
-      >
-        {parts.map((part, idx) => {
-          const matchKey = terms.find((t) => t.toLowerCase() === part.toLowerCase());
-          if (matchKey && FIRST_STORY.keyVocab[matchKey]) {
-            const isBookmarked = bookmarkedWords.includes(matchKey);
-            return (
-              <span
-                key={idx}
-                onClick={() => setActiveVocabWord(matchKey)}
-                role="button"
-                tabIndex={0}
-                className={`cursor-pointer px-1 py-0.5 rounded transition-all font-sans font-medium border-b ${
-                  isBookmarked
-                    ? 'bg-amber-100 text-amber-900 border-amber-500'
-                    : 'bg-emerald-100/70 text-emerald-900 border-emerald-500 hover:bg-emerald-100'
-                }`}
-                title="点击查看释义"
-              >
-                {part}
-              </span>
-            );
-          }
-          return <span key={idx}>{part}</span>;
-        })}
-      </p>
-    );
+    return parts.map((part, index) => {
+      const matchKey = VOCAB_TERMS.find((term) => term.toLowerCase() === part.toLowerCase());
+      if (!matchKey || !FIRST_STORY.keyVocab[matchKey]) {
+        return <React.Fragment key={index}>{part}</React.Fragment>;
+      }
+
+      const isBookmarked = bookmarkedWords.includes(matchKey);
+      return (
+        <button
+          key={index}
+          type="button"
+          onClick={() => setActiveVocabWord(matchKey)}
+          className={`rounded-sm border-b font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 ${
+            isBookmarked
+              ? 'border-emerald-600 bg-emerald-50 text-emerald-900'
+              : 'border-emerald-500/70 text-emerald-800'
+          }`}
+          aria-label={`查看词汇 ${part} 的释义`}
+        >
+          {part}
+        </button>
+      );
+    });
   };
 
   return (
-    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#FAF6ED]">
-      {/* 1. Minimal Header */}
-      <div className="shrink-0 pb-3 border-b border-[#E8DFC8]">
-        <div className="flex items-center justify-between">
+    <div className="h-full flex flex-col gap-3 px-5 pt-3 pb-3 text-[#103E39] relative overflow-hidden bg-[#F1FAF6]">
+      <header className="shrink-0">
+        <div className="flex items-center justify-between gap-3">
           <button
+            type="button"
             onClick={onBack}
-            className="w-8 h-8 rounded-full bg-white hover:bg-[#F2ECE1] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E2D8C6] shadow-xs cursor-pointer"
-            aria-label="返回上一步"
+            className="w-11 h-11 rounded-full bg-white border border-[#DCEDE5] flex items-center justify-center text-[#103E39] shadow-sm"
+            aria-label="返回"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={21} />
           </button>
-
-          {/* Minimal Progress Line */}
-          <div className="flex-1 mx-4 flex items-center gap-2.5">
-            <div className="flex-1 h-1.5 bg-[#E8DFC8] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-emerald-600 transition-all duration-300 rounded-full"
-                style={{ width: `${progressPct}%` }}
-              />
-            </div>
-            <span className="text-[11px] font-mono text-stone-500 shrink-0">
-              {timeRemaining}
-            </span>
+          <h1 className="min-w-0 flex-1 text-center text-[16px] font-semibold truncate">
+            {FIRST_STORY.title}
+          </h1>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowMore((shown) => !shown)}
+              className="w-11 h-11 rounded-full bg-white border border-[#DCEDE5] flex items-center justify-center text-[#103E39] shadow-sm"
+              aria-label="阅读设置"
+              aria-expanded={showMore}
+            >
+              <MoreHorizontal size={22} />
+            </button>
+            {showMore && (
+              <div className="absolute right-0 top-12 z-30 w-60 p-2 rounded-2xl bg-white border border-[#DCEDE5] shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTranslation((visible) => !visible);
+                  }}
+                  className="w-full min-h-11 px-3 rounded-xl text-left text-sm hover:bg-[#F1FAF6]"
+                >
+                  {showTranslation ? '隐藏中文译文' : '显示中文译文'}
+                </button>
+                <div className="my-2 border-t border-[#E5F0EB]" />
+                <p className="px-2 mb-2 text-xs font-medium text-[#72847D]">这段读起来感觉如何？</p>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {([
+                    ['hard', '偏难'],
+                    ['just_right', '刚好'],
+                    ['easy', '简单']
+                  ] as const).map(([rating, label]) => {
+                    const isActive = stageNumber === 6 && (
+                      (rating === 'hard' && activeLevel === 'easy') ||
+                      (rating === 'just_right' && activeLevel === 'mid') ||
+                      (rating === 'easy' && activeLevel === 'hard')
+                    );
+                    return (
+                      <button
+                        key={rating}
+                        type="button"
+                        onClick={() => {
+                          handleDifficultyClick(rating);
+                          setShowMore(false);
+                        }}
+                        aria-pressed={isActive}
+                        className={`min-h-11 rounded-xl border text-xs font-medium transition-colors ${
+                          isActive
+                            ? 'bg-emerald-700 border-emerald-700 text-white'
+                            : 'bg-[#F5FAF7] border-[#DCEDE5] text-[#315A50] hover:bg-[#EAF5EF]'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 px-2 text-[11px] text-[#8A9B94]">{stageTitle} · {timeRemaining}</p>
+              </div>
+            )}
           </div>
+        </div>
 
-          <span className="text-[11px] text-stone-500 font-mono">
-            0{stageNumber}/10
+        <div className="mt-3 flex items-center gap-3">
+          <div
+            className="h-2 flex-1 rounded-full bg-[#DCECE5] overflow-hidden"
+            role="progressbar"
+            aria-label={`${stageTitle}阅读进度`}
+            aria-valuemin={0}
+            aria-valuemax={totalPosition}
+            aria-valuenow={currentPosition}
+          >
+            <div
+              className="h-full rounded-full bg-lime-400 transition-[width] duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="shrink-0 text-sm font-medium text-[#718B83]">
+            {String(currentPosition).padStart(2, '0')} / {String(totalPosition).padStart(2, '0')}
           </span>
         </div>
+      </header>
 
-        {/* Quiet Kicker & Title */}
-        <div className="mt-3.5">
-          <div className="text-[11px] text-stone-500 mb-1 flex items-center gap-1.5">
-            <span>科学大陆</span>
-            <span>·</span>
-            <span>第 {stageNumber - 3} / 4 段</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 font-serif tracking-tight leading-snug">
-            The 47th Minute Without Power
-          </h1>
-        </div>
+      <div className="relative min-h-0 flex-1">
+        <div
+          aria-hidden="true"
+          className="absolute top-7 right-0 bottom-7 w-8 rounded-r-[28px] bg-[#E6F4ED] border border-[#D2E9DD]"
+        />
+        <main
+          onTouchStart={handleCardTouchStart}
+          onTouchEnd={handleCardTouchEnd}
+          onTouchCancel={() => {
+            swipeStartX.current = null;
+          }}
+          aria-label="阅读卡片，向左或向右滑动翻页"
+          className={`absolute left-1/2 top-1/2 h-[82%] w-[min(76%,320px)] -translate-x-1/2 -translate-y-1/2 rounded-[30px] bg-white border border-[#E5F0EB] shadow-[0_10px_0_#BCE8D8,0_18px_28px_rgba(17,72,61,0.08)] overflow-visible touch-pan-y transition-[opacity,transform] duration-300 ${
+            animatingText ? 'opacity-50' : 'opacity-100'
+          }`}
+        >
+          <article className="absolute inset-0 overflow-y-auto px-10 py-7">
+            <div className="relative z-10 min-h-full flex flex-col justify-center">
+              <p className="text-[24px] leading-[1.5] font-medium text-[#103E39]">
+                {renderParagraph(currentParagraph)}
+              </p>
+              {showTranslation && (
+                <p className="mt-7 text-[16px] leading-[1.8] text-[#687773]">
+                  {currentTranslation}
+                </p>
+              )}
+            </div>
+          </article>
+
+          <button
+            type="button"
+            onClick={handlePrevious}
+            className="absolute -left-8 top-1/2 z-20 -translate-y-1/2 w-11 h-11 rounded-full bg-white/95 border border-[#E3EEE9] flex items-center justify-center text-[#103E39] shadow-sm"
+            aria-label={paragraphIndex === 0 ? '返回上一步' : '上一段'}
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            className="absolute -right-8 top-1/2 z-20 -translate-y-1/2 w-11 h-11 rounded-full bg-white/95 border border-[#E3EEE9] flex items-center justify-center text-[#103E39] shadow-sm"
+            aria-label={paragraphIndex === totalParagraphs - 1 ? '继续阅读' : '下一段'}
+          >
+            <ArrowRight size={20} />
+          </button>
+
+          <img
+            src={companion.avatarUrl}
+            alt={`${companion.name}陪你阅读`}
+            className="absolute right-2 -top-14 z-10 w-[96px] h-[112px] object-contain pointer-events-none"
+          />
+        </main>
       </div>
 
-      {/* 2. Focused Article Body (Center Stage) */}
-      <div 
-        className={`flex-1 overflow-y-auto py-5 px-2 no-scrollbar transition-all duration-300 ${
-          animatingText ? 'opacity-40 scale-[0.99]' : 'opacity-100 scale-100'
-        }`}
-      >
-        {storyContent.paragraphs.map((p, idx) => renderParagraph(p, idx))}
-      </div>
-
-      {/* 3. Minimal Bottom Adaptive Interaction */}
-      <div className="shrink-0 pt-3 pb-1 border-t border-[#E8DFC8] space-y-2.5">
-        <p className="text-xs text-center text-stone-500 font-medium">
-          你感觉这个难度怎么样？
-        </p>
-
-        {/* The 3 Pure Feedback Buttons */}
-        <div className="grid grid-cols-3 gap-2">
+      <section className="shrink-0" aria-label="阅读操作">
+        <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => handleDifficultyClick('hard')}
-            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 cursor-pointer ${
-              stageNumber === 6 && activeLevel === 'easy'
-                ? 'bg-emerald-600 text-white font-bold border-emerald-600 shadow-sm'
-                : 'bg-white border-[#E8DFC8] hover:bg-[#F8F4EC] text-stone-800 hover:text-stone-950 shadow-xs'
-            }`}
+            type="button"
+            onClick={handleListen}
+            className="min-h-14 rounded-full bg-white border border-[#DCEDE5] text-[#103E39] font-semibold flex items-center justify-center gap-2 shadow-[0_5px_0_#DDEBE5] transition-transform active:scale-[0.98]"
           >
-            有点难了
+            {isSpeaking ? <VolumeX size={18} /> : <Headphones size={18} />}
+            <span>{isSpeaking ? '停止朗读' : '听全文'}</span>
           </button>
-
           <button
-            onClick={() => handleDifficultyClick('just_right')}
-            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 cursor-pointer ${
-              stageNumber === 6 && activeLevel === 'mid'
-                ? 'bg-amber-600 text-white font-bold border-amber-600 shadow-sm'
-                : 'bg-white border-[#E8DFC8] hover:bg-[#F8F4EC] text-stone-800 hover:text-stone-950 shadow-xs'
-            }`}
+            type="button"
+            onClick={() => setShowBreakdown(true)}
+            className="min-h-14 rounded-full bg-[#DDF47D] hover:bg-[#D2EE68] text-[#103E39] font-semibold flex items-center justify-center gap-2 shadow-[0_5px_0_#C4DF62] transition-transform active:scale-[0.98]"
           >
-            刚刚好
-          </button>
-
-          <button
-            onClick={() => handleDifficultyClick('easy')}
-            className={`py-3 px-2 rounded-2xl border text-xs sm:text-[13px] font-medium transition-all text-center active:scale-98 cursor-pointer ${
-              stageNumber === 6 && activeLevel === 'hard'
-                ? 'bg-sky-600 text-white font-bold border-sky-600 shadow-sm'
-                : 'bg-white border-[#E8DFC8] hover:bg-[#F8F4EC] text-stone-800 hover:text-stone-950 shadow-xs'
-            }`}
-          >
-            简简单单
+            <Sparkles size={18} />
+            <span>AI 解读</span>
           </button>
         </div>
-
-        {/* Stage 06 Confirmation Button when ready */}
-        {stageNumber === 6 && (
-          <div className="pt-1 animate-in fade-in duration-200">
-            <button
-              onClick={handleStage6Proceed}
-              className="w-full py-3 px-4 rounded-2xl bg-amber-600 hover:bg-amber-550 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-98 cursor-pointer"
-            >
-              <span>{hasInteractedOnStage6 ? '完成试读，生成我的专属路线' : '继续下一步'}</span>
-              <ArrowRight size={15} />
-            </button>
-          </div>
+        {stageNumber === 6 && hasInteractedOnStage6 && (
+          <button
+            type="button"
+            onClick={handleStage6Proceed}
+            className="w-full mt-2 h-10 rounded-full bg-emerald-700 text-white text-sm font-semibold flex items-center justify-center gap-2"
+          >
+            <Check size={16} />
+            完成阅读
+          </button>
         )}
-      </div>
+      </section>
 
-      {/* Word Lookup Modal on Tap */}
+      {showBreakdown && (
+        <div className="absolute inset-0 z-40 flex items-end justify-center bg-[#123D36]/35 p-3">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reading-breakdown-title"
+            className="w-full rounded-[24px] bg-white border border-[#DCEDE5] p-5 shadow-xl"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles size={17} className="text-emerald-700" />
+                <h2 id="reading-breakdown-title" className="font-bold text-[#103E39]">AI 解读</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBreakdown(false)}
+                className="w-9 h-9 rounded-full bg-[#F1FAF6] flex items-center justify-center"
+                aria-label="关闭解读"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-sm leading-relaxed text-[#315A50]">{currentParagraph}</p>
+            <p className="mt-3 p-3 rounded-xl bg-[#F1FAF6] text-sm leading-relaxed text-[#62756D]">
+              阅读提示：先找到句子的主语和动作，再留意时间、地点等补充信息。点击绿色词汇可以查看释义。
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowBreakdown(false)}
+              className="w-full mt-4 h-11 rounded-full bg-emerald-700 text-white text-sm font-semibold"
+            >
+              返回阅读
+            </button>
+          </section>
+        </div>
+      )}
+
       {activeVocabWord && FIRST_STORY.keyVocab[activeVocabWord] && (
         <WordLookupModal
           vocab={FIRST_STORY.keyVocab[activeVocabWord]}

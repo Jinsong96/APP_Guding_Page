@@ -49,16 +49,16 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-sm bg-[#FAF6ED] border border-[#E8DFC8] rounded-3xl p-5 shadow-2xl relative text-stone-900 flex flex-col max-h-[85vh]"
+        className="w-full max-w-sm bg-[#F0F8F4] border border-[#DCEBE5] rounded-3xl p-5 shadow-2xl relative text-stone-900 flex flex-col max-h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#E8DFC8]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#DCEBE5]">
           <div className="flex items-center gap-2">
             <img
               src={companion.avatarUrl}
               alt={companion.name}
-              className="w-6 h-6 rounded-full object-cover border border-amber-500/40"
+              className="w-6 h-6 rounded-full object-cover border border-emerald-500/40"
             />
             <div className="text-xs">
               <span className="font-bold text-stone-900">问问 {companion.name}</span>
@@ -67,7 +67,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-white hover:bg-[#F2ECE1] flex items-center justify-center text-stone-500 hover:text-stone-900 border border-[#E2D8C6] transition-colors cursor-pointer shadow-xs"
+            className="w-7 h-7 rounded-full bg-white hover:bg-[#EAF4EF] flex items-center justify-center text-stone-500 hover:text-stone-900 border border-[#DCEBE5] transition-colors cursor-pointer shadow-xs"
           >
             <X size={15} />
           </button>
@@ -90,8 +90,8 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
               <div
                 className={`p-3 rounded-2xl text-xs leading-relaxed max-w-[85%] ${
                   msg.sender === 'user'
-                    ? 'bg-amber-600 text-white font-medium rounded-tr-xs shadow-xs'
-                    : 'bg-white text-stone-800 border border-[#E8DFC8] rounded-tl-xs shadow-xs'
+                    ? 'bg-emerald-600 text-white font-medium rounded-tr-xs shadow-xs'
+                    : 'bg-white text-stone-800 border border-[#DCEBE5] rounded-tl-xs shadow-xs'
                 }`}
               >
                 {msg.text}
@@ -101,9 +101,9 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
         </div>
 
         {/* Quick Suggestion Chips */}
-        <div className="py-2 border-t border-[#E8DFC8]">
-          <div className="flex items-center gap-1 text-[11px] text-amber-700 mb-1.5 font-medium">
-            <Sparkles size={11} className="text-amber-600" />
+        <div className="py-2 border-t border-[#DCEBE5]">
+          <div className="flex items-center gap-1 text-[11px] text-emerald-700 mb-1.5 font-medium">
+            <Sparkles size={11} className="text-emerald-600" />
             <span>大家常问</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -111,7 +111,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
               <button
                 key={idx}
                 onClick={() => handleSend(q)}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-white hover:bg-[#F2ECE1] text-stone-700 hover:text-stone-900 border border-[#E2D8C6] transition-colors text-left truncate max-w-full shadow-xs cursor-pointer"
+                className="text-[11px] px-2.5 py-1 rounded-full bg-white hover:bg-[#EAF4EF] text-stone-700 hover:text-stone-900 border border-[#DCEBE5] transition-colors text-left truncate max-w-full shadow-xs cursor-pointer"
               >
                 {q}
               </button>
@@ -120,7 +120,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
         </div>
 
         {/* Input Composer */}
-        <div className="mt-2 flex items-center gap-1.5 pt-2 border-t border-[#E8DFC8]">
+        <div className="mt-2 flex items-center gap-1.5 pt-2 border-t border-[#DCEBE5]">
           <input
             type="text"
             value={inputVal}
@@ -129,12 +129,12 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
               if (e.key === 'Enter') handleSend();
             }}
             placeholder={`问问 ${companion.name} 关于这段文字的疑问...`}
-            className="flex-1 bg-white border border-[#E2D8C6] rounded-xl px-3 py-2 text-xs text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-600 shadow-xs"
+            className="flex-1 bg-white border border-[#DCEBE5] rounded-xl px-3 py-2 text-xs text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-600 shadow-xs"
           />
           <button
             onClick={() => handleSend()}
             disabled={!inputVal.trim()}
-            className="p-2 rounded-xl bg-amber-600 hover:bg-amber-550 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
+            className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-550 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
           >
             <Send size={14} />
           </button>

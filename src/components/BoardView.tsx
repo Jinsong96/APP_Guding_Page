@@ -35,9 +35,9 @@ export const BoardView: React.FC<BoardViewProps> = ({
   ];
 
   return (
-    <div className="w-full min-h-screen p-4 sm:p-8 bg-[#EDE7DC]">
+    <div className="w-full min-h-screen p-4 sm:p-8 bg-[#E8F2EE]">
       {/* Board Description Header */}
-      <div className="max-w-7xl mx-auto mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#D8CEBC] pb-6">
+      <div className="max-w-7xl mx-auto mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#DCEBE5] pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1 justify-center sm:justify-start">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
@@ -55,7 +55,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
 
         <button
           onClick={() => onJumpToStage(1)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
         >
           <Smartphone size={16} />
           <span>进入手机交互模式 (从第 01 屏开始)</span>
@@ -69,14 +69,14 @@ export const BoardView: React.FC<BoardViewProps> = ({
             {/* Screen Top Header Tag */}
             <div className="flex items-center justify-between mb-2.5 px-1">
               <div className="flex items-center gap-1.5">
-                <span className="w-6 h-5 rounded-md bg-white border border-[#E2D8C6] text-[11px] font-mono font-bold text-amber-700 flex items-center justify-center shadow-xs">
+                <span className="w-6 h-5 rounded-md bg-white border border-[#DCEBE5] text-[11px] font-mono font-bold text-emerald-700 flex items-center justify-center shadow-xs">
                   {stage.label}
                 </span>
                 <h3 className="text-xs font-bold text-stone-800 truncate">{stage.title}</h3>
               </div>
               <button
                 onClick={() => onJumpToStage(stage.num)}
-                className="text-[10px] text-stone-500 hover:text-amber-700 flex items-center gap-0.5 transition-colors font-medium cursor-pointer"
+                className="text-[10px] text-stone-500 hover:text-emerald-700 flex items-center gap-0.5 transition-colors font-medium cursor-pointer"
               >
                 <span>试玩</span>
                 <ArrowRight size={10} />
@@ -86,9 +86,9 @@ export const BoardView: React.FC<BoardViewProps> = ({
             {/* Scaled Phone Frame Container (Black phone chassis with warm cream screen) */}
             <div
               onClick={() => onJumpToStage(stage.num)}
-              className="relative w-full h-[580px] rounded-[32px] bg-[#16181F] border-2 border-[#2A2E39] hover:border-amber-500 p-2 shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden group flex flex-col"
+              className="relative w-full h-[580px] rounded-[32px] bg-[#16181F] border-2 border-[#2A2E39] hover:border-emerald-500 p-2 shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden group flex flex-col"
             >
-              <div className="w-full h-full rounded-[24px] bg-[#FAF6ED] overflow-hidden relative pointer-events-none text-left">
+              <div className="w-full h-full rounded-[24px] bg-[#F0F8F4] overflow-hidden relative pointer-events-none text-left">
                 {stage.num === 1 && (
                   <Stage01Companion
                     selectedCompanionId={preferences.companionId}
@@ -200,7 +200,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
 
               {/* Hover Overlay Hint */}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 backdrop-blur-[1px] flex items-center justify-center transition-opacity rounded-[32px]">
-                <span className="px-3 py-1.5 rounded-full bg-amber-500 text-slate-950 font-bold text-xs shadow-lg flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-full bg-emerald-500 text-slate-950 font-bold text-xs shadow-lg flex items-center gap-1.5">
                   <Smartphone size={13} />
                   <span>沉浸全屏体验</span>
                 </span>
