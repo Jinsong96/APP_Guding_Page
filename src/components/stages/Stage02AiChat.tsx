@@ -971,9 +971,10 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                         onClick={() => handleSelectOption(opt)}
                         role="radio"
                         aria-checked={isSelected}
-                        className={`group w-full min-h-[68px] px-1 text-left transition-colors duration-150 cursor-pointer flex items-center justify-between border-b border-[#E1E8E4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#176B57] ${
+                        className={`speech-option-enter group w-full min-h-[68px] px-1 text-left transition-colors duration-150 cursor-pointer flex items-center justify-between border-b border-[#E1E8E4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#176B57] ${
                           isSelected ? 'text-[#173D34]' : 'text-[#252D32] hover:bg-white/60'
                         }`}
+                        style={{ animationDelay: `${(idx + 1) * 90}ms` }}
                       >
                         <div className="flex items-center gap-4 min-w-0 pr-3 flex-1">
                           <span className="w-6 text-[12px] font-semibold tabular-nums text-[#9AA7A1] shrink-0">
