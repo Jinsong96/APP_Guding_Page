@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -445,7 +445,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   }, []);
 
   // Sync companion bubble text when step changes
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (autoAdvanceTimerRef.current) {
       clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
@@ -802,6 +802,9 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   // Questions dataset
   const surveyQuestions = getSurveyQuestions(companion.name, goalCategory);
   const currentQ = surveyQuestions.find((q) => q.step === step);
+  const surveyContentReady = Boolean(
+    currentQ && !isTyping && companionBubbleText === currentQ.title
+  );
   const sentenceIdx = step >= 3 && step <= 6 ? step - 3 : -1;
 
   const progressStep =
@@ -938,67 +941,71 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
               </div>
             </div>
 
-            <p className="min-h-6 mb-2 text-[13px] leading-5 text-[#7B8984]">
-              选一个最接近的就好，之后也可以调整
-            </p>
+            {surveyContentReady && (
+              <div className="speech-content-enter">
+                <p className="min-h-6 mb-2 text-[13px] leading-5 text-[#7B8984]">
+                  选一个最接近的就好，之后也可以调整
+                </p>
 
-            {/* Quiet single-choice rows keep the question and all options easy to scan. */}
-            <div className="w-full" role="radiogroup" aria-label={currentQ.title}>
-              {currentQ.options.map((opt, idx) => {
-                const isSelected = selectedOptionLabel === opt.label;
+                {/* Quiet single-choice rows keep the question and all options easy to scan. */}
+                <div className="w-full" role="radiogroup" aria-label={currentQ.title}>
+                  {currentQ.options.map((opt, idx) => {
+                    const isSelected = selectedOptionLabel === opt.label;
 
-                return (
-                  <button
-                    key={opt.label}
-                    type="button"
-                    onClick={() => handleSelectOption(opt)}
-                    role="radio"
-                    aria-checked={isSelected}
-                    className={`group w-full min-h-[68px] px-1 text-left transition-colors duration-150 cursor-pointer flex items-center justify-between border-b border-[#E1E8E4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#176B57] ${
-                      isSelected ? 'text-[#173D34]' : 'text-[#252D32] hover:bg-white/60'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4 min-w-0 pr-3 flex-1">
-                      <span className="w-6 text-[12px] font-semibold tabular-nums text-[#9AA7A1] shrink-0">
-                        0{idx + 1}
-                      </span>
-                      <span
-                        className={`text-[15px] font-semibold leading-snug break-words transition-colors ${
-                          isSelected ? 'text-[#173D34]' : 'text-[#252D32] group-hover:text-[#176B57]'
+                    return (
+                      <button
+                        key={opt.label}
+                        type="button"
+                        onClick={() => handleSelectOption(opt)}
+                        role="radio"
+                        aria-checked={isSelected}
+                        className={`group w-full min-h-[68px] px-1 text-left transition-colors duration-150 cursor-pointer flex items-center justify-between border-b border-[#E1E8E4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#176B57] ${
+                          isSelected ? 'text-[#173D34]' : 'text-[#252D32] hover:bg-white/60'
                         }`}
                       >
-                        {opt.label}
-                      </span>
-                    </div>
+                        <div className="flex items-center gap-4 min-w-0 pr-3 flex-1">
+                          <span className="w-6 text-[12px] font-semibold tabular-nums text-[#9AA7A1] shrink-0">
+                            0{idx + 1}
+                          </span>
+                          <span
+                            className={`text-[15px] font-semibold leading-snug break-words transition-colors ${
+                              isSelected ? 'text-[#173D34]' : 'text-[#252D32] group-hover:text-[#176B57]'
+                            }`}
+                          >
+                            {opt.label}
+                          </span>
+                        </div>
 
-                    <span
-                      className={`w-[22px] h-[22px] rounded-full shrink-0 flex items-center justify-center transition-all ${
-                        isSelected
-                          ? 'border-[6px] border-[#08735D] bg-white'
-                          : 'border-[1.5px] border-[#C9D5CF] bg-transparent group-hover:border-[#7A9A8D]'
-                      }`}
-                      aria-hidden="true"
-                    />
+                        <span
+                          className={`w-[22px] h-[22px] rounded-full shrink-0 flex items-center justify-center transition-all ${
+                            isSelected
+                              ? 'border-[6px] border-[#08735D] bg-white'
+                              : 'border-[1.5px] border-[#C9D5CF] bg-transparent group-hover:border-[#7A9A8D]'
+                          }`}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-7 w-full pb-4">
+                  <button
+                    type="button"
+                    onClick={handleContinue}
+                    disabled={!selectedOptionItem}
+                    className={`w-full h-14 rounded-[9px] font-semibold text-[15px] flex items-center justify-center gap-2 transition-colors duration-150 ${
+                      selectedOptionItem
+                        ? 'bg-[#08735D] text-white cursor-pointer hover:bg-[#06634F] active:bg-[#055642] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#08735D] focus-visible:ring-offset-2'
+                        : 'bg-[#E3EBE7] text-[#96A49E] cursor-not-allowed'
+                    }`}
+                  >
+                    <span>继续</span>
+                    <ArrowRight size={17} />
                   </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-7 w-full pb-4">
-              <button
-                type="button"
-                onClick={handleContinue}
-                disabled={!selectedOptionItem}
-                className={`w-full h-14 rounded-[9px] font-semibold text-[15px] flex items-center justify-center gap-2 transition-colors duration-150 ${
-                  selectedOptionItem
-                    ? 'bg-[#08735D] text-white cursor-pointer hover:bg-[#06634F] active:bg-[#055642] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#08735D] focus-visible:ring-offset-2'
-                    : 'bg-[#E3EBE7] text-[#96A49E] cursor-not-allowed'
-                }`}
-              >
-                <span>继续</span>
-                <ArrowRight size={17} />
-              </button>
-            </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

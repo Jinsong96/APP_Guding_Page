@@ -378,6 +378,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   const activeTopics = activeCategory?.topics || [];
   const coreTopics = activeTopics.slice(0, 6);
   const additionalTopics = activeTopics.slice(6);
+  const contentReady = !bubbleIsTyping && bubbleText === '选择你感兴趣的主题';
 
   const handleCreateTopic = () => {
     const topicName = Array.from(searchQuery.trim()).slice(0, 24).join('');
@@ -464,6 +465,13 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
         </div>
       </div>
 
+      <div
+        className={`flex min-h-0 flex-1 flex-col ${
+          contentReady
+            ? 'speech-content-enter'
+            : 'hidden'
+        }`}
+      >
       <div className="shrink-0 px-4 pb-3">
         <div className="mb-2 flex items-end justify-between gap-3">
           <h1 className="text-[18px] font-bold leading-6 text-[#29362F]">{activeCategory?.title}</h1>
@@ -606,6 +614,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
       </div>
 
       {footer}
+      </div>
     </div>
   );
 };
