@@ -927,21 +927,21 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         {currentQ && (
         <div className="w-full flex-1 flex flex-col justify-start animate-in fade-in slide-in-from-right-4 duration-300">
             {/* Duolingo Companion Speech Header (Mascot left + Speech bubble right) */}
-            <div className="flex items-center gap-3 mb-3 w-full">
+            <div className="mt-2 mb-3 flex w-full items-center gap-3">
               <img
                 src={companion.avatarUrl}
                 alt={companion.name}
-                className="h-[48px] w-[48px] shrink-0 object-contain"
+                className="h-16 w-16 shrink-0 object-contain"
               />
 
               {/* Pointing Speech Bubble with Notch */}
-              <div className="relative flex-1 rounded-[14px] border border-[#D8E2DD] bg-white px-4 py-3.5">
+              <div className="relative flex min-h-16 flex-1 items-center rounded-[14px] border border-[#D8E2DD] bg-white px-4 py-3.5">
                 <div className="absolute top-5 -left-2 w-0 h-0 border-y-[7px] border-y-transparent border-r-[9px] border-r-white z-10" />
                 <div className="absolute top-[19px] -left-[10px] w-0 h-0 border-y-[8px] border-y-transparent border-r-[10px] border-r-[#D8E2DD]" />
 
                 <div
                   aria-label={currentQ.title}
-                  className="text-[16px] font-semibold text-[#252D32] leading-snug"
+                  className="text-[17px] font-semibold leading-[26px] text-[#252D32]"
                 >
                   {companionBubbleText}
                   {isTyping && (

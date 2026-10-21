@@ -455,13 +455,13 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col bg-[#F0F8F4] text-[#27352F]">
-      <div className="flex shrink-0 items-start gap-3 px-4 pb-3 pt-2">
+      <div className="flex shrink-0 items-center gap-3 px-4 pb-3 pt-4">
         <img
           src={companion.avatarUrl}
           alt={companion.name}
-          className="mt-0.5 h-[52px] w-[52px] shrink-0 object-contain"
+          className="h-16 w-16 shrink-0 object-contain"
         />
-        <div className="relative min-h-[52px] w-fit max-w-[calc(100%_-_64px)] flex-none rounded-2xl border border-[#D7E4DC] bg-white px-3.5 py-3 shadow-[0_1px_2px_rgba(45,68,55,0.05)]">
+        <div className="relative flex min-h-16 w-fit max-w-[calc(100%_-_76px)] flex-none items-center rounded-2xl border border-[#D7E4DC] bg-white px-3.5 py-3 shadow-[0_1px_2px_rgba(45,68,55,0.05)]">
           <span
             className="absolute top-4 -left-2.5 z-10 h-0 w-0 border-y-[7px] border-y-transparent border-r-[10px] border-r-white"
             aria-hidden="true"
@@ -470,7 +470,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
             className="absolute top-[13px] -left-3.5 h-0 w-0 border-y-[8px] border-y-transparent border-r-[12px] border-r-[#D7E4DC]"
             aria-hidden="true"
           />
-          <p className="relative min-w-0 break-words text-[15px] font-semibold leading-6 text-[#2D3933]">
+          <p className="relative min-w-0 break-words text-[17px] font-semibold leading-[26px] text-[#2D3933]">
             {bubbleText}
             {bubbleIsTyping && (
               <span
