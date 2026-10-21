@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Award,
   Atom,
@@ -302,6 +302,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategoryId, setActiveCategoryId] = useState<string>(THEME_CATEGORIES[0].id);
   const [showMoreTopics, setShowMoreTopics] = useState(false);
+  const [contentDelayElapsed, setContentDelayElapsed] = useState(false);
   const topicScrollRef = useRef<HTMLDivElement>(null);
 
   const officialTopics = useMemo(
@@ -378,7 +379,19 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   const activeTopics = activeCategory?.topics || [];
   const coreTopics = activeTopics.slice(0, 6);
   const additionalTopics = activeTopics.slice(6);
-  const contentReady = !bubbleIsTyping && bubbleText === '选择你感兴趣的主题';
+
+  useEffect(() => {
+    if (bubbleIsTyping || bubbleText !== '选择你感兴趣的主题') {
+      setContentDelayElapsed(false);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setContentDelayElapsed(true), 320);
+    return () => window.clearTimeout(timeout);
+  }, [bubbleIsTyping, bubbleText]);
+
+  const contentReady =
+    contentDelayElapsed && !bubbleIsTyping && bubbleText === '选择你感兴趣的主题';
 
   const handleCreateTopic = () => {
     const topicName = Array.from(searchQuery.trim()).slice(0, 24).join('');

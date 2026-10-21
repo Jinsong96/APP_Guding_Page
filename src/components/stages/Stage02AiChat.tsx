@@ -396,6 +396,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   // Companion Dynamic Speech State
   const [companionBubbleText, setCompanionBubbleText] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [revealedQuestionStep, setRevealedQuestionStep] = useState<number | null>(null);
 
   // Reading assessment state
   const [_sentenceFeedbacks, setSentenceFeedbacks] = useState<
@@ -411,6 +412,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
 
   // Dynamic typewriter for companion speech bubble
   const triggerBubbleSpeech = (text: string) => {
+    setRevealedQuestionStep(null);
     if (typewriterTimerRef.current) clearInterval(typewriterTimerRef.current);
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setCompanionBubbleText(text);
@@ -802,8 +804,18 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   // Questions dataset
   const surveyQuestions = getSurveyQuestions(companion.name, goalCategory);
   const currentQ = surveyQuestions.find((q) => q.step === step);
+  useEffect(() => {
+    if (!currentQ || isTyping || companionBubbleText !== currentQ.title) return;
+
+    const timeout = window.setTimeout(() => setRevealedQuestionStep(currentQ.step), 320);
+    return () => window.clearTimeout(timeout);
+  }, [currentQ?.step, currentQ?.title, isTyping, companionBubbleText]);
+
   const surveyContentReady = Boolean(
-    currentQ && !isTyping && companionBubbleText === currentQ.title
+    currentQ &&
+      !isTyping &&
+      companionBubbleText === currentQ.title &&
+      revealedQuestionStep === currentQ.step
   );
   const sentenceIdx = step >= 3 && step <= 6 ? step - 3 : -1;
 
