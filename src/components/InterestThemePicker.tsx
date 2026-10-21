@@ -428,7 +428,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
             ? 'border-[#AFC6B8] bg-[#DCE9E1] text-[#283C32]'
             : 'border-[#E0E8E3] bg-white text-[#2D3933] hover:border-[#B8CBBF]'
         }`}
-        style={{ animationDelay: `${(index + 1) * 75}ms` }}
+        style={{ animationDelay: `${index * 380}ms` }}
       >
         <span className="min-w-0 break-words text-[14px] font-semibold leading-5">{name}</span>
         <span className={`flex h-5 w-5 shrink-0 items-center justify-center ${isSelected ? 'text-[#486A5B]' : 'text-[#83938A]'}`}>
@@ -578,7 +578,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
                   onClick={handleCreateTopic}
                   disabled={selectedTags.length >= 10}
                   className="speech-option-enter flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-[14px] border border-dashed border-[#AFC6B8] bg-[#E7F0EA] px-3.5 text-left text-[#2D3933] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
-                  style={{ animationDelay: `${(matchingThemes.length + 1) * 75}ms` }}
+                  style={{ animationDelay: `${matchingThemes.length * 380}ms` }}
                   aria-label={`创建自定义主题：${searchQuery.trim()}`}
                 >
                   <span className="min-w-0 break-words text-[14px] font-semibold leading-5">
