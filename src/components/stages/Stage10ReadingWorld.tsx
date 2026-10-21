@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BookOpen, Bookmark, User, Heart, Clock, Sparkles, ArrowRight, Volume2, Trash2 } from 'lucide-react';
-import { Companion, Story, UserPreferences } from '../../types';
+import { BookmarkedSentence, Companion, Story, UserPreferences } from '../../types';
 import { WORLD_STORIES, FIRST_STORY } from '../../data';
 
 interface Stage10ReadingWorldProps {
@@ -8,6 +8,7 @@ interface Stage10ReadingWorldProps {
   preferences: UserPreferences;
   onOpenStory: (storyId: string) => void;
   onToggleBookmark: (word: string) => void;
+  onToggleSentenceBookmark: (sentence: BookmarkedSentence) => void;
   onRestartOnboarding: () => void;
 }
 
@@ -16,9 +17,11 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
   preferences,
   onOpenStory,
   onToggleBookmark,
+  onToggleSentenceBookmark,
   onRestartOnboarding
 }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'vocab' | 'profile'>('home');
+  const [activeCollectionTab, setActiveCollectionTab] = useState<'words' | 'sentences'>('words');
   const [likes, setLikes] = useState<Record<string, number>>({
     'world-1': 124,
     'world-2': 89,
@@ -45,7 +48,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
   const duoStories = WORLD_STORIES.slice(1);
 
   return (
-    <div className="h-full flex flex-col justify-between text-stone-900 select-none relative overflow-hidden bg-[#F0F8F4]">
+    <div className="h-full flex flex-col justify-between text-stone-900 select-none relative overflow-hidden bg-[#F4F1FA]">
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto p-5 no-scrollbar">
         {activeTab === 'home' && (
@@ -83,7 +86,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
             {/* Featured Hero Story Card */}
             <div
               onClick={() => onOpenStory(mainStory.id)}
-              className="rounded-3xl bg-[#FFFFFF] border border-[#DCEBE5] overflow-hidden shadow-md mb-4 cursor-pointer group transition-all duration-300 hover:border-emerald-400/80"
+              className="rounded-3xl bg-[#FFFFFF] border border-[#E7E1F0] overflow-hidden shadow-md mb-4 cursor-pointer group transition-all duration-300 hover:border-emerald-400/80"
             >
               <div className="relative h-40 w-full overflow-hidden bg-stone-100">
                 <img
@@ -133,10 +136,10 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                   {mainStory.blurb}
                 </p>
 
-                <div className="mt-3 pt-3 border-t border-[#DCEBE5] flex items-center justify-between text-xs">
+                <div className="mt-3 pt-3 border-t border-[#E7E1F0] flex items-center justify-between text-xs">
                   <div className="flex items-center gap-1.5 text-[11px] text-stone-500">
                     {mainStory.tags.map((t, idx) => (
-                      <span key={idx} className="bg-[#F0F8F4] border border-[#DCEBE5] px-1.5 py-0.5 rounded text-stone-600">
+                      <span key={idx} className="bg-[#F4F1FA] border border-[#E7E1F0] px-1.5 py-0.5 rounded text-stone-600">
                         {t}
                       </span>
                     ))}
@@ -155,7 +158,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                 <div
                   key={story.id}
                   onClick={() => onOpenStory(story.id)}
-                  className="rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] overflow-hidden shadow-xs cursor-pointer group flex flex-col justify-between hover:border-emerald-400/60 transition-all"
+                  className="rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] overflow-hidden shadow-xs cursor-pointer group flex flex-col justify-between hover:border-emerald-400/60 transition-all"
                 >
                   <div className="relative h-24 w-full overflow-hidden bg-stone-100">
                     <img
@@ -181,7 +184,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                       </p>
                     </div>
 
-                    <div className="mt-2.5 pt-2 border-t border-[#DCEBE5] flex items-center justify-between text-[10px] text-stone-500">
+                    <div className="mt-2.5 pt-2 border-t border-[#E7E1F0] flex items-center justify-between text-[10px] text-stone-500">
                       <span>{story.tags[0]}</span>
                       <span className="text-emerald-700 font-medium">阅读 →</span>
                     </div>
@@ -195,20 +198,77 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
         {/* Tab 2: Vocabulary Book */}
         {activeTab === 'vocab' && (
           <div>
-            <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#DCEBE5]">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E7E1F0]">
               <div>
                 <h2 className="text-lg font-bold text-stone-900">我的词句本</h2>
-                <p className="text-xs text-stone-500">已收录 {preferences.bookmarkedWords.length} 个阅读高频词</p>
+                <p className="text-xs text-stone-500">
+                  {preferences.bookmarkedWords.length} 个词 · {preferences.bookmarkedSentences.length} 句
+                </p>
               </div>
               <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-medium">
                 L1 核心
               </span>
             </div>
 
-            {preferences.bookmarkedWords.length === 0 ? (
+            <div className="mb-4 flex w-full rounded-xl border border-[#E5DFF0] bg-white p-1" role="tablist" aria-label="词句本类型">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeCollectionTab === 'words'}
+                onClick={() => setActiveCollectionTab('words')}
+                className={`min-h-9 flex-1 rounded-lg text-[12px] font-semibold transition-colors ${
+                  activeCollectionTab === 'words' ? 'bg-[#F2EFFA] text-[#766B91]' : 'text-stone-500 hover:text-stone-800'
+                }`}
+              >
+                生词 {preferences.bookmarkedWords.length}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeCollectionTab === 'sentences'}
+                onClick={() => setActiveCollectionTab('sentences')}
+                className={`min-h-9 flex-1 rounded-lg text-[12px] font-semibold transition-colors ${
+                  activeCollectionTab === 'sentences' ? 'bg-[#FBE8E3] text-[#9B3021]' : 'text-stone-500 hover:text-stone-800'
+                }`}
+              >
+                收藏句子 {preferences.bookmarkedSentences.length}
+              </button>
+            </div>
+
+            {activeCollectionTab === 'sentences' ? (
+              preferences.bookmarkedSentences.length === 0 ? (
+                <div className="py-12 text-center text-xs text-stone-400">
+                  <Bookmark size={30} className="mx-auto mb-2 opacity-40" />
+                  <p>试读时收藏的句子会保存在这里。</p>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {preferences.bookmarkedSentences.map((item) => (
+                    <article
+                      key={item.sentence}
+                      className="flex items-start justify-between gap-3 rounded-xl border border-[#E7E1F0] bg-white p-3.5 shadow-xs"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-medium leading-5 text-[#25243C]">{item.sentence}</p>
+                        <p className="mt-1.5 text-[12px] leading-5 text-[#766B91]">{item.translation}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onToggleSentenceBookmark(item)}
+                        className="shrink-0 rounded-lg p-2 text-stone-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                        title="移除收藏句子"
+                        aria-label="移除收藏句子"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              )
+            ) : preferences.bookmarkedWords.length === 0 ? (
               <div className="text-center py-12 text-stone-400 text-xs">
                 <Bookmark size={32} className="mx-auto mb-2 opacity-40 text-stone-400" />
-                <p>在阅读正文中轻触绿色高亮词汇，即可加入词句本。</p>
+                <p>在阅读正文中轻触高亮词汇，即可加入词句本。</p>
               </div>
             ) : (
               <div className="space-y-2.5">
@@ -226,13 +286,13 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                   return (
                     <div
                       key={word}
-                      className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-start justify-between gap-3 shadow-xs"
+                      className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-start justify-between gap-3 shadow-xs"
                     >
                       <div className="flex-1">
                         <div className="flex items-baseline gap-2">
                           <h4 className="text-base font-bold font-serif text-stone-900">{word}</h4>
                           <span className="text-[11px] text-stone-400 font-mono">{vocab.phonetic}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F0F8F4] border border-[#DCEBE5] text-emerald-800 font-medium">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F4F1FA] border border-[#E7E1F0] text-emerald-800 font-medium">
                             {vocab.partOfSpeech}
                           </span>
                         </div>
@@ -243,14 +303,14 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => handlePronounce(word)}
-                          className="p-2 rounded-lg bg-[#F0F8F4] hover:bg-[#EAF4EF] text-emerald-700 transition-colors border border-[#DCEBE5] cursor-pointer shadow-xs"
+                          className="p-2 rounded-lg bg-[#F4F1FA] hover:bg-[#F0ECF8] text-emerald-700 transition-colors border border-[#E7E1F0] cursor-pointer shadow-xs"
                           title="听发音"
                         >
                           <Volume2 size={14} />
                         </button>
                         <button
                           onClick={() => onToggleBookmark(word)}
-                          className="p-2 rounded-lg bg-[#F0F8F4] hover:bg-rose-50 text-stone-400 hover:text-rose-600 transition-colors border border-[#DCEBE5] cursor-pointer shadow-xs"
+                          className="p-2 rounded-lg bg-[#F4F1FA] hover:bg-rose-50 text-stone-400 hover:text-rose-600 transition-colors border border-[#E7E1F0] cursor-pointer shadow-xs"
                           title="移除"
                         >
                           <Trash2 size={14} />
@@ -267,7 +327,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
         {/* Tab 3: Profile */}
         {activeTab === 'profile' && (
           <div>
-            <div className="text-center py-4 mb-4 pb-4 border-b border-[#DCEBE5]">
+            <div className="text-center py-4 mb-4 pb-4 border-b border-[#E7E1F0]">
               <div className="relative w-20 h-20 mx-auto mb-2">
                 <img
                   src={companion.avatarUrl}
@@ -282,28 +342,28 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
             </div>
 
             <div className="space-y-2.5 text-xs">
-              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                 <span className="text-stone-500">当前建议起点</span>
                 <span className="font-bold text-emerald-700 font-mono text-sm">
                   {preferences.profile.startingLevel} (初级进阶)
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                 <span className="text-stone-500">伴读提示偏好</span>
                 <span className="text-stone-800 font-medium">
                   {preferences.profile.hintDensity === 'light' ? '轻提示' : '多解释'}
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                 <span className="text-stone-500">单次阅读节奏</span>
                 <span className="text-stone-800 font-medium">
                   {preferences.profile.sessionDuration} 分钟 / 次
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+              <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                 <span className="text-stone-500">已点亮主题大陆</span>
                 <span className="text-emerald-700 font-semibold">科学大陆第 1 段海岸线</span>
               </div>
@@ -323,7 +383,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
               )}
 
               {preferences.profile.goalTrack?.targetHurdle && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                   <span className="text-stone-500">重点突破卡点</span>
                   <span className="text-stone-800 font-medium truncate max-w-[170px]">
                     {preferences.profile.goalTrack.targetHurdle}
@@ -332,28 +392,28 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
               )}
 
               {preferences.profile.goal && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                   <span className="text-stone-500">阅读目标</span>
                   <span className="text-stone-800 font-medium truncate max-w-[170px]">{preferences.profile.goal}</span>
                 </div>
               )}
 
               {preferences.profile.challenge && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                   <span className="text-stone-500">主要攻克阻碍</span>
                   <span className="text-stone-800 font-medium truncate max-w-[170px]">{preferences.profile.challenge}</span>
                 </div>
               )}
 
               {preferences.profile.durationPreference && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                   <span className="text-stone-500">专注习惯</span>
                   <span className="text-stone-800 font-medium truncate max-w-[170px]">{preferences.profile.durationPreference}</span>
                 </div>
               )}
 
               {preferences.profile.companionStyle && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#DCEBE5] flex items-center justify-between shadow-xs">
+                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
                   <span className="text-stone-500">伴读风格</span>
                   <span className="text-stone-800 font-medium truncate max-w-[170px]">{preferences.profile.companionStyle}</span>
                 </div>
@@ -362,7 +422,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
 
             <button
               onClick={onRestartOnboarding}
-              className="w-full mt-5 py-2.5 rounded-xl bg-white hover:bg-[#EAF4EF] text-stone-700 hover:text-stone-900 text-xs font-medium transition-colors border border-[#DCEBE5] shadow-xs cursor-pointer"
+              className="w-full mt-5 py-2.5 rounded-xl bg-white hover:bg-[#F0ECF8] text-stone-700 hover:text-stone-900 text-xs font-medium transition-colors border border-[#E7E1F0] shadow-xs cursor-pointer"
             >
               重新体验完整引导流程
             </button>
@@ -371,7 +431,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
       </div>
 
       {/* Bottom Fixed Tab Navigation */}
-      <nav className="h-16 border-t border-[#DCEBE5] bg-[#F0F8F4] flex items-center justify-around px-4 shadow-sm z-30">
+      <nav className="h-16 border-t border-[#E7E1F0] bg-[#F4F1FA] flex items-center justify-around px-4 shadow-sm z-30">
         <button
           onClick={() => setActiveTab('home')}
           className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${

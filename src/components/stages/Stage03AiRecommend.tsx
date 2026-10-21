@@ -39,13 +39,13 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#F0F8F4]">
+    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#F4F1FA]">
       {/* Top Bar */}
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-[#DCEBE5]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E7E1F0]">
           <button
             onClick={onBack}
-            className="w-8 h-8 rounded-full bg-white hover:bg-[#EAF4EF] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#DCEBE5] shadow-xs cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white hover:bg-[#F0ECF8] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E7E1F0] shadow-xs cursor-pointer"
             aria-label="返回上一步"
           >
             <ArrowLeft size={16} />
@@ -59,7 +59,7 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
 
           <button
             onClick={handleSwap}
-            className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-white hover:bg-[#EAF4EF] text-stone-600 hover:text-stone-900 border border-[#DCEBE5] shadow-xs transition-colors cursor-pointer"
+            className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-white hover:bg-[#F0ECF8] text-stone-600 hover:text-stone-900 border border-[#E7E1F0] shadow-xs transition-colors cursor-pointer"
           >
             <RefreshCw size={12} />
             <span>换一条</span>
@@ -85,7 +85,7 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
               {selectedThemes.map((t) => (
                 <span
                   key={t}
-                  className="text-[11px] px-2.5 py-0.5 rounded-full bg-white border border-[#DCEBE5] text-stone-700 font-medium shadow-xs"
+                  className="text-[11px] px-2.5 py-0.5 rounded-full bg-white border border-[#E7E1F0] text-stone-700 font-medium shadow-xs"
                 >
                   {t}
                 </span>
@@ -97,7 +97,7 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
 
       {/* Recommended Story Card */}
       <div className="my-auto py-2">
-        <div className="rounded-3xl bg-[#FFFFFF] border border-[#DCEBE5] overflow-hidden shadow-md relative transition-all duration-300">
+        <div className="rounded-3xl bg-[#FFFFFF] border border-[#E7E1F0] overflow-hidden shadow-md relative transition-all duration-300">
           {/* Cover Image Banner */}
           <div className="relative h-44 w-full overflow-hidden bg-stone-100">
             <img
@@ -136,7 +136,7 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
             <p className="text-xs font-serif text-stone-500 italic mb-2.5">
               {currentStory.title}
             </p>
-            <p className="text-xs text-stone-700 leading-relaxed bg-[#F0F8F4] p-2.5 rounded-xl border border-[#DCEBE5]">
+            <p className="text-xs text-stone-700 leading-relaxed bg-[#F4F1FA] p-2.5 rounded-xl border border-[#E7E1F0]">
               {currentStory.synopsis}
             </p>
           </div>
@@ -159,7 +159,7 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
 
         <button
           onClick={handleSwap}
-          className="w-full py-2.5 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-white hover:bg-[#EAF4EF] border border-[#DCEBE5] flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+          className="w-full py-2.5 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-white hover:bg-[#F0ECF8] border border-[#E7E1F0] flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
         >
           <span>我想换一个感觉</span>
         </button>

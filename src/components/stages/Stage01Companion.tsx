@@ -48,7 +48,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
   const browsingMore = currentIndex === moreIndex;
 
   return (
-    <div className="h-full flex flex-col items-center justify-center px-5 py-3 text-stone-800 select-none relative overflow-y-auto no-scrollbar bg-[#F0F8F4]">
+    <div className="h-full flex flex-col items-center justify-center px-5 py-3 text-stone-800 select-none relative overflow-y-auto no-scrollbar bg-[#F4F1FA]">
       <div className="w-full max-w-[280px] flex flex-col items-center">
         <div className="w-full text-left mb-4 px-1">
           <p className="text-xs font-semibold text-emerald-700 mb-1">一鹿知 · 开始阅读旅程</p>
@@ -85,9 +85,9 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                       : undefined,
                     borderColor: companion.id === selectedCompanionId
                       ? isLight
-                        ? '#75D8B5'
+                        ? '#D7A497'
                         : companion.accentColor
-                      : '#DCEBE5',
+                      : '#E7E1F0',
                     background: isLight
                       ? '#FFFFFF'
                       : '#FFFFFF'
@@ -104,7 +104,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                     </span>
                   )}
 
-                  <div className={`w-32 h-32 my-auto relative flex items-center justify-center rounded-full ${isLight ? 'bg-[#F0F8F4]' : 'bg-[#F5F6F4]'}`}>
+                  <div className={`w-32 h-32 my-auto relative flex items-center justify-center rounded-full ${isLight ? 'bg-[#F4F1FA]' : 'bg-[#F7F5FA]'}`}>
                     <img
                       src={companion.avatarUrl}
                       alt={companion.name}
@@ -120,8 +120,8 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                     <div
                       className="text-[11px] font-bold mt-0.5 inline-block px-2.5 py-0.5 rounded-full"
                       style={{
-                        color: isLight ? '#087A59' : companion.accentColor,
-                        backgroundColor: isLight ? '#E6F8F0' : `${companion.accentColor}18`,
+                        color: isLight ? '#B83825' : companion.accentColor,
+                        backgroundColor: isLight ? '#FBE8E3' : `${companion.accentColor}18`,
                       }}
                     >
                       {companion.type}
@@ -146,9 +146,9 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                 <div
                   key="coming-soon"
                   onClick={() => setCurrentIndex(idx)}
-                  className={`absolute inset-0 rounded-3xl bg-[#F5FBF8] border border-dashed border-[#BDDCCF] p-4 shadow-sm flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer ${posClass}`}
+                  className={`absolute inset-0 rounded-3xl bg-[#FAF8FD] border border-dashed border-[#CDC3E0] p-4 shadow-sm flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer ${posClass}`}
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-white border border-[#DCEBE4] flex items-center justify-center text-emerald-700 mb-3">
+                  <div className="w-14 h-14 rounded-2xl bg-white border border-[#E7E1F0] flex items-center justify-center text-emerald-700 mb-3">
                     <Sparkles size={24} aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold text-stone-900">更多伴读萌宠</h3>
@@ -165,7 +165,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
           <div className="flex items-center justify-center gap-4 mt-3">
             <button
               onClick={handlePrev}
-              className="w-9 h-9 rounded-full bg-[#FFFFFF] hover:bg-[#EAF4EF] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#DCEBE5] shadow-xs cursor-pointer"
+              className="w-9 h-9 rounded-full bg-[#FFFFFF] hover:bg-[#F0ECF8] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E7E1F0] shadow-xs cursor-pointer"
               aria-label="上一个旅伴"
             >
               <ArrowLeft size={16} />
@@ -180,7 +180,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                     if (i < COMPANIONS.length) onSelectCompanion(COMPANIONS[i].id);
                   }}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === currentIndex ? 'w-5 bg-emerald-600' : 'w-1.5 bg-[#C9D9D1] hover:bg-[#91B9A7]'
+                  i === currentIndex ? 'w-5 bg-emerald-600' : 'w-1.5 bg-[#D3CEE0] hover:bg-[#AFA7C5]'
                   }`}
                   aria-label={i === moreIndex ? '浏览更多伴读萌宠' : `选择${COMPANIONS[i].name}`}
                 />
@@ -189,7 +189,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
 
             <button
               onClick={handleNext}
-              className="w-9 h-9 rounded-full bg-[#FFFFFF] hover:bg-[#EAF4EF] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#DCEBE5] shadow-xs cursor-pointer"
+              className="w-9 h-9 rounded-full bg-[#FFFFFF] hover:bg-[#F0ECF8] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E7E1F0] shadow-xs cursor-pointer"
               aria-label="下一个旅伴"
             >
               <ArrowRight size={16} />
@@ -211,7 +211,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
 
           <button
             onClick={handleRandom}
-            className="w-full mt-2 min-h-10 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-white hover:bg-[#F4F8F6] border border-[#DCEBE4] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            className="w-full mt-2 min-h-10 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-white hover:bg-[#F5F2FA] border border-[#E7E1F0] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             <Shuffle size={13} />
             <span>帮我随机选一个</span>

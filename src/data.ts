@@ -377,5 +377,6 @@ export const INITIAL_PREFERENCES: UserPreferences = {
     sessionDuration: 5
   },
   bookmarkedWords: ['emerged', 'unhurried'],
+  bookmarkedSentences: [],
   streakDays: 0
 };

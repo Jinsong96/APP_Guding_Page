@@ -67,6 +67,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import type { Companion } from '../types';
 import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from './speechTiming';
+import { CompletionRipple } from './CompletionRipple';
 
 interface InterestTheme {
   name: string;
@@ -81,6 +82,7 @@ interface InterestThemePickerProps {
   selectedTags: string[];
   customTopics: string[];
   priorityTopics: string[];
+  isConfirming: boolean;
   onToggleTag: (tag: string) => void;
   onApplyCustomTopics: (topics: string[], newlyCreated: string[]) => void;
   onConfirm: (tags: string[]) => void;
@@ -296,6 +298,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   selectedTags,
   customTopics,
   priorityTopics,
+  isConfirming,
   onToggleTag,
   onApplyCustomTopics,
   onConfirm
@@ -423,18 +426,22 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
         type="button"
         aria-pressed={isSelected}
         onClick={() => onToggleTag(name)}
-        disabled={!isSelected && selectedTags.length >= 10}
-        className={`speech-option-enter flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-[14px] border px-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45 ${
+        disabled={isConfirming || (!isSelected && selectedTags.length >= 10)}
+        className={`speech-option-enter ${
+          isConfirming && isSelected ? 'interest-theme-confirm' : ''
+        } flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-[14px] border px-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45 ${
           isSelected
-            ? 'border-[#AFC6B8] bg-[#DCE9E1] text-[#283C32]'
-            : 'border-[#E0E8E3] bg-white text-[#2D3933] hover:border-[#B8CBBF]'
+            ? 'border-[#CEC4E2] bg-[#E8E2F2] text-[#37334F]'
+            : 'border-[#E7E3EF] bg-white text-[#25243C] hover:border-[#D7A497]'
         }`}
         style={{
-          animationDelay: `${SPEECH_CONTENT_REVEAL_MS + index * COMPANION_TYPING_INTERVAL_MS}ms`
+          animationDelay: isConfirming && isSelected
+            ? `${Math.min(index, 5) * 36}ms`
+            : `${SPEECH_CONTENT_REVEAL_MS + index * COMPANION_TYPING_INTERVAL_MS}ms`
         }}
       >
         <span className="min-w-0 break-words text-[14px] font-semibold leading-5">{name}</span>
-        <span className={`flex h-5 w-5 shrink-0 items-center justify-center ${isSelected ? 'text-[#486A5B]' : 'text-[#83938A]'}`}>
+        <span className={`flex h-5 w-5 shrink-0 items-center justify-center ${isSelected ? 'text-[#A94732]' : 'text-[#948FA3]'}`}>
           {isSelected ? <Check size={17} strokeWidth={2} /> : <Plus size={16} strokeWidth={1.7} />}
         </span>
       </button>
@@ -442,11 +449,12 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   };
 
   const footer = (
-    <div className="z-10 shrink-0 border-t border-[#DCE7E0] bg-[#F0F8F4] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-3">
+    <div className="z-10 shrink-0 border-t border-[#E7E1F0] bg-[#F4F1FA] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-3">
       <button
         type="button"
         onClick={() => onConfirm(selectedTags)}
-        className="flex h-12 w-full items-center justify-center rounded-xl bg-[#526F65] px-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#456257] active:bg-[#3D574D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F0F8F4]"
+        disabled={isConfirming}
+        className="flex h-12 w-full items-center justify-center rounded-xl bg-[#B83825] px-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#A52F1D] active:bg-[#8C281A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F4F1FA] disabled:cursor-wait disabled:opacity-90"
       >
         继续
       </button>
@@ -454,27 +462,30 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   );
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col bg-[#F0F8F4] text-[#27352F]">
+    <div className="flex h-full min-h-0 w-full flex-col bg-[#F4F1FA] text-[#24243D]">
       <div className="flex shrink-0 items-center gap-3 px-4 pb-3 pt-4">
-        <img
-          src={companion.avatarUrl}
-          alt={companion.name}
-          className="h-16 w-16 shrink-0 object-contain"
-        />
-        <div className="relative flex min-h-16 w-fit max-w-[calc(100%_-_76px)] flex-none items-center rounded-2xl border border-[#D7E4DC] bg-white px-3.5 py-3 shadow-[0_1px_2px_rgba(45,68,55,0.05)]">
+        <div className="relative h-16 w-16 shrink-0">
+          <img
+            src={companion.avatarUrl}
+            alt={companion.name}
+            className="h-full w-full object-contain"
+          />
+          <CompletionRipple active={isConfirming} />
+        </div>
+        <div className="relative flex min-h-16 w-fit max-w-[calc(100%_-_76px)] flex-none items-center rounded-2xl border border-[#E4DFF0] bg-white px-3.5 py-3 shadow-[0_1px_2px_rgba(45,68,55,0.05)]">
           <span
             className="absolute top-4 -left-2.5 z-10 h-0 w-0 border-y-[7px] border-y-transparent border-r-[10px] border-r-white"
             aria-hidden="true"
           />
           <span
-            className="absolute top-[13px] -left-3.5 h-0 w-0 border-y-[8px] border-y-transparent border-r-[12px] border-r-[#D7E4DC]"
+            className="absolute top-[13px] -left-3.5 h-0 w-0 border-y-[8px] border-y-transparent border-r-[12px] border-r-[#E4DFF0]"
             aria-hidden="true"
           />
-          <p className="relative min-w-0 break-words text-[17px] font-semibold leading-[26px] text-[#2D3933]">
+          <p className="relative min-w-0 break-words text-[17px] font-semibold leading-[26px] text-[#25243C]">
             {bubbleText}
             {bubbleIsTyping && (
               <span
-                className="ml-1 inline-block h-4 w-[2px] translate-y-[2px] animate-pulse bg-[#526F65] motion-reduce:animate-none"
+                className="ml-1 inline-block h-4 w-[2px] translate-y-[2px] animate-pulse bg-[#B83825] motion-reduce:animate-none"
                 aria-hidden="true"
               />
             )}
@@ -485,14 +496,14 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
       <div
         className={`flex min-h-0 flex-1 flex-col ${
           contentReady
-            ? 'speech-content-enter'
+          ? `speech-content-enter ${isConfirming ? 'pointer-events-none' : ''}`
             : 'hidden'
         }`}
       >
       <div className="shrink-0 px-4 pb-3">
         <div className="mb-2 flex items-end justify-between gap-3">
-          <h1 className="text-[18px] font-bold leading-6 text-[#29362F]">{activeCategory?.title}</h1>
-          <span className="text-[12px] text-[#718078]" aria-live="polite">
+          <h1 className="text-[18px] font-bold leading-6 text-[#25243C]">{activeCategory?.title}</h1>
+          <span className="text-[12px] text-[#77728A]" aria-live="polite">
             已选 {selectedTags.length}
           </span>
         </div>
@@ -506,10 +517,10 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
                 type="button"
                 aria-pressed={isActive}
                 onClick={() => handleSwitchCategory(category.id)}
-                className={`flex min-h-11 min-w-0 items-center justify-between gap-1.5 rounded-[11px] border px-2.5 text-left text-[12px] leading-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] focus-visible:ring-offset-1 ${
+                className={`flex min-h-11 min-w-0 items-center justify-between gap-1.5 rounded-[11px] border px-2.5 text-left text-[12px] leading-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-1 ${
                   isActive
-                    ? 'border-[#779687] bg-[#DCE9E1] font-semibold text-[#2D4539]'
-                    : 'border-[#DCE5DF] bg-white/55 text-[#66766D] hover:bg-white'
+                    ? 'border-[#C39D96] bg-[#E8E2F2] font-semibold text-[#3B3655]'
+                    : 'border-[#E6E1EF] bg-white/55 text-[#706B82] hover:bg-white'
                 }`}
               >
                 <span className="min-w-0 break-words">{category.title}</span>
@@ -527,10 +538,10 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
             type="button"
             aria-pressed={activeCategoryId === customCategory.id}
             onClick={() => handleSwitchCategory(customCategory.id)}
-            className={`mt-2 flex min-h-11 w-full items-center gap-2 rounded-[11px] border px-3 text-left text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] focus-visible:ring-offset-1 ${
+            className={`mt-2 flex min-h-11 w-full items-center gap-2 rounded-[11px] border px-3 text-left text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-1 ${
               activeCategoryId === customCategory.id
-                ? 'border-[#779687] bg-[#DCE9E1] text-[#2D4539]'
-                : 'border-dashed border-[#C8D7CE] bg-white/45 text-[#66766D] hover:bg-white'
+                ? 'border-[#C39D96] bg-[#E8E2F2] text-[#3B3655]'
+                : 'border-dashed border-[#D0C9DF] bg-white/45 text-[#706B82] hover:bg-white'
             }`}
           >
             <Sparkles size={15} aria-hidden="true" />
@@ -545,7 +556,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
           <Search
             size={18}
             strokeWidth={1.8}
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#74847B]"
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#89839A]"
             aria-hidden="true"
           />
           <input
@@ -554,7 +565,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
             onChange={(event) => setSearchQuery(event.target.value)}
             maxLength={80}
             placeholder="搜索或添加感兴趣的主题"
-            className="h-11 w-full rounded-xl border border-[#D8E4DC] bg-white pl-10 pr-4 text-[14px] text-[#27352F] outline-none placeholder:text-[#849189] focus:border-[#8EA99B] focus:ring-2 focus:ring-[#8EA99B]/20"
+            className="h-11 w-full rounded-xl border border-[#E4DFF0] bg-white pl-10 pr-4 text-[14px] text-[#24243D] outline-none placeholder:text-[#948FA3] focus:border-[#B88C86] focus:ring-2 focus:ring-[#B88C86]/20"
           />
         </label>
       </div>
@@ -567,10 +578,10 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
         {normalizedQuery ? (
           <section aria-labelledby="topic-search-results-title">
             <div className="mb-2.5 flex items-center justify-between">
-              <h2 id="topic-search-results-title" className="text-[13px] font-semibold text-[#56675D]">
+              <h2 id="topic-search-results-title" className="text-[13px] font-semibold text-[#615C75]">
                 搜索结果
               </h2>
-              <span className="text-[11px] text-[#7B8981]">{matchingThemes.length} 个匹配</span>
+              <span className="text-[11px] text-[#807A92]">{matchingThemes.length} 个匹配</span>
             </div>
             <div className="grid grid-cols-2 gap-2.5" role="group" aria-label="搜索匹配的主题">
               {matchingThemes.map(renderTopicCard)}
@@ -580,7 +591,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
                   type="button"
                   onClick={handleCreateTopic}
                   disabled={selectedTags.length >= 10}
-                  className="speech-option-enter flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-[14px] border border-dashed border-[#AFC6B8] bg-[#E7F0EA] px-3.5 text-left text-[#2D3933] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+                  className="speech-option-enter flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-[14px] border border-dashed border-[#CEC4E2] bg-[#F0EBF8] px-3.5 text-left text-[#25243C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
                   style={{
                     animationDelay: `${
                       SPEECH_CONTENT_REVEAL_MS + matchingThemes.length * COMPANION_TYPING_INTERVAL_MS
@@ -591,7 +602,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
                   <span className="min-w-0 break-words text-[14px] font-semibold leading-5">
                     {Array.from(searchQuery.trim()).slice(0, 24).join('')}
                   </span>
-                  <Plus size={17} className="shrink-0 text-[#526F65]" aria-hidden="true" />
+                  <Plus size={17} className="shrink-0 text-[#B83825]" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -600,8 +611,8 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
           <>
             <section aria-labelledby="core-topics-heading">
               <div className="mb-2.5 flex items-center justify-between">
-                <h2 id="core-topics-heading" className="text-[13px] font-semibold text-[#56675D]">选择主题</h2>
-                <span className="text-[11px] text-[#7B8981]">{activeTopics.length} 个</span>
+                <h2 id="core-topics-heading" className="text-[13px] font-semibold text-[#615C75]">选择主题</h2>
+                <span className="text-[11px] text-[#807A92]">{activeTopics.length} 个</span>
               </div>
               <div className="grid grid-cols-2 gap-2.5" role="group" aria-label="兴趣主题">
                 {coreTopics.map(renderTopicCard)}
@@ -614,10 +625,10 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
                   type="button"
                   aria-expanded={showMoreTopics}
                   onClick={() => setShowMoreTopics((value) => !value)}
-                  className="flex min-h-[48px] w-full items-center justify-between rounded-[14px] border border-[#DCE5DF] bg-white px-3.5 text-left text-[13px] font-semibold text-[#35443B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] focus-visible:ring-offset-2"
+                  className="flex min-h-[48px] w-full items-center justify-between rounded-[14px] border border-[#E6E1EF] bg-white px-3.5 text-left text-[13px] font-semibold text-[#302D49] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-2"
                 >
                   <span>更多{activeCategory?.title === '故事小说' ? '故事' : '主题'}</span>
-                  <span className="ml-auto mr-3 text-[11px] font-normal text-[#7B8981]">{additionalTopics.length} 个</span>
+                  <span className="ml-auto mr-3 text-[11px] font-normal text-[#807A92]">{additionalTopics.length} 个</span>
                   <ChevronDown
                     size={16}
                     className={`text-[#718178] transition-transform ${showMoreTopics ? 'rotate-180' : ''}`}

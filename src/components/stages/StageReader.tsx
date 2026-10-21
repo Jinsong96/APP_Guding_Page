@@ -189,13 +189,13 @@ export const StageReader: React.FC<StageReaderProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col gap-3 px-5 pt-3 pb-3 text-[#103E39] relative overflow-hidden bg-[#F1FAF6]">
+    <div className="h-full flex flex-col gap-3 px-5 pt-3 pb-3 text-[#171A35] relative overflow-hidden bg-[#F4F0FA]">
       <header className="shrink-0">
         <div className="flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={onBack}
-            className="w-11 h-11 rounded-full bg-white border border-[#DCEDE5] flex items-center justify-center text-[#103E39] shadow-sm"
+            className="w-11 h-11 rounded-full bg-white border border-[#E5DFF0] flex items-center justify-center text-[#171A35] shadow-sm"
             aria-label="返回"
           >
             <ArrowLeft size={21} />
@@ -207,25 +207,25 @@ export const StageReader: React.FC<StageReaderProps> = ({
             <button
               type="button"
               onClick={() => setShowMore((shown) => !shown)}
-              className="w-11 h-11 rounded-full bg-white border border-[#DCEDE5] flex items-center justify-center text-[#103E39] shadow-sm"
+              className="w-11 h-11 rounded-full bg-white border border-[#E5DFF0] flex items-center justify-center text-[#171A35] shadow-sm"
               aria-label="阅读设置"
               aria-expanded={showMore}
             >
               <MoreHorizontal size={22} />
             </button>
             {showMore && (
-              <div className="absolute right-0 top-12 z-30 w-60 p-2 rounded-2xl bg-white border border-[#DCEDE5] shadow-lg">
+              <div className="absolute right-0 top-12 z-30 w-60 p-2 rounded-2xl bg-white border border-[#E5DFF0] shadow-lg">
                 <button
                   type="button"
                   onClick={() => {
                     setShowTranslation((visible) => !visible);
                   }}
-                  className="w-full min-h-11 px-3 rounded-xl text-left text-sm hover:bg-[#F1FAF6]"
+                  className="w-full min-h-11 px-3 rounded-xl text-left text-sm hover:bg-[#F4F0FA]"
                 >
                   {showTranslation ? '隐藏中文译文' : '显示中文译文'}
                 </button>
-                <div className="my-2 border-t border-[#E5F0EB]" />
-                <p className="px-2 mb-2 text-xs font-medium text-[#72847D]">这段读起来感觉如何？</p>
+                <div className="my-2 border-t border-[#E8E2EF]" />
+                <p className="px-2 mb-2 text-xs font-medium text-[#77728A]">这段读起来感觉如何？</p>
                 <div className="grid grid-cols-3 gap-1.5">
                   {([
                     ['hard', '偏难'],
@@ -249,7 +249,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
                         className={`min-h-11 rounded-xl border text-xs font-medium transition-colors ${
                           isActive
                             ? 'bg-emerald-700 border-emerald-700 text-white'
-                            : 'bg-[#F5FAF7] border-[#DCEDE5] text-[#315A50] hover:bg-[#EAF5EF]'
+                            : 'bg-[#F5F2FA] border-[#E5DFF0] text-[#38344F] hover:bg-[#F0ECF8]'
                         }`}
                       >
                         {label}
@@ -265,7 +265,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
 
         <div className="mt-3 flex items-center gap-3">
           <div
-            className="h-2 flex-1 rounded-full bg-[#DCECE5] overflow-hidden"
+            className="h-2 flex-1 rounded-full bg-[#E6E1EF] overflow-hidden"
             role="progressbar"
             aria-label={`${stageTitle}阅读进度`}
             aria-valuemin={0}
@@ -277,7 +277,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
               style={{ width: `${progress}%` }}
             />
           </div>
-          <span className="shrink-0 text-sm font-medium text-[#718B83]">
+          <span className="shrink-0 text-sm font-medium text-[#77728A]">
             {String(currentPosition).padStart(2, '0')} / {String(totalPosition).padStart(2, '0')}
           </span>
         </div>
@@ -286,7 +286,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
       <div className="relative min-h-0 flex-1">
         <div
           aria-hidden="true"
-          className="absolute top-7 right-0 bottom-7 w-8 rounded-r-[28px] bg-[#E6F4ED] border border-[#D2E9DD]"
+          className="absolute top-7 right-0 bottom-7 w-8 rounded-r-[28px] bg-[#E9E3F2] border border-[#DBD3EB]"
         />
         <main
           onTouchStart={handleCardTouchStart}
@@ -295,17 +295,17 @@ export const StageReader: React.FC<StageReaderProps> = ({
             swipeStartX.current = null;
           }}
           aria-label="阅读卡片，向左或向右滑动翻页"
-          className={`absolute left-1/2 top-1/2 h-[82%] w-[min(76%,320px)] -translate-x-1/2 -translate-y-1/2 rounded-[30px] bg-white border border-[#E5F0EB] shadow-[0_10px_0_#BCE8D8,0_18px_28px_rgba(17,72,61,0.08)] overflow-visible touch-pan-y transition-[opacity,transform] duration-300 ${
+          className={`absolute left-1/2 top-1/2 h-[82%] w-[min(76%,320px)] -translate-x-1/2 -translate-y-1/2 rounded-[30px] bg-white border border-[#E8E2EF] shadow-[0_10px_0_#C9BEE6,0_18px_28px_rgba(42,32,71,0.08)] overflow-visible touch-pan-y transition-[opacity,transform] duration-300 ${
             animatingText ? 'opacity-50' : 'opacity-100'
           }`}
         >
           <article className="absolute inset-0 overflow-y-auto px-10 py-7">
             <div className="relative z-10 min-h-full flex flex-col justify-center">
-              <p className="text-[24px] leading-[1.5] font-medium text-[#103E39]">
+              <p className="text-[24px] leading-[1.5] font-medium text-[#171A35]">
                 {renderParagraph(currentParagraph)}
               </p>
               {showTranslation && (
-                <p className="mt-7 text-[16px] leading-[1.8] text-[#687773]">
+                  <p className="mt-7 text-[16px] leading-[1.8] text-[#706B82]">
                   {currentTranslation}
                 </p>
               )}
@@ -315,7 +315,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
           <button
             type="button"
             onClick={handlePrevious}
-            className="absolute -left-8 top-1/2 z-20 -translate-y-1/2 w-11 h-11 rounded-full bg-white/95 border border-[#E3EEE9] flex items-center justify-center text-[#103E39] shadow-sm"
+            className="absolute -left-8 top-1/2 z-20 -translate-y-1/2 w-11 h-11 rounded-full bg-white/95 border border-[#E6E1EF] flex items-center justify-center text-[#171A35] shadow-sm"
             aria-label={paragraphIndex === 0 ? '返回上一步' : '上一段'}
           >
             <ArrowLeft size={20} />
@@ -323,7 +323,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
           <button
             type="button"
             onClick={handleNext}
-            className="absolute -right-8 top-1/2 z-20 -translate-y-1/2 w-11 h-11 rounded-full bg-white/95 border border-[#E3EEE9] flex items-center justify-center text-[#103E39] shadow-sm"
+            className="absolute -right-8 top-1/2 z-20 -translate-y-1/2 w-11 h-11 rounded-full bg-white/95 border border-[#E6E1EF] flex items-center justify-center text-[#171A35] shadow-sm"
             aria-label={paragraphIndex === totalParagraphs - 1 ? '继续阅读' : '下一段'}
           >
             <ArrowRight size={20} />
@@ -342,7 +342,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
           <button
             type="button"
             onClick={handleListen}
-            className="min-h-14 rounded-full bg-white border border-[#DCEDE5] text-[#103E39] font-semibold flex items-center justify-center gap-2 shadow-[0_5px_0_#DDEBE5] transition-transform active:scale-[0.98]"
+            className="min-h-14 rounded-full bg-white border border-[#E5DFF0] text-[#171A35] font-semibold flex items-center justify-center gap-2 shadow-[0_5px_0_#E7E1F0] transition-transform active:scale-[0.98]"
           >
             {isSpeaking ? <VolumeX size={18} /> : <Headphones size={18} />}
             <span>{isSpeaking ? '停止朗读' : '听全文'}</span>
@@ -350,7 +350,7 @@ export const StageReader: React.FC<StageReaderProps> = ({
           <button
             type="button"
             onClick={() => setShowBreakdown(true)}
-            className="min-h-14 rounded-full bg-[#DDF47D] hover:bg-[#D2EE68] text-[#103E39] font-semibold flex items-center justify-center gap-2 shadow-[0_5px_0_#C4DF62] transition-transform active:scale-[0.98]"
+            className="min-h-14 rounded-full bg-[#B83825] hover:bg-[#A52F1D] text-white font-semibold flex items-center justify-center gap-2 shadow-[0_5px_0_#8C281A] transition-transform active:scale-[0.98]"
           >
             <Sparkles size={18} />
             <span>AI 解读</span>
@@ -369,30 +369,30 @@ export const StageReader: React.FC<StageReaderProps> = ({
       </section>
 
       {showBreakdown && (
-        <div className="absolute inset-0 z-40 flex items-end justify-center bg-[#123D36]/35 p-3">
+        <div className="absolute inset-0 z-40 flex items-end justify-center bg-[#1D1A32]/35 p-3">
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby="reading-breakdown-title"
-            className="w-full rounded-[24px] bg-white border border-[#DCEDE5] p-5 shadow-xl"
+            className="w-full rounded-[24px] bg-white border border-[#E5DFF0] p-5 shadow-xl"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Sparkles size={17} className="text-emerald-700" />
-                <h2 id="reading-breakdown-title" className="font-bold text-[#103E39]">AI 解读</h2>
+                <h2 id="reading-breakdown-title" className="font-bold text-[#171A35]">AI 解读</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowBreakdown(false)}
-                className="w-9 h-9 rounded-full bg-[#F1FAF6] flex items-center justify-center"
+                className="w-9 h-9 rounded-full bg-[#F4F0FA] flex items-center justify-center"
                 aria-label="关闭解读"
               >
                 <X size={18} />
               </button>
             </div>
-            <p className="text-sm leading-relaxed text-[#315A50]">{currentParagraph}</p>
-            <p className="mt-3 p-3 rounded-xl bg-[#F1FAF6] text-sm leading-relaxed text-[#62756D]">
-              阅读提示：先找到句子的主语和动作，再留意时间、地点等补充信息。点击绿色词汇可以查看释义。
+            <p className="text-sm leading-relaxed text-[#38344F]">{currentParagraph}</p>
+            <p className="mt-3 p-3 rounded-xl bg-[#F4F0FA] text-sm leading-relaxed text-[#706B82]">
+              阅读提示：先找到句子的主语和动作，再留意时间、地点等补充信息。点击高亮词汇可以查看释义。
             </p>
             <button
               type="button"

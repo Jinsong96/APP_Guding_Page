@@ -50,11 +50,11 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-sm bg-[#F0F8F4] border border-[#DCEBE5] rounded-3xl p-5 shadow-2xl relative text-stone-900 flex flex-col max-h-[85vh]"
+        className="w-full max-w-sm bg-[#F4F1FA] border border-[#E7E1F0] rounded-3xl p-5 shadow-2xl relative text-stone-900 flex flex-col max-h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#DCEBE5]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E7E1F0]">
           <div className="flex items-center gap-2">
             <img
               src={companion.avatarUrl}
@@ -68,7 +68,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-white hover:bg-[#EAF4EF] flex items-center justify-center text-stone-500 hover:text-stone-900 border border-[#DCEBE5] transition-colors cursor-pointer shadow-xs"
+            className="w-7 h-7 rounded-full bg-white hover:bg-[#F0ECF8] flex items-center justify-center text-stone-500 hover:text-stone-900 border border-[#E7E1F0] transition-colors cursor-pointer shadow-xs"
           >
             <X size={15} />
           </button>
@@ -92,7 +92,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
                 className={`p-3 rounded-2xl text-xs leading-relaxed max-w-[85%] ${
                   msg.sender === 'user'
                     ? 'bg-emerald-600 text-white font-medium rounded-tr-xs shadow-xs'
-                    : 'bg-white text-stone-800 border border-[#DCEBE5] rounded-tl-xs shadow-xs'
+                    : 'bg-white text-stone-800 border border-[#E7E1F0] rounded-tl-xs shadow-xs'
                 }`}
               >
                 {msg.sender === 'companion' ? <TypingText text={msg.text} /> : msg.text}
@@ -102,7 +102,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
         </div>
 
         {/* Quick Suggestion Chips */}
-        <div className="py-2 border-t border-[#DCEBE5]">
+        <div className="py-2 border-t border-[#E7E1F0]">
           <div className="flex items-center gap-1 text-[11px] text-emerald-700 mb-1.5 font-medium">
             <Sparkles size={11} className="text-emerald-600" />
             <span>大家常问</span>
@@ -112,7 +112,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
               <button
                 key={idx}
                 onClick={() => handleSend(q)}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-white hover:bg-[#EAF4EF] text-stone-700 hover:text-stone-900 border border-[#DCEBE5] transition-colors text-left truncate max-w-full shadow-xs cursor-pointer"
+                className="text-[11px] px-2.5 py-1 rounded-full bg-white hover:bg-[#F0ECF8] text-stone-700 hover:text-stone-900 border border-[#E7E1F0] transition-colors text-left truncate max-w-full shadow-xs cursor-pointer"
               >
                 {q}
               </button>
@@ -121,7 +121,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
         </div>
 
         {/* Input Composer */}
-        <div className="mt-2 flex items-center gap-1.5 pt-2 border-t border-[#DCEBE5]">
+        <div className="mt-2 flex items-center gap-1.5 pt-2 border-t border-[#E7E1F0]">
           <input
             type="text"
             value={inputVal}
@@ -130,7 +130,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
               if (e.key === 'Enter') handleSend();
             }}
             placeholder={`问问 ${companion.name} 关于这段文字的疑问...`}
-            className="flex-1 bg-white border border-[#DCEBE5] rounded-xl px-3 py-2 text-xs text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-600 shadow-xs"
+            className="flex-1 bg-white border border-[#E7E1F0] rounded-xl px-3 py-2 text-xs text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-600 shadow-xs"
           />
           <button
             onClick={() => handleSend()}

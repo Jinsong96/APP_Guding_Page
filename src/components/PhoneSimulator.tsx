@@ -88,7 +88,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
   return (
     <div ref={containerRef} className="relative flex flex-col items-center select-none py-0.5">
       {/* Sleek iPhone 15 Model & Scale Adjustment Bar */}
-      <div className="mb-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-[#DCEBE5] text-stone-700 shadow-md backdrop-blur-md text-[11px] font-medium z-30">
+      <div className="mb-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-[#E7E1F0] text-stone-700 shadow-md backdrop-blur-md text-[11px] font-medium z-30">
         <div className="flex items-center gap-1 text-stone-500 mr-1 text-[11px] font-medium">
           <Smartphone size={12} className="text-emerald-600" />
           <span className="font-semibold text-stone-800">iPhone 15</span>
@@ -214,10 +214,10 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
           {/* iPhone 15 Right button: Side power key */}
           <div className="absolute top-36 -right-[3px] w-[3px] h-16 bg-[#2A2E39] rounded-r-xs" />
 
-          {/* iPhone 15 Screen Display Viewport (Warm Paper Ivory #F0F8F4) */}
-          <div className="relative w-[393px] h-[852px] rounded-[44px] bg-[#F0F8F4] overflow-hidden flex flex-col shadow-inner border border-[#DCEBE5]">
+          {/* iPhone 15 Screen Display Viewport (Warm Paper Ivory #F4F1FA) */}
+          <div className="relative w-[393px] h-[852px] rounded-[44px] bg-[#F4F1FA] overflow-hidden flex flex-col shadow-inner border border-[#E7E1F0]">
             {/* iOS Top Status Bar with iPhone 15 Dynamic Island (灵动岛) */}
-            <div className="h-11 px-7 pt-2 flex items-center justify-between text-stone-800 text-xs font-semibold z-40 select-none bg-[#F0F8F4]/95 backdrop-blur-sm shrink-0 border-b border-[#DCEBE5]/60">
+            <div className="h-11 px-7 pt-2 flex items-center justify-between text-stone-800 text-xs font-semibold z-40 select-none bg-[#F4F1FA]/95 backdrop-blur-sm shrink-0 border-b border-[#E7E1F0]/60">
               <span className="font-mono text-[13px] tracking-tight font-bold text-stone-800">9:41</span>
               
               {/* Precision iPhone 15 Dynamic Island */}
@@ -237,12 +237,12 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
             </div>
 
             {/* Screen Content Viewport (Warm Paper Ivory) */}
-            <div className="flex-1 overflow-hidden relative bg-[#F0F8F4]">
+            <div className="flex-1 overflow-hidden relative bg-[#F4F1FA]">
               {children}
             </div>
 
             {/* Bottom Home Indicator Bar (iPhone 15 ergonomic safe area) */}
-            <div className="h-6 bg-[#F0F8F4] flex items-center justify-center shrink-0 z-40 select-none">
+            <div className="h-6 bg-[#F4F1FA] flex items-center justify-center shrink-0 z-40 select-none">
               <div className="w-36 h-1 bg-stone-700/30 rounded-full" />
             </div>
           </div>

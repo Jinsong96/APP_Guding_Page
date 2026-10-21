@@ -221,7 +221,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
                 onClick={() => handleTagClick(tag)}
                 style={{
                   transitionDelay: animStep < 5 ? `${i * 45}ms` : '0ms',
-                  borderColor: isSelected ? currentDomain.color : '#DCEBE5',
+                  borderColor: isSelected ? currentDomain.color : '#E7E1F0',
                   backgroundColor: isSelected ? currentDomain.color : '#FFFFFF',
                   color: isSelected ? '#FFFFFF' : '#1C1E24',
                   boxShadow: isSelected
@@ -288,7 +288,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
             className="w-3 h-3 rotate-45 border-t-2 border-l-2 shadow-sm transition-colors duration-300"
             style={{
               borderColor: currentDomain.color,
-              backgroundColor: '#F0F8F4'
+              backgroundColor: '#F4F1FA'
             }}
           />
           <div
@@ -521,7 +521,7 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
               <span
                 key={t}
                 onClick={() => onToggleTag(t)}
-                className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-white border border-[#DCEBE5] text-emerald-800 shrink-0 cursor-pointer hover:bg-[#EAF4EF] transition-colors shadow-2xs font-medium"
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-white border border-[#E7E1F0] text-emerald-800 shrink-0 cursor-pointer hover:bg-[#F0ECF8] transition-colors shadow-2xs font-medium"
                 title="点击移出"
               >
                 <span>{t}</span>

@@ -29,18 +29,18 @@ export const WordLookupModal: React.FC<WordLookupModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-sm bg-[#F0F8F4] border border-[#DCEBE5] rounded-3xl p-5 shadow-2xl relative text-stone-900"
+        className="w-full max-w-sm bg-[#F4F1FA] border border-[#E7E1F0] rounded-3xl p-5 shadow-2xl relative text-stone-900"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#DCEBE5]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E7E1F0]">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: companion.accentColor }} />
             <span className="text-xs font-semibold text-stone-600">词汇即时解析</span>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white hover:bg-[#EAF4EF] flex items-center justify-center text-stone-500 hover:text-stone-900 border border-[#DCEBE5] transition-colors cursor-pointer shadow-xs"
+            className="w-8 h-8 rounded-full bg-white hover:bg-[#F0ECF8] flex items-center justify-center text-stone-500 hover:text-stone-900 border border-[#E7E1F0] transition-colors cursor-pointer shadow-xs"
             aria-label="关闭"
           >
             <X size={16} />
@@ -73,7 +73,7 @@ export const WordLookupModal: React.FC<WordLookupModalProps> = ({
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer shadow-xs ${
               isBookmarked
                 ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                : 'bg-white hover:bg-[#EAF4EF] text-stone-700 border border-[#DCEBE5]'
+                : 'bg-white hover:bg-[#F0ECF8] text-stone-700 border border-[#E7E1F0]'
             }`}
           >
             {isBookmarked ? <Check size={13} /> : <Bookmark size={13} />}
@@ -83,12 +83,12 @@ export const WordLookupModal: React.FC<WordLookupModalProps> = ({
 
         {/* Chinese & English Definition */}
         <div className="mt-4 space-y-2">
-          <div className="p-3 rounded-xl bg-white border border-[#DCEBE5] shadow-xs">
+          <div className="p-3 rounded-xl bg-white border border-[#E7E1F0] shadow-xs">
             <p className="text-base font-bold text-emerald-800">{vocab.chinese}</p>
             <p className="text-xs text-stone-600 mt-1 leading-relaxed">{vocab.englishDef}</p>
           </div>
 
-          <div className="p-3 rounded-xl bg-white border border-[#DCEBE5] shadow-xs">
+          <div className="p-3 rounded-xl bg-white border border-[#E7E1F0] shadow-xs">
             <span className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider block mb-1 font-mono">
               例句 Context
             </span>

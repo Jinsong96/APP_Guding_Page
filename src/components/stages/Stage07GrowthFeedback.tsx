@@ -14,13 +14,13 @@ export const Stage07GrowthFeedback: React.FC<Stage07GrowthFeedbackProps> = ({
   onNext
 }) => {
   return (
-    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#F0F8F4]">
+    <div className="h-full flex flex-col justify-between p-5 text-stone-900 select-none relative overflow-hidden bg-[#F4F1FA]">
       {/* Top Bar */}
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-[#DCEBE5]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E7E1F0]">
           <button
             onClick={onBack}
-            className="w-8 h-8 rounded-full bg-white hover:bg-[#EAF4EF] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#DCEBE5] shadow-xs cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white hover:bg-[#F0ECF8] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E7E1F0] shadow-xs cursor-pointer"
             aria-label="返回上一步"
           >
             <ArrowLeft size={16} />
@@ -47,7 +47,7 @@ export const Stage07GrowthFeedback: React.FC<Stage07GrowthFeedbackProps> = ({
 
       {/* Growth Card */}
       <div className="my-auto py-2">
-        <div className="rounded-3xl bg-[#FFFFFF] border border-[#DCEBE5] p-5 shadow-md relative overflow-hidden text-center">
+        <div className="rounded-3xl bg-[#FFFFFF] border border-[#E7E1F0] p-5 shadow-md relative overflow-hidden text-center">
           {/* Subtle background glow */}
           <div
             className="absolute -top-12 -right-12 w-36 h-36 rounded-full blur-3xl opacity-20 pointer-events-none"

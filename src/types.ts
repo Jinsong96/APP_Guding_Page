@@ -33,6 +33,11 @@ export interface SentenceChunk {
   explanation: string;
 }
 
+export interface BookmarkedSentence {
+  sentence: string;
+  translation: string;
+}
+
 export interface StoryLevelContent {
   level: ReadingLevel;
   cefr: 'A1' | 'A2' | 'B1';
@@ -96,6 +101,7 @@ export interface UserPreferences {
     goalTrack?: GoalTrackDetails;
   };
   bookmarkedWords: string[];
+  bookmarkedSentences: BookmarkedSentence[];
   streakDays: number;
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Smartphone, Eye, ArrowRight } from 'lucide-react';
-import { Companion, UserPreferences, ReadingLevel } from '../types';
+import { BookmarkedSentence, Companion, UserPreferences, ReadingLevel } from '../types';
 import { Stage01Companion } from './stages/Stage01Companion';
 import { Stage02AiChat } from './stages/Stage02AiChat';
 import { Stage03AiRecommend } from './stages/Stage03AiRecommend';
@@ -16,6 +16,7 @@ interface BoardViewProps {
   onSelectCompanion: (id: any) => void;
   onJumpToStage: (stageNum: number) => void;
   onToggleBookmark: (word: string) => void;
+  onToggleSentenceBookmark: (sentence: BookmarkedSentence) => void;
   onUpdatePreferences: (updated: Partial<UserPreferences>) => void;
 }
 
@@ -25,6 +26,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
   onSelectCompanion,
   onJumpToStage,
   onToggleBookmark,
+  onToggleSentenceBookmark,
   onUpdatePreferences
 }) => {
   const STAGE_TITLES = [
@@ -35,9 +37,9 @@ export const BoardView: React.FC<BoardViewProps> = ({
   ];
 
   return (
-    <div className="w-full min-h-screen p-4 sm:p-8 bg-[#E8F2EE]">
+    <div className="w-full min-h-screen p-4 sm:p-8 bg-[#ECE8F7]">
       {/* Board Description Header */}
-      <div className="max-w-7xl mx-auto mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#DCEBE5] pb-6">
+      <div className="max-w-7xl mx-auto mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#E7E1F0] pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1 justify-center sm:justify-start">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
@@ -69,7 +71,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
             {/* Screen Top Header Tag */}
             <div className="flex items-center justify-between mb-2.5 px-1">
               <div className="flex items-center gap-1.5">
-                <span className="w-6 h-5 rounded-md bg-white border border-[#DCEBE5] text-[11px] font-mono font-bold text-emerald-700 flex items-center justify-center shadow-xs">
+                <span className="w-6 h-5 rounded-md bg-white border border-[#E7E1F0] text-[11px] font-mono font-bold text-emerald-700 flex items-center justify-center shadow-xs">
                   {stage.label}
                 </span>
                 <h3 className="text-xs font-bold text-stone-800 truncate">{stage.title}</h3>
@@ -88,7 +90,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
               onClick={() => onJumpToStage(stage.num)}
               className="relative w-full h-[580px] rounded-[32px] bg-[#16181F] border-2 border-[#2A2E39] hover:border-emerald-500 p-2 shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden group flex flex-col"
             >
-              <div className="w-full h-full rounded-[24px] bg-[#F0F8F4] overflow-hidden relative pointer-events-none text-left">
+              <div className="w-full h-full rounded-[24px] bg-[#F4F1FA] overflow-hidden relative pointer-events-none text-left">
                 {stage.num === 1 && (
                   <Stage01Companion
                     selectedCompanionId={preferences.companionId}
@@ -99,6 +101,8 @@ export const BoardView: React.FC<BoardViewProps> = ({
                 {stage.num === 2 && (
                   <Stage02AiChat
                     companion={companion}
+                    bookmarkedSentences={preferences.bookmarkedSentences}
+                    onToggleSentenceBookmark={onToggleSentenceBookmark}
                     onBack={() => {}}
                     onComplete={() => {}}
                     onSkip={() => {}}
@@ -193,6 +197,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                     preferences={preferences}
                     onOpenStory={() => {}}
                     onToggleBookmark={onToggleBookmark}
+                    onToggleSentenceBookmark={onToggleSentenceBookmark}
                     onRestartOnboarding={() => {}}
                   />
                 )}

@@ -80,12 +80,12 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
       : interestTheme || '前沿科技';
 
   return (
-    <div className="h-full flex flex-col justify-between p-4 sm:p-5 text-stone-900 select-none relative overflow-hidden bg-[#FCFDFC]">
+    <div className="h-full flex flex-col justify-between p-4 sm:p-5 text-stone-900 select-none relative overflow-hidden bg-[#F7F4FC]">
       {/* Top Header Bar */}
-      <div className="flex items-center pb-3 border-b border-[#DCEBE5] shrink-0 z-20">
+      <div className="flex items-center pb-3 border-b border-[#E7E1F0] shrink-0 z-20">
         <button
           onClick={onBack}
-          className="w-10 h-10 rounded-full bg-white hover:bg-[#F2F7F4] flex items-center justify-center text-stone-700 hover:text-stone-900 transition-colors border border-[#DCEBE5] cursor-pointer"
+          className="w-10 h-10 rounded-full bg-white hover:bg-[#F2EFFA] flex items-center justify-center text-stone-700 hover:text-stone-900 transition-colors border border-[#E7E1F0] cursor-pointer"
           aria-label="返回上一步"
         >
           <ArrowLeft size={16} />
@@ -110,40 +110,40 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
             }`}
           >
             {!isCalibrated && (
-              <div className="absolute w-20 h-20 rounded-full bg-[#E7F4EE] pointer-events-none" />
+              <div className="absolute w-20 h-20 rounded-full bg-[#EEE9F8] pointer-events-none" />
             )}
             {/* Halo Glow & Breathing Ambient Light */}
             <div
               className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 pointer-events-none ${
                 isCalibrated ? 'animate-companion-glow' : 'opacity-0'
               }`}
-              style={{ backgroundColor: companion.accentColor }}
+              style={{ backgroundColor: '#8176A8' }}
             />
 
             {/* Soft Ambient Breathing Ring when Calibrated (No aggressive ping/flash) */}
             {isCalibrated && (
               <div
                 className="absolute -inset-2.5 rounded-full border pointer-events-none animate-companion-glow"
-                style={{ borderColor: `${companion.accentColor}45` }}
+                style={{ borderColor: '#8176A845' }}
               />
             )}
 
             {/* Soft Sparkle Icons Floating Around Companion with gentle pacing */}
             {!isCalibrated && (
-              <span className="absolute top-10 right-2 text-emerald-500 pointer-events-none">
+              <span className="absolute top-10 right-2 text-[#C83E26] pointer-events-none">
                 <Sparkles size={18} />
               </span>
             )}
 
             {isCalibrated && (
               <div className="absolute inset-0 pointer-events-none">
-                <span className="absolute -top-1 -right-1 text-emerald-500/90 animate-sparkle-soft-1">
+                <span className="absolute -top-1 -right-1 text-[#C83E26]/90 animate-sparkle-soft-1">
                   <Sparkles size={16} />
                 </span>
-                <span className="absolute top-1/2 -left-2 text-emerald-600/80 animate-sparkle-soft-2">
-                  <Star size={13} fill="#059669" />
+                <span className="absolute top-1/2 -left-2 text-[#8176A8]/90 animate-sparkle-soft-2">
+                  <Star size={13} fill="#8176A8" />
                 </span>
-                <span className="absolute -bottom-1 right-2 text-emerald-500/75 animate-sparkle-spin-slow">
+                <span className="absolute -bottom-1 right-2 text-[#C83E26]/75 animate-sparkle-spin-slow">
                   <Sparkles size={14} />
                 </span>
               </div>
@@ -175,32 +175,32 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
         {!isCalibrated ? (
           <div className="w-full max-w-sm sm:max-w-md px-1 flex flex-col items-center text-center animate-in fade-in duration-300">
             <div className="text-center mb-5 px-2 animate-title-entrance">
-              <h1 className="text-xl font-bold text-[#26372F] leading-snug">
+              <h1 className="text-xl font-bold text-[#25243C] leading-snug">
                 {companion.name}在读你的兴趣与水平
               </h1>
             </div>
 
-            <div className="w-full bg-[#DCEEE6] h-[5px] rounded-full overflow-hidden mb-9">
+            <div className="w-full bg-[#E6E0F0] h-[5px] rounded-full overflow-hidden mb-9">
               <div
-                className="h-full bg-[#079B6B] rounded-full transition-all duration-300"
+                className="h-full bg-[#C83E26] rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
 
-            <div className="w-full text-left divide-y divide-[#DFE9E4]">
+            <div className="w-full text-left divide-y divide-[#E7E1F0]">
               <div
                 className={`min-h-[72px] px-1 flex items-center justify-between gap-3 transition-opacity duration-300 ${
                   activeStep >= 1 ? 'opacity-100' : 'opacity-45'
                 }`}
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-[#079B6B] text-white flex items-center justify-center shrink-0">
+                  <span className="w-7 h-7 rounded-full bg-[#C83E26] text-white flex items-center justify-center shrink-0">
                     <Check size={15} className="stroke-[2.5]" />
                   </span>
-                  <span className="text-[15px] font-semibold text-[#26372F]">兴趣领域</span>
+                  <span className="text-[15px] font-semibold text-[#25243C]">兴趣领域</span>
                 </div>
                 <span
-                  className="max-w-[44%] truncate text-right text-[13px] font-medium text-[#26785D]"
+                  className="max-w-[44%] truncate text-right text-[13px] font-medium text-[#766B91]"
                   title={displayThemes}
                 >
                   {displayThemes}
@@ -213,12 +213,12 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
                 }`}
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-[#079B6B] text-white flex items-center justify-center shrink-0">
+                  <span className="w-7 h-7 rounded-full bg-[#C83E26] text-white flex items-center justify-center shrink-0">
                     <Check size={15} className="stroke-[2.5]" />
                   </span>
-                  <span className="text-[15px] font-semibold text-[#26372F]">阅读偏好</span>
+                  <span className="text-[15px] font-semibold text-[#25243C]">阅读偏好</span>
                 </div>
-                <span className="shrink-0 text-[13px] font-medium text-[#26785D]">已同步</span>
+                <span className="shrink-0 text-[13px] font-medium text-[#766B91]">已同步</span>
               </div>
 
               <div
@@ -227,12 +227,12 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
                 }`}
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-[#079B6B] text-white flex items-center justify-center shrink-0">
+                  <span className="w-7 h-7 rounded-full bg-[#C83E26] text-white flex items-center justify-center shrink-0">
                     <Check size={15} className="stroke-[2.5]" />
                   </span>
-                  <span className="text-[15px] font-semibold text-[#26372F]">定制画像</span>
+                  <span className="text-[15px] font-semibold text-[#25243C]">定制画像</span>
                 </div>
-                <span className="shrink-0 text-[13px] font-medium text-[#26785D]">已就绪</span>
+                <span className="shrink-0 text-[13px] font-medium text-[#766B91]">已就绪</span>
               </div>
             </div>
           </div>
@@ -242,15 +242,15 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
             {/* Duolingo-style Starting Level Anchor Badge */}
             <div className="relative mb-4 flex flex-col items-center justify-center animate-in zoom-in-75 fade-in duration-700 ease-out">
               {/* Dynamic warm light pulse glow */}
-              <div className="absolute inset-0 rounded-full bg-emerald-400/20 blur-md animate-pulse opacity-50 pointer-events-none" />
+              <div className="absolute inset-0 rounded-full bg-[#DAD2EB]/65 blur-md animate-pulse opacity-60 pointer-events-none" />
 
               {/* Centered Pill Badge */}
-              <div className="relative inline-flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-2 border-emerald-400 shadow-md shadow-emerald-900/10 transition-transform duration-300 hover:scale-102">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <div className="relative inline-flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#F1ECF8] via-white to-[#F1ECF8] border-2 border-[#C9BDE6] shadow-md shadow-[#4C3D6C]/10 transition-transform duration-300 hover:scale-102">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#C83E26] animate-pulse shrink-0" />
                 <span className="text-[14.5px] sm:text-[15px] font-bold text-stone-800 tracking-wider">
                   建议阅读起点
                 </span>
-                <strong className="text-2xl sm:text-3xl font-black font-mono text-emerald-600 leading-none tracking-tight">
+                <strong className="text-2xl sm:text-3xl font-black font-mono text-[#B83825] leading-none tracking-tight">
                   {resolvedStartingLevel}
                 </strong>
               </div>
@@ -264,7 +264,7 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
             {/* Duolingo Tactile 3D Action Button */}
             <button
               onClick={onNext}
-              className="w-full h-13 sm:h-14 rounded-2xl bg-[#526F65] font-black text-white text-base sm:text-lg flex items-center justify-center gap-2 transition-all hover:bg-[#456257] active:bg-[#3D574D] active:translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] focus-visible:ring-offset-2 cursor-pointer"
+              className="w-full h-13 sm:h-14 rounded-2xl bg-[#B83825] font-black text-white text-base sm:text-lg flex items-center justify-center gap-2 transition-all hover:bg-[#A52F1D] active:bg-[#8C281A] active:translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-2 cursor-pointer"
             >
               <span>开启阅读体验</span>
               <ArrowRight size={19} className="stroke-[2.5]" />

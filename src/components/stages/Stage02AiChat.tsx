@@ -2,13 +2,17 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
+  Bookmark,
+  Languages,
+  MoreHorizontal,
+  RotateCcw,
   Volume2,
-  Check,
   Sparkle,
   Sparkles
 } from 'lucide-react';
-import { Companion, GoalTrackDetails } from '../../types';
+import { BookmarkedSentence, Companion, GoalTrackDetails } from '../../types';
 import { InterestThemePicker } from '../InterestThemePicker';
+import { CompletionRipple } from '../CompletionRipple';
 import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
 
 export type CefrLevelKey = 'A1-' | 'A2' | 'B1' | 'B2+';
@@ -32,7 +36,7 @@ export interface SurveyOptionItem {
 }
 
 export interface SurveyQuestionDef {
-  step: number; // 11: Q1, 12: Q2 (focus), 15: Q3 (hurdle), 13: Q4 (duration), 14: Q5 (reading state / starting level)
+  step: number;
   number: number;
   total: number;
   stageName: string;
@@ -45,7 +49,7 @@ export const getSurveyQuestions = (companionName: string, goalCat: GoalCategory 
   {
     step: 11,
     number: 1,
-    total: 5,
+    total: 3,
     stageName: '核心目标',
     title: '平时读英语，你最想达成什么目标？',
     defaultPrompt: `嗨！告诉我你的主要阅读方向，${companionName}将据此调配全套篇目与梯度～`,
@@ -75,7 +79,7 @@ export const getSurveyQuestions = (companionName: string, goalCat: GoalCategory 
   {
     step: 12,
     number: 2,
-    total: 5,
+    total: 3,
     stageName: '场景定位',
     title:
       goalCat === 'exam'
@@ -164,93 +168,9 @@ export const getSurveyQuestions = (companionName: string, goalCat: GoalCategory 
           ]
   },
   {
-    step: 15,
-    number: 3,
-    total: 5,
-    stageName: '核心卡点',
-    title: '读英文时，最让你头疼的是？',
-    defaultPrompt: `${companionName}会在后续阅读中专门标注破解支架与攻坚技巧～`,
-    options:
-      goalCat === 'exam'
-        ? [
-            {
-              label: '长难句看不懂',
-              aiReasoning: '激活句法支架：后续长难句将提供分层染色与逻辑主干拆解！'
-            },
-            {
-              label: '核心词记不住',
-              aiReasoning: '语境记忆加持：高频考点词随文高亮解析，彻底告别死记硬背！'
-            },
-            {
-              label: '阅读速度太慢',
-              aiReasoning: '意群速读训练：引导视线快速定位主谓宾，大幅提升做题效率！'
-            },
-            {
-              label: '抓不住文章主旨',
-              aiReasoning: '段落脉络导引：重点点拨段落首尾论点与转折过渡词！'
-            }
-          ]
-        : goalCat === 'workplace'
-        ? [
-            {
-              label: '表达不够地道',
-              aiReasoning: '地道表达置换：自动标注本土原生用词，职场表达更自信！'
-            },
-            {
-              label: '专业术语看不懂',
-              aiReasoning: '行业黑话精析：专业术语与行业缩写即点即查、智能速记！'
-            },
-            {
-              label: '长文抓不住重点',
-              aiReasoning: '关键信息抓取：以数据和核心结论为锚点，迅速抓住决策重点！'
-            },
-            {
-              label: '读得慢效率低',
-              aiReasoning: '结构化速读法：先看结论后看论据，成倍提升文献阅读速度！'
-            }
-          ]
-        : goalCat === 'original'
-        ? [
-            {
-              label: '生词打断节奏',
-              aiReasoning: '智能释义浮窗：轻量提示高亮，无需跳出查词打断阅读心流！'
-            },
-            {
-              label: '长句容易绕晕',
-              aiReasoning: '多层从句拆解：抽丝剥茧还原主干，长句子也能一眼看懂！'
-            },
-            {
-              label: '背景文化看不懂',
-              aiReasoning: '背景百科卡片：随文补充西方历史文化、政治与社会背景！'
-            },
-            {
-              label: '长篇阅读容易疲劳',
-              aiReasoning: '意群微步推进：舒适分段阅读，长文读起来轻盈不费力！'
-            }
-          ]
-        : [
-            {
-              label: '很难坚持下去',
-              aiReasoning: '微习惯正向反馈：每天几分钟无痛打卡，让进步清晰可见！'
-            },
-            {
-              label: '文章内容太难',
-              aiReasoning: '智能难度降阶：随时根据你的状态自动调配最友善的版本！'
-            },
-            {
-              label: '感觉不到进步',
-              aiReasoning: '多维成长勋章：即时记录新学词汇与阅读里程碑，满满成就感！'
-            },
-            {
-              label: '找不到想读的',
-              aiReasoning: '兴趣星系推送：紧密围绕你的专属星盘，精准推荐心仪佳作！'
-            }
-          ]
-  },
-  {
     step: 13,
-    number: 4,
-    total: 5,
+    number: 3,
+    total: 3,
     stageName: '专注节奏',
     title: '每天留一段专注阅读时间，你更习惯哪种时长？',
     defaultPrompt: '选择最契合当前生活节奏的打卡时长，可持续才是硬道理～',
@@ -269,32 +189,6 @@ export const getSurveyQuestions = (companionName: string, goalCat: GoalCategory 
         aiReasoning: '深度心流沉浸：适合长篇探究与全景输入，快速积累大体量语料。'
       }
     ]
-  },
-  {
-    step: 14,
-    number: 5,
-    total: 5,
-    stageName: '当前状态',
-    title: '读英文文章时，你一般是什么状态？',
-    defaultPrompt: '选出你的真实状态，我们将据此为你锁定最适宜的起步试读！',
-    options: [
-      {
-        label: '只能看懂简单的句子',
-        aiReasoning: '从基础短句起步：词汇高频、句式简短，零压力开启第一步！'
-      },
-      {
-        label: '能读懂短文，但要查不少词',
-        aiReasoning: '稳固日常语感：涵盖实用复合句与生活叙事，查词更智能省心！'
-      },
-      {
-        label: '大部分能读懂，偶尔卡住',
-        aiReasoning: '进阶地道流畅：适应丰富从句与主流资讯，快速突破阅读瓶颈！'
-      },
-      {
-        label: '读外刊、原版书比较轻松',
-        aiReasoning: '原生深度阅读：品读细腻修辞与复杂论证，享受母语级阅读快感！'
-      }
-    ]
   }
 ];
 
@@ -305,28 +199,28 @@ export const LEVEL_METAS: Record<
   'A1-': {
     levelLabel: 'A1- 入门启蒙',
     code: 'L1',
-    color: '#38BDF8',
+    color: '#9A8EBB',
     tagline: '短句高频词，零负担轻松读',
     description: '核心词汇 800 以内，以基础日常会话与简短叙事短句为主，帮助你轻松找回英语语感。'
   },
   'A2': {
     levelLabel: 'A2 基础衔接',
     code: 'L4',
-    color: '#34D399',
+    color: '#C83E26',
     tagline: '生活语境叙事，自然建立语感',
     description: '词汇量约 1500-2000，涵盖常见复合句与生活叙事，能在熟悉的题材中流畅获取核心信息。'
   },
   'B1': {
     levelLabel: 'B1 地道流畅',
     code: 'L7',
-    color: '#BDE65C',
+    color: '#B83825',
     tagline: '复合从句与地道短语，畅读原版',
     description: '词汇量约 3500-4500，适应复合从句、地道成语与时事科普，可从容阅读国外主流媒体原版短文。'
   },
   'B2+': {
     levelLabel: 'B2+ 原汁原味',
     code: 'L10',
-    color: '#F472B6',
+    color: '#7F4568',
     tagline: '原生文笔与细腻修辞，深度探究',
     description: '词汇量 6000 以上，面对复杂论证、学术专论与原生文笔游刃有余，享受母语级沉浸体验。'
   }
@@ -360,26 +254,42 @@ export const SENTENCES_BY_LEVEL: Record<CefrLevelKey, string[]> = {
   ]
 };
 
+const SENTENCE_TRANSLATIONS = [
+  '我们都记得最喜欢的泰迪熊。它曾给过我们安慰。',
+  '长大后，我们通常会把泰迪熊收起来或送人。但并不是每个人都会这样。',
+  '有调查显示，英国每十个人中，就有一个人睡觉时需要泰迪熊陪伴。',
+  '有些成年人甚至会带着毛绒玩具到处走。'
+];
+
+const SENTENCE_INTERPRETATIONS = [
+  '这里的 comfort 不只是“舒服”，更强调玩偶带来的安慰与安全感。',
+  'But this is not true for everyone 用转折指出：并非所有人长大后都会告别童年玩偶。',
+  'one in ten 表示“十分之一”，也就是每十个人中有一个。重点是这项调查呈现的陪伴需求。',
+  'take their soft toys everywhere 描写的是持续的陪伴习惯，everywhere 突出了“无论去哪里”。'
+];
+
 interface Stage02AiChatProps {
   companion: Companion;
   onBack: () => void;
   onComplete: (selectedInterests: string[], determinedLevel: CefrLevelKey, surveyAnswers?: SurveyAnswers) => void;
   onSkip: () => void;
+  bookmarkedSentences?: BookmarkedSentence[];
+  onToggleSentenceBookmark?: (sentence: BookmarkedSentence) => void;
 }
 
 export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   companion,
   onBack,
   onComplete,
-  onSkip: _onSkip
+  onSkip: _onSkip,
+  bookmarkedSentences = [],
+  onToggleSentenceBookmark
 }) => {
   // Navigation Steps:
   // 1: Interest theme selection
   // 11: Q1 核心目标
   // 12: Q2 场景定位
-  // 15: Q3 核心卡点
-  // 13: Q4 专注节奏
-  // 14: Q5 当前状态（语感自评 ➔ 决定试读起步等级）
+  // 13: Q3 专注节奏
   // 3-6: Four sentence-reading assessment questions
   const [step, setStep] = useState<number>(1);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -398,6 +308,9 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const [companionBubbleText, setCompanionBubbleText] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [revealedQuestionStep, setRevealedQuestionStep] = useState<number | null>(null);
+  const [revealedSentenceStep, setRevealedSentenceStep] = useState<number | null>(null);
+  const [isConfirmingInterest, setIsConfirmingInterest] = useState(false);
+  const [isCompletingHabits, setIsCompletingHabits] = useState(false);
 
   // Reading assessment state
   const [_sentenceFeedbacks, setSentenceFeedbacks] = useState<
@@ -406,14 +319,23 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const [selectedFeeling, setSelectedFeeling] = useState<'down' | 'keep' | 'up' | null>(null);
   const [sentenceLevelHistory, setSentenceLevelHistory] = useState<Record<number, CefrLevelKey>>({ 0: 'A2' });
   const [playingSentenceIdx, setPlayingSentenceIdx] = useState<number | null>(null);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
+  const [showSentenceMenu, setShowSentenceMenu] = useState(false);
 
 
   const typewriterTimerRef = useRef<NodeJS.Timeout | null>(null);
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const completionTimerRef = useRef<number | null>(null);
 
   // Dynamic typewriter for companion speech bubble
   const triggerBubbleSpeech = (text: string) => {
     setRevealedQuestionStep(null);
+    setRevealedSentenceStep(null);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setPlayingSentenceIdx(null);
+    }
     if (typewriterTimerRef.current) clearInterval(typewriterTimerRef.current);
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setCompanionBubbleText(text);
@@ -441,6 +363,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     return () => {
       if (typewriterTimerRef.current) clearInterval(typewriterTimerRef.current);
       if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+      if (completionTimerRef.current !== null) window.clearTimeout(completionTimerRef.current);
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
@@ -456,6 +379,14 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     setSelectedOptionLabel(null);
     setSelectedOptionItem(null);
     setSelectedFeeling(null);
+    setRevealedSentenceStep(null);
+    setShowTranslation(false);
+    setIsCardFlipped(false);
+    setShowSentenceMenu(false);
+    setPlayingSentenceIdx(null);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
 
     const questions = getSurveyQuestions(companion.name, goalCategory);
     const q = questions.find((item) => item.step === step);
@@ -517,7 +448,17 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   // Confirm selected themes and proceed directly to the reading-habits questions.
   const handleConfirmAstrolabe = (tags: string[]) => {
     setSelectedTags(tags);
-    setStep(11);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setStep(11);
+      return;
+    }
+
+    setIsConfirmingInterest(true);
+    completionTimerRef.current = window.setTimeout(() => {
+      completionTimerRef.current = null;
+      setIsConfirmingInterest(false);
+      setStep(11);
+    }, 640);
   };
 
   // Auto Commit Helper for Survey Options
@@ -558,59 +499,33 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
           targetHurdle: prev.goalTrack?.targetHurdle || ''
         }
       }));
-      setStep(15);
-      return;
-    }
-
-    if (currentStep === 15) {
-      setSurveyAnswers((prev) => ({
-        ...prev,
-        challenge: opt.label,
-        goalTrack: {
-          category: prev.goalTrack?.category || goalCategory,
-          categoryLabel: prev.goalTrack?.categoryLabel || prev.goal || '目标冲刺',
-          targetFocus: prev.goalTrack?.targetFocus || '核心专项',
-          targetHurdle: opt.label
-        }
-      }));
       setStep(13);
       return;
     }
 
     if (currentStep === 13) {
+      if (isCompletingHabits) return;
+
       const defaultCompanionStyle = companion.type || '智能点拨';
       setSurveyAnswers((prev) => ({
         ...prev,
         duration: opt.label,
-        companionStyle: defaultCompanionStyle
+        companionStyle: defaultCompanionStyle,
+        initialLevel: currentLevel
       }));
-      setStep(14); // Proceed to Q5 Reading State
-      return;
-    }
-
-    if (currentStep === 14) {
-      // Q5 Reading State maps directly to initial placement testing level:
-      // 只能看懂简单的句子 ➔ A1-
-      // 能读懂短文，但要查不少词 ➔ A2
-      // 大部分能读懂，偶尔卡住 ➔ B1
-      // 读外刊、原版书比较轻松 ➔ B2+
-      const levelMap: Record<string, CefrLevelKey> = {
-        '只能看懂简单的句子': 'A1-',
-        '能读懂短文，但要查不少词': 'A2',
-        '大部分能读懂，偶尔卡住': 'B1',
-        '读外刊、原版书比较轻松': 'B2+'
-      };
-      const determinedStartLevel: CefrLevelKey = levelMap[opt.label] || 'A2';
-
-      setSurveyAnswers((prev) => ({
-        ...prev,
-        readingState: opt.label,
-        initialLevel: determinedStartLevel
-      }));
-      setCurrentLevel(determinedStartLevel);
-      setSentenceLevelHistory({ 0: determinedStartLevel });
+      setSentenceLevelHistory({ 0: currentLevel });
       setSentenceFeedbacks({});
-      setStep(3);
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setStep(3);
+        return;
+      }
+
+      setIsCompletingHabits(true);
+      completionTimerRef.current = window.setTimeout(() => {
+        completionTimerRef.current = null;
+        setIsCompletingHabits(false);
+        setStep(3);
+      }, 640);
       return;
     }
   };
@@ -711,27 +626,15 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       return;
     }
 
-    // 2. From Q2 (Step 12) -> Q3 (Step 15)
+    // 2. From Q2 (Step 12) -> Q3 (Step 13)
     if (step === 12 && selectedOptionItem) {
       commitOptionAndAdvance(selectedOptionItem, 12);
       return;
     }
 
-    // 3. From Q3 (Step 15) -> Q4 (Step 13)
-    if (step === 15 && selectedOptionItem) {
-      commitOptionAndAdvance(selectedOptionItem, 15);
-      return;
-    }
-
-    // 4. From Q4 (Step 13) -> Q5 (Step 14)
+    // 3. From Q3 (Step 13) -> Sentence 1
     if (step === 13 && selectedOptionItem) {
       commitOptionAndAdvance(selectedOptionItem, 13);
-      return;
-    }
-
-    // 5. From Q5 (Step 14) -> Sentence 1 (Step 3)
-    if (step === 14 && selectedOptionItem) {
-      commitOptionAndAdvance(selectedOptionItem, 14);
       return;
     }
 
@@ -754,6 +657,12 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
     }
+    if (completionTimerRef.current !== null) {
+      window.clearTimeout(completionTimerRef.current);
+      completionTimerRef.current = null;
+    }
+    setIsConfirmingInterest(false);
+    setIsCompletingHabits(false);
     if (step === 1) {
       onBack();
       return;
@@ -766,20 +675,12 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       setStep(11);
       return;
     }
-    if (step === 15) {
+    if (step === 13) {
       setStep(12);
       return;
     }
-    if (step === 13) {
-      setStep(15);
-      return;
-    }
-    if (step === 14) {
-      setStep(13); // Back to Q4
-      return;
-    }
     if (step === 3) {
-      setStep(14);
+      setStep(13);
       return;
     }
     if (step === 4) {
@@ -819,68 +720,232 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       revealedQuestionStep === currentQ.step
   );
   const sentenceIdx = step >= 3 && step <= 6 ? step - 3 : -1;
+  const currentSentence = sentenceIdx === -1 ? '' : SENTENCES_BY_LEVEL[currentLevel][sentenceIdx];
+  const sentenceHighlightEnd = currentSentence.search(/[.!?]/);
+  const sentenceHighlight = sentenceHighlightEnd === -1
+    ? currentSentence
+    : currentSentence.slice(0, sentenceHighlightEnd + 1);
+  const sentenceRemainder = currentSentence.slice(sentenceHighlight.length);
+
+  useEffect(() => {
+    if (sentenceIdx === -1 || isTyping) return;
+
+    const timeout = window.setTimeout(() => setRevealedSentenceStep(step), 320);
+    return () => window.clearTimeout(timeout);
+  }, [sentenceIdx, step, isTyping, companionBubbleText]);
+
+  const sentenceControlsReady =
+    sentenceIdx !== -1 &&
+    !isTyping &&
+    selectedFeeling === null &&
+    revealedSentenceStep === step;
+  const currentTranslation = sentenceIdx === -1 ? '' : SENTENCE_TRANSLATIONS[sentenceIdx];
+  const currentBookmarkedSentence = sentenceIdx === -1
+    ? null
+    : { sentence: currentSentence, translation: currentTranslation };
+  const isSentenceBookmarked = Boolean(
+    currentBookmarkedSentence &&
+      bookmarkedSentences.some((item) => item.sentence === currentBookmarkedSentence.sentence)
+  );
+
+  const handlePlayFullText = () => {
+    if (!('speechSynthesis' in window) || sentenceIdx === -1) return;
+    if (playingSentenceIdx === sentenceIdx) {
+      window.speechSynthesis.cancel();
+      setPlayingSentenceIdx(null);
+      return;
+    }
+    handlePlayAudio(SENTENCES_BY_LEVEL[currentLevel].join(' '), sentenceIdx);
+  };
+
+  const handleToggleSentenceBookmark = () => {
+    if (!currentBookmarkedSentence || !onToggleSentenceBookmark) return;
+    onToggleSentenceBookmark(currentBookmarkedSentence);
+  };
+
+  const renderSentenceActions = () => (
+    <div className="grid h-[58px] shrink-0 grid-cols-3 items-center border-t border-[#E5DFF0] bg-white/95 px-2 sm:px-4">
+      <button
+        type="button"
+        onClick={() => setShowTranslation((visible) => !visible)}
+        aria-pressed={showTranslation}
+        className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-1 text-[12px] font-medium transition-colors hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] sm:gap-2 sm:text-[13px] ${
+          showTranslation ? 'text-[#B83825]' : 'text-[#34314F]'
+        }`}
+      >
+        <Languages size={18} />
+        <span>{showTranslation ? '隐藏译文' : '译文'}</span>
+      </button>
+      <button
+        type="button"
+        onClick={handlePlayFullText}
+        className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-1 text-[12px] font-medium text-[#34314F] transition-colors hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] sm:gap-2 sm:text-[13px]"
+        aria-label={playingSentenceIdx === sentenceIdx ? '停止播放全文' : '听全文'}
+      >
+        <Volume2
+          size={18}
+          className={playingSentenceIdx === sentenceIdx ? 'animate-pulse text-[#B83825]' : 'text-[#514D6E]'}
+        />
+        <span>{playingSentenceIdx === sentenceIdx ? '停止' : '听全文'}</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => setIsCardFlipped((flipped) => !flipped)}
+        aria-label={isCardFlipped ? '翻回原句' : '翻面解读'}
+        aria-pressed={isCardFlipped}
+        className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-1 text-[12px] font-medium text-[#34314F] transition-colors hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] sm:gap-2 sm:text-[13px]"
+      >
+        <RotateCcw size={17} />
+        <span>{isCardFlipped ? '返回原句' : '翻面解读'}</span>
+      </button>
+    </div>
+  );
 
   const progressStep =
     step === 1 ? 1 :
     currentQ ? currentQ.number + 1 :
-    sentenceIdx !== -1 ? sentenceIdx + 7 :
-    10;
-  const progressPercentage = progressStep * 10;
+    sentenceIdx !== -1 ? sentenceIdx + 5 :
+    8;
+  const progressPercentage = (progressStep / 8) * 100;
   const isHabitSurvey = Boolean(currentQ);
 
   return (
-    <div className={`w-full h-full flex flex-col ${sentenceIdx !== -1 ? 'bg-[#F1FAF6] text-[#103E39]' : isHabitSurvey ? 'bg-[#FAFBFA] text-[#252D32]' : 'bg-[#F0F8F4] text-stone-900'} select-none overflow-hidden relative font-sans`}>
-      <div className={`z-30 mx-auto flex h-14 w-full max-w-xl shrink-0 items-center gap-3 border-b px-3 sm:px-5 ${
-        isHabitSurvey
-          ? 'border-[#E0E7E3] bg-[#FAFBFA]'
-          : 'border-[#DCE7E0] bg-[#F0F8F4]'
-      }`}>
-        <button
-          onClick={handlePrevStep}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#64766B] transition-colors hover:bg-white/80 hover:text-[#29362F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#526F65] active:scale-95"
-          aria-label="返回上一页"
-        >
-          <ArrowLeft size={20} className="stroke-[2.2]" />
-        </button>
-        <div
-          className="flex flex-1 items-center gap-1.5"
-          role="progressbar"
-          aria-label="引导进度"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={progressPercentage}
-          aria-valuetext={`第 ${progressStep} 步，共 10 步`}
-        >
-          {Array.from({ length: 7 }, (_, index) => {
-            const segmentSize = 100 / 7;
-            const fill = Math.max(0, Math.min(100, ((progressPercentage - index * segmentSize) / segmentSize) * 100));
-            return (
-              <span key={index} className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#D9E5DD]">
-                <span
-                  className="block h-full rounded-full bg-[#526F65] transition-[width] duration-300 ease-out"
-                  style={{ width: `${fill}%` }}
-                />
-              </span>
-            );
-          })}
+    <div
+      className={`w-full h-full flex flex-col ${sentenceIdx !== -1 ? 'bg-[#F2EFFA] text-[#171A35]' : isHabitSurvey ? 'bg-[#FBFAFD] text-[#25243C]' : 'bg-[#F4F1FA] text-stone-900'} select-none overflow-hidden relative font-sans`}
+      style={sentenceIdx !== -1 ? {
+        backgroundImage: `url(${import.meta.env.BASE_URL}assets/reading-trial-scene.webp)`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center bottom',
+        backgroundSize: '100% auto'
+      } : undefined}
+    >
+      {sentenceIdx !== -1 ? (
+        <header className="relative z-30 mx-auto w-full max-w-xl shrink-0 border-b border-[#E5DFF0] bg-[#F2EFFA]/95 px-3 pb-2 pt-1.5">
+          <div className="relative flex h-10 items-center justify-between">
+            <button
+              onClick={handlePrevStep}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#171A35] shadow-sm transition-colors hover:bg-[#F7F4FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
+              aria-label="返回上一步"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <h1 className="pointer-events-none absolute left-1/2 max-w-[calc(100%-150px)] -translate-x-1/2 truncate text-center text-[15px] font-semibold text-[#171A35]">
+              Teddy Bear Comfort
+            </h1>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleToggleSentenceBookmark}
+                disabled={!onToggleSentenceBookmark}
+                aria-pressed={isSentenceBookmarked}
+                aria-label={isSentenceBookmarked ? '取消收藏句子' : '收藏句子'}
+                title={isSentenceBookmarked ? '取消收藏句子' : '收藏句子'}
+                className={`flex h-10 w-10 items-center justify-center rounded-full bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] disabled:cursor-not-allowed disabled:opacity-50 ${
+                  isSentenceBookmarked ? 'text-[#B83825]' : 'text-[#171A35] hover:text-[#B83825]'
+                }`}
+              >
+                <Bookmark size={20} fill={isSentenceBookmarked ? 'currentColor' : 'none'} />
+              </button>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowSentenceMenu((open) => !open)}
+                  aria-expanded={showSentenceMenu}
+                  aria-label="更多阅读选项"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#171A35] transition-colors hover:bg-[#F7F4FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
+                >
+                  <MoreHorizontal size={22} />
+                </button>
+                {showSentenceMenu && (
+                  <div className="absolute right-0 top-11 z-40 w-48 rounded-xl border border-[#E5DFF0] bg-white p-1.5 shadow-lg">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowTranslation((visible) => !visible);
+                        setShowSentenceMenu(false);
+                      }}
+                      className="w-full rounded-lg px-3 py-2.5 text-left text-[13px] font-medium text-[#34314F] hover:bg-[#F5F2FA]"
+                    >
+                      {showTranslation ? '隐藏中文译文' : '显示中文译文'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 px-1 pt-1.5">
+            <div
+              className="flex h-2 flex-1 overflow-hidden rounded-full bg-[#D8D2E8]"
+              role="progressbar"
+              aria-label="句子试读进度"
+              aria-valuemin={0}
+              aria-valuemax={4}
+              aria-valuenow={sentenceIdx + 1}
+              aria-valuetext={`第 ${sentenceIdx + 1} 句，共 4 句`}
+            >
+              <span
+                className="h-full rounded-full bg-[#C83E26] transition-[width] duration-500 ease-out"
+                style={{ width: `${((sentenceIdx + 1) / 4) * 100}%` }}
+              />
+            </div>
+            <span className="min-w-[42px] text-right text-[12px] tabular-nums text-[#77728D]">
+              {sentenceIdx + 1} / 4
+            </span>
+          </div>
+        </header>
+      ) : (
+        <div className={`z-30 mx-auto flex h-14 w-full max-w-xl shrink-0 items-center gap-3 border-b px-3 sm:px-5 ${
+          isHabitSurvey
+            ? 'border-[#E8E3F0] bg-[#FBFAFD]'
+            : 'border-[#E5E0EF] bg-[#F4F1FA]'
+        }`}>
+          <button
+            onClick={handlePrevStep}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#68647E] transition-colors hover:bg-white/80 hover:text-[#24233E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94A30] active:scale-95"
+            aria-label="返回上一页"
+          >
+            <ArrowLeft size={20} className="stroke-[2.2]" />
+          </button>
+          <div
+            className="flex flex-1 items-center gap-1.5"
+            role="progressbar"
+            aria-label="引导进度"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progressPercentage}
+            aria-valuetext={`第 ${progressStep} 步，共 8 步`}
+          >
+            {Array.from({ length: 8 }, (_, index) => {
+              const segmentSize = 100 / 8;
+              const fill = Math.max(0, Math.min(100, ((progressPercentage - index * segmentSize) / segmentSize) * 100));
+              return (
+                <span key={index} className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#DCD6E9]">
+                  <span
+                    className="block h-full rounded-full bg-[#D94A30] transition-[width] duration-300 ease-out"
+                    style={{ width: `${fill}%` }}
+                  />
+                </span>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ================= MAIN CONTENT CANVAS ================= */}
-      <div className={`flex-1 no-scrollbar flex w-full max-w-xl mx-auto ${step === 1 ? 'min-h-0 overflow-hidden p-0' : 'overflow-y-auto flex-col items-center justify-between p-4 sm:p-5'}`}>
+      <div className={`flex-1 no-scrollbar flex w-full max-w-xl mx-auto ${step === 1 ? 'min-h-0 overflow-hidden p-0' : sentenceIdx !== -1 ? 'min-h-0 overflow-hidden flex-col items-center justify-start p-3 sm:p-4' : 'overflow-y-auto flex-col items-center justify-between p-4 sm:p-5'}`}>
         {/* ================= SCREEN 0: ENTRY WELCOME ANIMATION (参考用户视频) ================= */}
         {false && step === 0 && (
           <div className="w-full flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-400 my-auto">
             <div className="relative mb-6 max-w-xs sm:max-w-sm w-full">
               {/* Duolingo Speech Bubble pointing downwards to mascot */}
-              <div className="relative bg-white rounded-3xl border-2 border-[#DCEBE5] p-5 shadow-sm mb-6 inline-block text-left animate-in zoom-in-95 fade-in duration-300">
+              <div className="relative bg-white rounded-3xl border-2 border-[#E7E1F0] p-5 shadow-sm mb-6 inline-block text-left animate-in zoom-in-95 fade-in duration-300">
                 <p className="text-base sm:text-[18px] font-bold tracking-tight leading-snug animate-title-gradient">
                   {companionBubbleText}
                   {isTyping && <span className="inline-block w-1.5 h-3.5 bg-emerald-600 ml-1 animate-pulse" />}
                 </p>
                 {/* Speech Bubble Arrow Notch pointing downward */}
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-white" />
-                <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-t-[14px] border-t-[#DCEBE5] -z-10" />
+                <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[11px] border-l-transparent border-r-[11px] border-r-transparent border-t-[14px] border-t-[#E7E1F0] -z-10" />
               </div>
 
               {/* Mascot Center Glow Avatar with celebratory wave */}
@@ -917,6 +982,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             selectedTags={selectedTags}
             customTopics={customTopics}
             priorityTopics={priorityTopics}
+            isConfirming={isConfirmingInterest}
             onToggleTag={handleToggleTag}
             onApplyCustomTopics={handleApplyCustomTopics}
             onConfirm={handleConfirmAstrolabe}
@@ -928,16 +994,19 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         <div className="w-full flex-1 flex flex-col justify-start animate-in fade-in slide-in-from-right-4 duration-300">
             {/* Duolingo Companion Speech Header (Mascot left + Speech bubble right) */}
             <div className="mt-2 mb-3 flex w-full items-center gap-3">
-              <img
-                src={companion.avatarUrl}
-                alt={companion.name}
-                className="h-16 w-16 shrink-0 object-contain"
-              />
+              <div className="relative h-16 w-16 shrink-0">
+                <img
+                  src={companion.avatarUrl}
+                  alt={companion.name}
+                  className="h-full w-full object-contain"
+                />
+                <CompletionRipple active={isCompletingHabits} showCheck />
+              </div>
 
               {/* Pointing Speech Bubble with Notch */}
-              <div className="relative flex min-h-16 flex-1 items-center rounded-[14px] border border-[#D8E2DD] bg-white px-4 py-3.5">
+              <div className="relative flex min-h-16 flex-1 items-center rounded-[14px] border border-[#E2DCEC] bg-white px-4 py-3.5">
                 <div className="absolute top-5 -left-2 w-0 h-0 border-y-[7px] border-y-transparent border-r-[9px] border-r-white z-10" />
-                <div className="absolute top-[19px] -left-[10px] w-0 h-0 border-y-[8px] border-y-transparent border-r-[10px] border-r-[#D8E2DD]" />
+                <div className="absolute top-[19px] -left-[10px] w-0 h-0 border-y-[8px] border-y-transparent border-r-[10px] border-r-[#E2DCEC]" />
 
                 <div
                   aria-label={currentQ.title}
@@ -956,7 +1025,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
 
             {surveyContentReady && (
               <div className="speech-content-enter">
-                <p className="min-h-6 mb-2 text-[13px] leading-5 text-[#7B8984]">
+                <p className="min-h-6 mb-2 text-[13px] leading-5 text-[#79758D]">
                   选一个最接近的就好，之后也可以调整
                 </p>
 
@@ -972,8 +1041,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                         onClick={() => handleSelectOption(opt)}
                         role="radio"
                         aria-checked={isSelected}
-                        className={`speech-option-enter group w-full min-h-[68px] px-1 text-left transition-colors duration-150 cursor-pointer flex items-center justify-between border-b border-[#E1E8E4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#176B57] ${
-                          isSelected ? 'text-[#173D34]' : 'text-[#252D32] hover:bg-white/60'
+                        className={`speech-option-enter group w-full min-h-[68px] px-1 text-left transition-colors duration-150 cursor-pointer flex items-center justify-between border-b border-[#E8E3F0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D94A30] ${
+                          isSelected ? 'text-[#8F3025]' : 'text-[#25243C] hover:bg-white/60'
                         }`}
                         style={{
                           animationDelay: `${
@@ -982,12 +1051,12 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                         }}
                       >
                         <div className="flex items-center gap-4 min-w-0 pr-3 flex-1">
-                          <span className="w-6 text-[12px] font-semibold tabular-nums text-[#9AA7A1] shrink-0">
+                          <span className="w-6 text-[12px] font-semibold tabular-nums text-[#9994A8] shrink-0">
                             0{idx + 1}
                           </span>
                           <span
                             className={`text-[15px] font-semibold leading-snug break-words transition-colors ${
-                              isSelected ? 'text-[#173D34]' : 'text-[#252D32] group-hover:text-[#176B57]'
+                              isSelected ? 'text-[#8F3025]' : 'text-[#25243C] group-hover:text-[#B83825]'
                             }`}
                           >
                             {opt.label}
@@ -997,8 +1066,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                         <span
                           className={`w-[22px] h-[22px] rounded-full shrink-0 flex items-center justify-center transition-all ${
                             isSelected
-                              ? 'border-[6px] border-[#08735D] bg-white'
-                              : 'border-[1.5px] border-[#C9D5CF] bg-transparent group-hover:border-[#7A9A8D]'
+                              ? 'border-[6px] border-[#D94A30] bg-white'
+                              : 'border-[1.5px] border-[#D2CDDD] bg-transparent group-hover:border-[#B6AFC8]'
                           }`}
                           aria-hidden="true"
                         />
@@ -1011,11 +1080,11 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                   <button
                     type="button"
                     onClick={handleContinue}
-                    disabled={!selectedOptionItem}
+                    disabled={!selectedOptionItem || isCompletingHabits}
                     className={`w-full h-14 rounded-[9px] font-semibold text-[15px] flex items-center justify-center gap-2 transition-colors duration-150 ${
                       selectedOptionItem
-                        ? 'bg-[#08735D] text-white cursor-pointer hover:bg-[#06634F] active:bg-[#055642] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#08735D] focus-visible:ring-offset-2'
-                        : 'bg-[#E3EBE7] text-[#96A49E] cursor-not-allowed'
+                        ? 'bg-emerald-600 text-white cursor-pointer hover:bg-emerald-500 active:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2'
+                        : 'bg-[#E9E5F0] text-[#9893A7] cursor-not-allowed'
                     }`}
                   >
                     <span>继续</span>
@@ -1027,93 +1096,138 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
           </div>
         )}
 
-        {/* ================= SCREENS 8..11: 4-SENTENCE PLACEMENT TEST (选项整体上移，去除中空缝隙) ================= */}
+        {/* ================= SENTENCE PLACEMENT TEST ================= */}
         {sentenceIdx !== -1 && (
-          <div className="w-full flex-1 flex flex-col justify-start gap-2.5 py-1 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="relative w-full min-h-[190px] max-h-[245px] flex-1">
-              <div
-                aria-hidden="true"
-                className="absolute top-5 right-0 bottom-5 w-7 rounded-r-[26px] bg-[#E6F4ED] border border-[#D2E9DD]"
-              />
-              <article className="absolute inset-y-0 left-0 right-3 rounded-[28px] bg-white border border-[#E5F0EB] shadow-[0_9px_0_#BCE8D8,0_16px_24px_rgba(17,72,61,0.08)] overflow-hidden">
-                <div className="absolute inset-0 overflow-y-auto px-5 py-5">
-                  <p className="pr-2 pb-[76px] text-[21px] leading-[1.5] font-medium text-[#103E39] selection:bg-emerald-200">
-                    {SENTENCES_BY_LEVEL[currentLevel][sentenceIdx]}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handlePlayAudio(SENTENCES_BY_LEVEL[currentLevel][sentenceIdx], sentenceIdx)}
-                  className="absolute bottom-3 left-4 z-20 w-10 h-10 rounded-full bg-[#F1FAF6] border border-[#DCEDE5] flex items-center justify-center text-[#315A50] shadow-sm transition-colors hover:bg-[#EAF5EF]"
-                  title="播放发音"
-                  aria-label="播放发音"
-                >
-                  <Volume2
-                    size={18}
-                    className={playingSentenceIdx === sentenceIdx ? 'text-emerald-700 animate-pulse' : 'text-[#315A50]'}
-                  />
-                </button>
+          <div className="flex w-full min-h-0 flex-1 flex-col gap-2 py-1 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="flex min-h-[68px] shrink-0 items-center gap-2.5">
+              <div className="relative h-[58px] w-[58px] shrink-0 sm:h-[64px] sm:w-[64px]">
                 <img
                   src={companion.avatarUrl}
-                  alt={`${companion.name}陪你试读`}
-                  className="absolute right-0 bottom-0 z-10 w-[82px] h-[98px] object-contain pointer-events-none"
+                  alt={companion.name}
+                  className="h-full w-full object-contain drop-shadow-sm"
                 />
+              </div>
+              <div
+                className="relative flex min-h-[58px] flex-1 items-center rounded-[15px] border border-[#E1DBED] bg-white px-3.5 py-2.5 shadow-[0_3px_10px_rgba(63,48,90,0.04)] sm:px-4"
+                role="status"
+                aria-live="polite"
+                aria-label={`${companion.name}正在说话`}
+              >
+                <span className="absolute left-[-7px] top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 border-b border-l border-[#E1DBED] bg-white" />
+                <p className="relative text-[13px] font-medium leading-[1.5] text-[#393550] sm:text-[14px]">
+                  {companionBubbleText}
+                  {isTyping && (
+                    <span
+                      aria-hidden="true"
+                      className="ml-1 inline-block h-3.5 w-[2px] translate-y-[2px] animate-pulse bg-[#C83E26] motion-reduce:animate-none"
+                    />
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="relative flex min-h-[300px] flex-1 px-1 py-2 [perspective:1200px]">
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-2 bottom-1 top-5 rotate-[-2deg] rounded-[24px] bg-[#8176A8]/30"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-1 bottom-2 top-4 rotate-[1.2deg] rounded-[24px] bg-[#C83E26]/75"
+              />
+              <article
+                className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-[24px] border border-[#E5DFF0] bg-white shadow-[0_12px_28px_rgba(50,38,77,0.10)] transition-transform duration-500 motion-reduce:transition-none"
+                style={{
+                  transform: isCardFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                  transformStyle: 'preserve-3d'
+                }}
+              >
+                <div
+                  aria-hidden={isCardFlipped}
+                  className={`absolute inset-0 flex min-h-0 flex-col bg-white [backface-visibility:hidden] ${
+                    isCardFlipped ? 'invisible pointer-events-none' : ''
+                  }`}
+                >
+                  <div className="flex-1 overflow-y-auto px-5 pb-4 pt-7 sm:px-7 sm:pt-9">
+                    <p className="text-[21px] font-medium leading-[1.5] text-[#171A35] selection:bg-[#F9DCD5] sm:text-[24px]">
+                      <span className="sentence-highlight">{sentenceHighlight}</span>
+                      {sentenceRemainder}
+                    </p>
+                    {showTranslation && (
+                      <div className="mt-6 border-l-[3px] border-[#C83E26] bg-[#F8F5FC] px-3.5 py-3 animate-in fade-in slide-in-from-bottom-1 duration-200">
+                        <span className="mb-1 block text-[10px] font-semibold text-[#8176A8]">中文译文</span>
+                        <p className="text-[14px] leading-6 text-[#49445E]">{currentTranslation}</p>
+                      </div>
+                    )}
+                  </div>
+                  {renderSentenceActions()}
+                </div>
+
+                <div
+                  aria-hidden={!isCardFlipped}
+                  className={`absolute inset-0 flex min-h-0 flex-col bg-white [backface-visibility:hidden] [transform:rotateY(180deg)] ${
+                    isCardFlipped ? '' : 'invisible pointer-events-none'
+                  }`}
+                >
+                  <div className="flex-1 overflow-y-auto px-5 pb-4 pt-6 sm:px-7 sm:pt-8">
+                    <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-[#F2EFFA] px-2.5 py-1 text-[11px] font-semibold text-[#766B91]">
+                      <Sparkles size={13} />
+                      句意解读
+                    </div>
+                    {showTranslation && (
+                      <p className="mb-5 text-[17px] font-semibold leading-7 text-[#24213C]">
+                        {currentTranslation}
+                      </p>
+                    )}
+                    <div className="border-t border-[#E9E4F0] pt-4">
+                      <h2 className="mb-2 text-[12px] font-semibold text-[#B83825]">读句提示</h2>
+                      <p className="text-[14px] leading-6 text-[#49445E]">
+                        {SENTENCE_INTERPRETATIONS[sentenceIdx]}
+                      </p>
+                    </div>
+                    <p className="mt-5 text-[12px] leading-5 text-[#77728D]">{currentSentence}</p>
+                  </div>
+                  {renderSentenceActions()}
+                </div>
               </article>
             </div>
 
             <div
-              className="min-h-[48px] shrink-0 flex items-center gap-2 px-1 text-[13px] font-medium leading-snug text-[#315A50]"
-              role="status"
-              aria-live="polite"
+              className={`grid min-h-[50px] w-full shrink-0 grid-cols-3 gap-2 ${
+                sentenceControlsReady ? '' : 'invisible'
+              }`}
+              role="group"
+              aria-label="这句话的阅读难度"
+              aria-hidden={!sentenceControlsReady}
             >
-              <Sparkles size={16} className="shrink-0 text-emerald-700" />
-              <span>
-                {companionBubbleText}
-                {isTyping && <span className="inline-block w-1.5 h-3 bg-emerald-600 ml-1 animate-pulse" />}
-              </span>
-            </div>
-
-            <div className="w-full shrink-0">
-              <div className="flex flex-col gap-2 w-full">
                 {([
-                  ['keep', '顺畅适中', '契合心流'],
-                  ['down', '偏难吃力', '降阶调轻'],
-                  ['up', '轻松有余', '加档拔高']
-                ] as const).map(([feeling, label, hint]) => {
+                  ['down', '偏难'],
+                  ['keep', '刚刚好'],
+                  ['up', '太简单']
+                ] as const).map(([feeling, label], index) => {
                   const isSelected = selectedFeeling === feeling;
                   return (
                     <button
-                      key={feeling}
+                      key={`${step}-${feeling}-${sentenceControlsReady}`}
                       type="button"
                       onClick={() => handleSelectFeeling(feeling)}
                       aria-pressed={isSelected}
-                      className={`group relative w-full min-h-[50px] rounded-2xl px-4 py-2.5 text-left transition-all duration-150 cursor-pointer flex items-center justify-between border-2 active:scale-[0.99] ${
+                      disabled={!sentenceControlsReady}
+                      className={`speech-option-enter flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-[14px] border px-2 text-[14px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94A30] focus-visible:ring-offset-2 active:scale-[0.98] ${
                         isSelected
-                          ? 'border-emerald-500 bg-[#F8FCFA] shadow-[0_3px_0_#65A30D] ring-2 ring-emerald-400/20 translate-y-0.5'
-                          : 'border-[#DCEDE5] bg-white hover:border-emerald-400 hover:bg-[#F8FCFA] shadow-[0_3px_0_#DCEBE5] hover:shadow-[0_1px_0_#DCEBE5] hover:translate-y-0.5 active:translate-y-1 active:shadow-none'
+                        ? 'border-[#D94A30] bg-[#FBE8E3] text-[#9B3021]'
+                          : 'border-[#E3DEEC] bg-white text-[#403C5A] hover:border-[#D7A497] hover:bg-[#FCF8F7]'
                       }`}
+                      style={{
+                        animationDelay: `${
+                          SPEECH_CONTENT_REVEAL_MS + index * COMPANION_TYPING_INTERVAL_MS
+                        }ms`
+                      }}
                     >
-                      <span className={`text-[14px] font-bold ${isSelected ? 'text-[#103E39]' : 'text-[#24483F]'}`}>
-                        {label}
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <span className={`text-xs ${isSelected ? 'font-semibold text-emerald-800' : 'text-[#84958E]'}`}>
-                          {isSelected ? '已选择' : hint}
-                        </span>
-                        <span
-                          className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                            isSelected
-                              ? 'bg-emerald-500 text-white'
-                              : 'border border-[#DCEDE5] bg-[#F1FAF6] text-transparent'
-                          }`}
-                        >
-                          <Check size={12} className="stroke-[3]" />
-                        </span>
-                      </span>
+                      {label}
                     </button>
                   );
                 })}
-              </div>
             </div>
           </div>
         )}

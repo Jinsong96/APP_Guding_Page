@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Companion, CompanionId, ReadingLevel, UserPreferences } from './types';
+import { BookmarkedSentence, Companion, CompanionId, ReadingLevel, UserPreferences } from './types';
 import { COMPANIONS, INITIAL_PREFERENCES } from './data';
 import { TopNavigationHeader } from './components/TopNavigationHeader';
 import { PhoneSimulator } from './components/PhoneSimulator';
@@ -55,6 +55,17 @@ export default function App() {
     });
   };
 
+  const handleToggleSentenceBookmark = (sentence: BookmarkedSentence) => {
+    setPreferences((prev) => {
+      const exists = prev.bookmarkedSentences.some((item) => item.sentence === sentence.sentence);
+      const nextSentences = exists
+        ? prev.bookmarkedSentences.filter((item) => item.sentence !== sentence.sentence)
+        : [...prev.bookmarkedSentences, sentence];
+      showToast(exists ? '已从词句本移除这句话' : '已收藏到词句本');
+      return { ...prev, bookmarkedSentences: nextSentences };
+    });
+  };
+
   const handleUpdatePreferences = (updated: Partial<UserPreferences>) => {
     setPreferences((prev) => ({ ...prev, ...updated }));
     showToast('阅读画像偏好设置已更新');
@@ -67,7 +78,7 @@ export default function App() {
   };
 
   return (
-    <div className="onboarding-app min-h-screen bg-[#E8F2EE] text-stone-900 flex flex-col font-sans selection:bg-emerald-600 selection:text-white">
+    <div className="onboarding-app min-h-screen bg-[#ECE8F7] text-stone-900 flex flex-col font-sans selection:bg-emerald-600 selection:text-white">
       {/* Top Global Navigation Bar */}
       <TopNavigationHeader
         currentStage={currentStage}
@@ -91,6 +102,7 @@ export default function App() {
               showToast(`进入第 0${stageNum} 屏实操`);
             }}
             onToggleBookmark={handleToggleBookmark}
+            onToggleSentenceBookmark={handleToggleSentenceBookmark}
             onUpdatePreferences={handleUpdatePreferences}
           />
         ) : (
@@ -111,6 +123,8 @@ export default function App() {
               {currentStage === 2 && (
                 <Stage02AiChat
                   companion={currentCompanion}
+                  bookmarkedSentences={preferences.bookmarkedSentences}
+                  onToggleSentenceBookmark={handleToggleSentenceBookmark}
                   onBack={() => setCurrentStage(1)}
                   onComplete={(themes, cefrLevel, surveyData) => {
                     // A1- -> L1 (L1-L3), A2 -> L4 (L4-L6), B1 -> L7 (L7-L9), B2+ -> L10 (L10-L12)
@@ -224,6 +238,7 @@ export default function App() {
                     showToast('开始沉浸阅读');
                   }}
                   onToggleBookmark={handleToggleBookmark}
+                  onToggleSentenceBookmark={handleToggleSentenceBookmark}
                   onRestartOnboarding={handleReset}
                 />
               )}
