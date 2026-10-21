@@ -9,10 +9,6 @@ import {
 } from 'lucide-react';
 import { Companion, GoalTrackDetails } from '../../types';
 import { InterestThemePicker } from '../InterestThemePicker';
-import {
-  ReadingEngineCelebration,
-  ReadingEngineCelebrationMode
-} from '../ReadingEngineCelebration';
 import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
 
 export type CefrLevelKey = 'A1-' | 'A2' | 'B1' | 'B2+';
@@ -402,8 +398,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const [companionBubbleText, setCompanionBubbleText] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [revealedQuestionStep, setRevealedQuestionStep] = useState<number | null>(null);
-  const [celebrationMode, setCelebrationMode] =
-    useState<ReadingEngineCelebrationMode | null>(null);
 
   // Reading assessment state
   const [_sentenceFeedbacks, setSentenceFeedbacks] = useState<
@@ -523,7 +517,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   // Confirm selected themes and proceed directly to the reading-habits questions.
   const handleConfirmAstrolabe = (tags: string[]) => {
     setSelectedTags(tags);
-    setCelebrationMode('interest');
+    setStep(11);
   };
 
   // Auto Commit Helper for Survey Options
@@ -616,7 +610,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       setCurrentLevel(determinedStartLevel);
       setSentenceLevelHistory({ 0: determinedStartLevel });
       setSentenceFeedbacks({});
-      setCelebrationMode('profile');
+      setStep(3);
       return;
     }
   };
@@ -752,15 +746,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       commitFeelingAndAdvance(selectedFeeling, 6);
       return;
     }
-  };
-
-  const finishCelebration = () => {
-    if (celebrationMode === 'interest') {
-      setStep(11);
-    } else if (celebrationMode === 'profile') {
-      setStep(3);
-    }
-    setCelebrationMode(null);
   };
 
   // Back Navigation
@@ -1134,15 +1119,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         )}
 
       </div>
-
-      {celebrationMode && (
-        <ReadingEngineCelebration
-          companion={companion}
-          mode={celebrationMode}
-          topics={selectedTags}
-          onContinue={finishCelebration}
-        />
-      )}
     </div>
   );
 };
