@@ -1,0 +1,2 @@
+export const COMPANION_TYPING_INTERVAL_MS = 28;
+export const SPEECH_CONTENT_REVEAL_MS = 120;

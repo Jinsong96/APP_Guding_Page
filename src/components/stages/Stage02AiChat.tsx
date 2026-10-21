@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Companion, GoalTrackDetails } from '../../types';
 import { InterestThemePicker } from '../InterestThemePicker';
+import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
 
 export type CefrLevelKey = 'A1-' | 'A2' | 'B1' | 'B2+';
 export type GoalCategory = 'exam' | 'workplace' | 'original' | 'interest';
@@ -433,7 +434,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         typewriterTimerRef.current = null;
         setIsTyping(false);
       }
-    }, 28);
+    }, COMPANION_TYPING_INTERVAL_MS);
   };
 
   useEffect(() => {
@@ -974,7 +975,11 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                         className={`speech-option-enter group w-full min-h-[68px] px-1 text-left transition-colors duration-150 cursor-pointer flex items-center justify-between border-b border-[#E1E8E4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#176B57] ${
                           isSelected ? 'text-[#173D34]' : 'text-[#252D32] hover:bg-white/60'
                         }`}
-                        style={{ animationDelay: `${idx * 380}ms` }}
+                        style={{
+                          animationDelay: `${
+                            SPEECH_CONTENT_REVEAL_MS + idx * COMPANION_TYPING_INTERVAL_MS
+                          }ms`
+                        }}
                       >
                         <div className="flex items-center gap-4 min-w-0 pr-3 flex-1">
                           <span className="w-6 text-[12px] font-semibold tabular-nums text-[#9AA7A1] shrink-0">
