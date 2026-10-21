@@ -101,7 +101,7 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
           {/* Cover Image Banner */}
           <div className="relative h-44 w-full overflow-hidden bg-stone-100">
             <img
-              src={currentStory.coverImage || '/assets/story/hero.webp'}
+              src={currentStory.coverImage || `${import.meta.env.BASE_URL}assets/story/hero.webp`}
               alt={currentStory.title}
               className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />

@@ -923,8 +923,17 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                 <div className="absolute top-5 -left-2 w-0 h-0 border-y-[7px] border-y-transparent border-r-[9px] border-r-white z-10" />
                 <div className="absolute top-[19px] -left-[10px] w-0 h-0 border-y-[8px] border-y-transparent border-r-[10px] border-r-[#D8E2DD]" />
 
-                <div className="text-[16px] font-semibold text-[#252D32] leading-snug">
-                  {currentQ.title}
+                <div
+                  aria-label={currentQ.title}
+                  className="text-[16px] font-semibold text-[#252D32] leading-snug"
+                >
+                  {companionBubbleText}
+                  {isTyping && (
+                    <span
+                      aria-hidden="true"
+                      className="ml-1 inline-block h-4 w-[2px] translate-y-[2px] animate-pulse bg-emerald-600 motion-reduce:animate-none"
+                    />
+                  )}
                 </div>
               </div>
             </div>

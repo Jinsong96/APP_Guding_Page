@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Send, Sparkles, MessageSquare } from 'lucide-react';
+import { X, Send, Sparkles } from 'lucide-react';
 import { Companion } from '../types';
+import { TypingText } from './TypingText';
 
 interface AskCompanionModalProps {
   companion: Companion;
@@ -94,7 +95,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
                     : 'bg-white text-stone-800 border border-[#DCEBE5] rounded-tl-xs shadow-xs'
                 }`}
               >
-                {msg.text}
+                {msg.sender === 'companion' ? <TypingText text={msg.text} /> : msg.text}
               </div>
             </div>
           ))}

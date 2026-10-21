@@ -1,5 +1,7 @@
 import { Companion, Story, UserPreferences } from './types';
 
+const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+
 export interface ContentCategory {
   id: string;
   name: string;
@@ -133,7 +135,7 @@ export const COMPANIONS: Companion[] = [
     nameEn: 'Light',
     type: '引路型旅伴',
     quote: '“慢慢来，我在。”',
-    avatarUrl: '/assets/light_character.png',
+    avatarUrl: publicAsset('/assets/light_character.png'),
     celebrateActionName: '喜悦欢呼跃动',
     celebrateQuote: '“太棒啦！小鹿准备好啦，我们开读吧！🐾”',
     accentColor: '#558B2F',
@@ -146,7 +148,7 @@ export const COMPANIONS: Companion[] = [
     nameEn: 'Pal',
     type: '机灵型旅伴',
     quote: '“我会吐槽难句，不吐槽你。”',
-    avatarUrl: '/assets/pal.png',
+    avatarUrl: publicAsset('/assets/pal.png'),
     celebrateActionName: '机智跃动致意',
     celebrateQuote: '“完美定级！走，看我带你拆解长难句～🦊”',
     accentColor: '#EA580C',
@@ -159,7 +161,7 @@ export const COMPANIONS: Companion[] = [
     nameEn: 'Wick',
     type: '安静型旅伴',
     quote: '“你读你的，我替你留灯。”',
-    avatarUrl: '/assets/wick.png',
+    avatarUrl: publicAsset('/assets/wick.png'),
     celebrateActionName: '轻盈欣喜点亮',
     celebrateQuote: '“阅读之光为你点亮，享受专属故事之旅吧✨”',
     accentColor: '#38BDF8',
@@ -172,7 +174,7 @@ export const COMPANIONS: Companion[] = [
     nameEn: 'Nubo',
     type: '活力型旅伴',
     quote: '“看正文时，我会安静下来。”',
-    avatarUrl: '/assets/nubo.png',
+    avatarUrl: publicAsset('/assets/nubo.png'),
     celebrateActionName: '元气活力跳跃',
     celebrateQuote: '“叮！阅读引擎已全功率启动！冲鸭～🚀”',
     accentColor: '#10B981',
@@ -189,7 +191,7 @@ export const FIRST_STORY: Story = {
   series: '火星系列 · 当城市失效',
   part: '第 1 / 4 段',
   synopsis: '一座城市突然停电，旧维修机器人带着玛拉穿过一条不靠中心网络的地下隧道。',
-  coverImage: '/assets/story/hero.webp',
+  coverImage: publicAsset('/assets/story/hero.webp'),
   levels: {
     easy: {
       level: 'easy',
@@ -329,8 +331,8 @@ export const WORLD_STORIES = [
     id: 'world-1',
     title: "A Children's World Game",
     chineseTitle: '儿童世界游戏',
-    cover: '/assets/story/Soft_watercolor_children_s_boo_2026-10-12T08-14-23.png',
-    fallbackCover: '/assets/story/hero.webp',
+    cover: publicAsset('/assets/story/Soft_watercolor_children_s_boo_2026-10-12T08-14-23.png'),
+    fallbackCover: publicAsset('/assets/story/hero.webp'),
     mood: '有趣好玩',
     duration: '约 3 分钟',
     likes: 124,
@@ -341,8 +343,8 @@ export const WORLD_STORIES = [
     id: 'world-2',
     title: 'An Amazing Friend',
     chineseTitle: '不可思议的朋友',
-    cover: '/assets/story/friend.webp',
-    fallbackCover: '/assets/story/Soft_watercolor_children_s_boo_2026-10-12T08-14-40.png',
+    cover: publicAsset('/assets/story/friend.webp'),
+    fallbackCover: publicAsset('/assets/story/Soft_watercolor_children_s_boo_2026-10-12T08-14-40.png'),
     mood: '社交与温情',
     duration: '约 8 分钟',
     likes: 89,
@@ -353,8 +355,8 @@ export const WORLD_STORIES = [
     id: 'world-3',
     title: 'The Five Elements',
     chineseTitle: '五行之谜',
-    cover: '/assets/story/five.webp',
-    fallbackCover: '/assets/story/Soft_watercolor_illustration_i_2026-10-12T08-14-56.png',
+    cover: publicAsset('/assets/story/five.webp'),
+    fallbackCover: publicAsset('/assets/story/Soft_watercolor_illustration_i_2026-10-12T08-14-56.png'),
     mood: '东方智慧',
     duration: '约 6 分钟',
     likes: 215,
