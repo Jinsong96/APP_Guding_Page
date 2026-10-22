@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+import subprocess
+
+svg_content = '''<svg xmlns="http://www.w3.org/2000/svg" width="427" height="852" viewBox="0 0 427 852">
+  <defs>
+    <!-- Smooth 3D cylindrical boiler body gradient -->
+    <linearGradient id="boilerCylinder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3c5075" />
+      <stop offset="15%" stop-color="#283958" />
+      <stop offset="50%" stop-color="#1b2740" />
+      <stop offset="85%" stop-color="#121b2d" />
+      <stop offset="100%" stop-color="#0b101b" />
+    </linearGradient>
+
+    <!-- Roof moonlight highlight curve -->
+    <linearGradient id="roofSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7a92bc" stop-opacity="0.9" />
+      <stop offset="45%" stop-color="#4a5f85" stop-opacity="0.65" />
+      <stop offset="100%" stop-color="#24334f" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Brass strap metallic gradient -->
+    <linearGradient id="brassStrap" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#aa8322" />
+      <stop offset="45%" stop-color="#fff2ad" />
+      <stop offset="100%" stop-color="#7a580c" />
+    </linearGradient>
+
+    <!-- Chimney cylinder gradient -->
+    <linearGradient id="chimneyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1d283e" />
+      <stop offset="40%" stop-color="#465b82" />
+      <stop offset="70%" stop-color="#283856" />
+      <stop offset="100%" stop-color="#121b2b" />
+    </linearGradient>
+
+    <!-- Brass trim gradient -->
+    <linearGradient id="goldTrim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe699" />
+      <stop offset="35%" stop-color="#d4af37" />
+      <stop offset="75%" stop-color="#997515" />
+      <stop offset="100%" stop-color="#553f06" />
+    </linearGradient>
+
+    <!-- Glowing headlight lantern radial core -->
+    <radialGradient id="lampCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+      <stop offset="25%" stop-color="#fff7bd" stop-opacity="0.98" />
+      <stop offset="58%" stop-color="#f59e0b" stop-opacity="0.85" />
+      <stop offset="85%" stop-color="#d97706" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#d97706" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Warm forward light beam on curved railway tracks -->
+    <radialGradient id="trackBeam" cx="10%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#fff4c2" stop-opacity="0.65" />
+      <stop offset="35%" stop-color="#fde047" stop-opacity="0.32" />
+      <stop offset="70%" stop-color="#f59e0b" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Dreamy volumetric steam puffs -->
+    <radialGradient id="steamSoft" cx="45%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65" />
+      <stop offset="45%" stop-color="#f8fafc" stop-opacity="0.38" />
+      <stop offset="75%" stop-color="#e2e8f0" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Perfect linear mask to feather the left seam from 0% to 100% -->
+    <linearGradient id="leftFeatherGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" />
+      <stop offset="100%" stop-color="#ffffff" />
+    </linearGradient>
+
+    <mask id="seamlessFeatherMask" maskUnits="userSpaceOnUse" x="320" y="380" width="80" height="150">
+      <rect x="338" y="380" width="70" height="150" fill="#ffffff" />
+      <rect x="324" y="380" width="14" height="150" fill="url(#leftFeatherGrad)" />
+    </mask>
+
+    <!-- Filters for organic painterly blur -->
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.5" />
+    </filter>
+    <filter id="wideGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="9" />
+    </filter>
+    <filter id="steamBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" />
+    </filter>
+    <filter id="subtleBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="0.5" />
+    </filter>
+  </defs>
+
+  <g id="locomotive-engine" filter="url(#subtleBlur)">
+    <!-- 1. Sleek Locomotive Boiler Barrel with feathered left edge -->
+    <path d="M 324,409 
+             C 345,419 362,434 374,450 
+             C 382,460 384,472 383,485 
+             C 381,498 376,508 371,514 
+             L 324,510 Z" 
+          fill="url(#boilerCylinder)" 
+          mask="url(#seamlessFeatherMask)" />
+
+    <!-- 2. Roof Moonlight Specular Rim Light -->
+    <path d="M 324,408 
+             C 346,418 363,433 376,450 
+             C 368,443 350,430 324,416 Z" 
+          fill="url(#roofSheen)" 
+          mask="url(#seamlessFeatherMask)" />
+
+    <!-- 3. Boiler Brass Straps (Golden hoops encircling boiler along perspective curves) -->
+    <!-- Strap 1 -->
+    <path d="M 344,422 C 348,442 352,475 354,512" 
+          stroke="url(#brassStrap)" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.85" />
+    <!-- Strap 2 -->
+    <path d="M 360,437 C 364,457 368,485 370,513" 
+          stroke="url(#brassStrap)" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.85" />
+
+    <!-- Lower Gold Belt Pinstripe (Continuous with train's lower accent line) -->
+    <path d="M 328,504 C 345,505 365,507 375,509" 
+          stroke="url(#brassStrap)" stroke-width="1.8" fill="none" opacity="0.9" />
+
+    <!-- 4. Front Smokebox Face Plate (The round circular front of the steam locomotive boiler) -->
+    <ellipse cx="378" cy="480" rx="6.5" ry="24" transform="rotate(-14 378 480)" 
+             fill="#141c2c" stroke="url(#goldTrim)" stroke-width="1.6" />
+
+    <!-- Boiler Door Central Brass Compass Star Emblem -->
+    <g transform="translate(378, 479) rotate(-14) scale(0.6)">
+      <polygon points="0,-9 2,-2 9,0 2,2 0,9 -2,2 -9,0 -2,-2" fill="url(#goldTrim)" />
+      <polygon points="0,-6 1.5,-1.5 6,0 1.5,1.5 0,6 -1.5,1.5 -6,0 -1.5,-1.5" fill="#fff9d0" />
+      <circle cx="0" cy="0" r="1.5" fill="#5a4208" />
+    </g>
+
+    <!-- 5. Brass Steam Dome (Mounted behind chimney: x ~ 336, y ~ 410) -->
+    <path d="M 333,415 C 333,405 341,405 341,415 Z" fill="url(#goldTrim)" />
+    <ellipse cx="337" cy="415" rx="4" ry="1.4" fill="#886308" />
+
+    <!-- 6. Vintage Steam Locomotive Smokestack / Chimney (x ~ 349, y ~ 386 to 424) -->
+    <path d="M 345,422 L 346,394 L 343,388 L 354,388 L 352,394 L 353,425 Z" 
+          fill="url(#chimneyGrad)" stroke="#162032" stroke-width="0.8" />
+    <!-- Chimney vertical reflection highlight -->
+    <path d="M 348,393 L 348,421" stroke="#6880ad" stroke-width="1.2" opacity="0.75" />
+    <!-- Chimney Polished Flanged Brass Crown -->
+    <ellipse cx="348.5" cy="388" rx="5.8" ry="1.8" fill="url(#goldTrim)" />
+    <ellipse cx="348.5" cy="387.2" rx="4.2" ry="1.2" fill="#2c2004" />
+
+    <!-- 7. Soft Billowing Chimney Steam (Dreamy, painterly puffs rising into the moonlight) -->
+    <g filter="url(#steamBlur)">
+      <circle cx="347" cy="380" r="8" fill="url(#steamSoft)" />
+      <circle cx="343" cy="370" r="12" fill="url(#steamSoft)" />
+      <circle cx="335" cy="358" r="16" fill="url(#steamSoft)" />
+      <circle cx="323" cy="345" r="22" fill="url(#steamSoft)" opacity="0.75" />
+      <circle cx="308" cy="332" r="28" fill="url(#steamSoft)" opacity="0.45" />
+    </g>
+
+    <!-- 8. Front Locomotive Cowcatcher / Pilot Grill (Lower front on tracks: x ~ 372..384, y ~ 508..524) -->
+    <path d="M 370,511 L 382,510 L 386,523 L 368,524 Z" fill="#131b2a" />
+    <!-- Pilot vertical brass ribs -->
+    <line x1="373" y1="511" x2="371" y2="524" stroke="url(#goldTrim)" stroke-width="1.3" />
+    <line x1="376" y1="510" x2="376" y2="524" stroke="url(#goldTrim)" stroke-width="1.3" />
+    <line x1="379" y1="510" x2="381" y2="524" stroke="url(#goldTrim)" stroke-width="1.3" />
+
+    <!-- 9. Forward Headlight Projection Beam (Casts warm golden beam onto curved tracks) -->
+    <polygon points="380,474 427,452 427,515 382,488" 
+             fill="url(#trackBeam)" />
+
+    <!-- 10. Prominent Locomotive Front Headlight Lantern (Mounted on boiler nose at x=380, y=474) -->
+    <!-- Outer ambient lantern glow halo -->
+    <circle cx="380" cy="474" r="24" fill="url(#lampCore)" filter="url(#wideGlow)" />
+    <circle cx="380" cy="474" r="13" fill="url(#lampCore)" filter="url(#softGlow)" />
+
+    <!-- Brass Lantern Bell Housing -->
+    <ellipse cx="378" cy="474" rx="7.2" ry="8.2" fill="url(#goldTrim)" />
+    <path d="M 376,466 L 381,468 L 381,480 L 376,482 Z" fill="#785508" />
+
+    <!-- Radiant Glowing Lantern Lens -->
+    <ellipse cx="381" cy="474" rx="5.4" ry="6.8" fill="#f59e0b" />
+    <ellipse cx="381.5" cy="474" rx="4.2" ry="5.2" fill="#fde047" />
+    <ellipse cx="382" cy="474" rx="2.8" ry="3.5" fill="#ffffff" />
+    <!-- Lens starlight spark -->
+    <circle cx="382" cy="473.5" r="1.4" fill="#ffffff" />
+  </g>
+</svg>'''
+
+with open('/tmp/locomotive_overlay.svg', 'w') as f:
+    f.write(svg_content)
+
+# Render SVG to high-res PNG using rsvg-convert
+subprocess.run(['rsvg-convert', '-w', '427', '-h', '852', '-o', '/tmp/locomotive_overlay.png', '/tmp/locomotive_overlay.svg'], check=True)
+
+# Composite over the original pristine image
+subprocess.run(['convert', 'public/assets/readpal-start-scene.orig.png', '/tmp/locomotive_overlay.png', '-composite', 'public/assets/readpal-start-scene.png'], check=True)
+
+# Clean up temp preview files
+subprocess.run(['rm', '-f', 'public/assets/preview_loco.png'], check=True)
+print("Locomotive overlay successfully rendered and composited into readpal-start-scene.png!")
