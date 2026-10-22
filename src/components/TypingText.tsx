@@ -36,7 +36,7 @@ export const TypingText: React.FC<TypingTextProps> = ({
   }, [text, speed, characters.length]);
 
   return (
-    <span className={className}>
+    <span className={className} dir="ltr">
       {characters.slice(0, visibleCount).join('')}
       {visibleCount < characters.length && (
         <span

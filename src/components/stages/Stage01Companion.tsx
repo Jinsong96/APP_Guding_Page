@@ -1,222 +1,176 @@
-import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Shuffle, Sparkles, Check } from 'lucide-react';
-import { Companion, CompanionId } from '../../types';
+import React from 'react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { CompanionId } from '../../types';
 import { COMPANIONS } from '../../data';
+
+type CompanionStyle = '热闹一点' | '刚刚好' | '安静一点';
 
 interface Stage01CompanionProps {
   selectedCompanionId: CompanionId;
+  selectedStyle?: string;
   onSelectCompanion: (id: CompanionId) => void;
+  onSelectStyle?: (style: CompanionStyle) => void;
+  onBack?: () => void;
   onNext: () => void;
 }
 
+const COMPANION_STYLES: CompanionStyle[] = ['热闹一点', '刚刚好', '安静一点'];
+
+const COMPANION_TAGLINES: Record<CompanionId, string> = {
+  wick: '安静陪着你，慢慢读。',
+  pal: '机灵探索，陪你发现新线索。',
+  tuanzi: '安静在场，按自己的节奏陪你。'
+};
+
+const CARD_TAGLINES: Record<CompanionId, string> = {
+  wick: '静默引路',
+  pal: '机灵探索',
+  tuanzi: '安静在场'
+};
+
 export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
   selectedCompanionId,
+  selectedStyle,
   onSelectCompanion,
+  onSelectStyle,
+  onBack,
   onNext
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(() => {
-    const idx = COMPANIONS.findIndex(c => c.id === selectedCompanionId);
-    return idx >= 0 ? idx : 0;
-  });
-
-  const moreIndex = COMPANIONS.length;
-  const totalCards = COMPANIONS.length + 1;
-
-  const handlePrev = () => {
-    const nextIdx = (currentIndex - 1 + totalCards) % totalCards;
-    setCurrentIndex(nextIdx);
-    if (nextIdx < COMPANIONS.length) {
-      onSelectCompanion(COMPANIONS[nextIdx].id);
-    }
-  };
-
-  const handleNext = () => {
-    const nextIdx = (currentIndex + 1) % totalCards;
-    setCurrentIndex(nextIdx);
-    if (nextIdx < COMPANIONS.length) {
-      onSelectCompanion(COMPANIONS[nextIdx].id);
-    }
-  };
-
-  const handleRandom = () => {
-    const randomIdx = Math.floor(Math.random() * COMPANIONS.length);
-    setCurrentIndex(randomIdx);
-    onSelectCompanion(COMPANIONS[randomIdx].id);
-  };
-
-  const selectedCompanion = COMPANIONS.find((c) => c.id === selectedCompanionId) || COMPANIONS[0];
-  const browsingMore = currentIndex === moreIndex;
+  const selectedCompanion =
+    COMPANIONS.find((companion) => companion.id === selectedCompanionId) || COMPANIONS[0];
+  const activeStyle = COMPANION_STYLES.includes(selectedStyle as CompanionStyle)
+    ? (selectedStyle as CompanionStyle)
+    : '刚刚好';
 
   return (
-    <div className="h-full flex flex-col items-center justify-center px-5 py-3 text-stone-800 select-none relative overflow-y-auto no-scrollbar bg-[#F4F1FA]">
-      <div className="w-full max-w-[280px] flex flex-col items-center">
-        <div className="w-full text-left mb-4 px-1">
-          <p className="text-xs font-semibold text-emerald-700 mb-1">一鹿知 · 开始阅读旅程</p>
-          <h1 className="text-[21px] font-bold leading-tight text-stone-900">
-            选一位伴读伙伴
-          </h1>
-          <p className="text-xs text-stone-500 mt-1">找到最适合你的阅读节奏</p>
-        </div>
+    <div className="flex h-full w-full flex-col justify-between overflow-hidden bg-[#fbfbfd] px-4 pb-1 pt-0 text-[#192b4d]">
+      <header className="relative flex h-[38px] shrink-0 items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="返回启动页"
+          className="flex h-9 w-9 items-center justify-center text-[#172747] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a]"
+        >
+          <ArrowLeft size={21} strokeWidth={1.8} />
+        </button>
+        <span className="absolute left-1/2 -translate-x-1/2 text-[14px] font-semibold">
+          选择旅伴
+        </span>
+        <span className="pr-1 text-[13px] font-medium">1 / 2</span>
+      </header>
 
-        <div className="relative deck-container flex flex-col items-center">
-          <div className="relative w-64 h-[285px] flex items-center justify-center">
-            {/* Companions cards */}
-            {COMPANIONS.map((companion, idx) => {
-              let posClass = 'deck-card-hidden';
-              if (idx === currentIndex) posClass = 'deck-card-front';
-              else if (idx === (currentIndex - 1 + totalCards) % totalCards) posClass = 'deck-card-left';
-              else if (idx === (currentIndex + 1) % totalCards) posClass = 'deck-card-right';
+      <section className="flex h-[67px] shrink-0 flex-col items-center justify-center text-center">
+        <h1
+          className="text-[23px] font-semibold leading-[1.2]"
+          style={{ fontFamily: '"Songti SC", "STSong", "Iowan Old Style", Georgia, serif' }}
+        >
+          这一程，想和谁同行？
+        </h1>
+        <p className="mt-1 text-[13px] text-[#344867]">学习功能相同，陪伴方式由你选择。</p>
+      </section>
 
-              const isLight = companion.id === 'light';
+      <div className="-mx-4 aspect-[2/1] w-[calc(100%+2rem)] shrink-0 overflow-hidden bg-[#dbe1ea]">
+        <img
+          src={`${import.meta.env.BASE_URL}assets/companion-train-scene.png`}
+          alt="夜行列车 B-01 卧铺包厢，灯芯在月色窗景前安静休息"
+          className="h-full w-full object-fill"
+        />
+      </div>
 
-              return (
-                <div
-                  key={companion.id}
-                  onClick={() => {
-                    setCurrentIndex(idx);
-                    onSelectCompanion(companion.id);
-                  }}
-                  className={`absolute inset-0 rounded-3xl border p-4 shadow-lg flex flex-col items-center justify-between transition-all duration-300 cursor-pointer ${posClass}`}
-                  style={{
-                    boxShadow: companion.id === selectedCompanionId
-                      ? isLight
-                        ? '0 16px 36px -8px rgba(16, 100, 78, 0.18)'
-                        : '0 16px 36px -10px rgba(28, 25, 23, 0.14)'
-                      : undefined,
-                    borderColor: companion.id === selectedCompanionId
-                      ? isLight
-                        ? '#D7A497'
-                        : companion.accentColor
-                      : '#E7E1F0',
-                    background: isLight
-                      ? '#FFFFFF'
-                      : '#FFFFFF'
-                  }}
-                >
-                  {companion.id === selectedCompanionId && (
-                    <span
-                      className="absolute top-3 right-3 z-20 w-6 h-6 rounded-full flex items-center justify-center shadow-sm font-bold text-xs bg-emerald-500 text-white"
-                      style={{
-                        color: '#FFFFFF'
-                      }}
-                    >
-                      <Check size={14} strokeWidth={2.5} />
-                    </span>
-                  )}
-
-                  <div className={`w-32 h-32 my-auto relative flex items-center justify-center rounded-full ${isLight ? 'bg-[#F4F1FA]' : 'bg-[#F7F5FA]'}`}>
-                    <img
-                      src={companion.avatarUrl}
-                      alt={companion.name}
-                      className="w-28 h-28 object-contain drop-shadow-md transition-transform duration-300 hover:scale-105"
-                    />
-                  </div>
-
-                  <div className="text-center w-full pb-1">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <h3 className="text-lg font-bold text-stone-900">{companion.name}</h3>
-                      <span className="text-xs text-stone-400">{companion.nameEn}</span>
-                    </div>
-                    <div
-                      className="text-[11px] font-bold mt-0.5 inline-block px-2.5 py-0.5 rounded-full"
-                      style={{
-                        color: isLight ? '#B83825' : companion.accentColor,
-                        backgroundColor: isLight ? '#FBE8E3' : `${companion.accentColor}18`,
-                      }}
-                    >
-                      {companion.type}
-                    </div>
-                    <p className="text-xs text-stone-600 mt-2 line-clamp-2 px-1">
-                      {companion.quote}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* 5th Card: More coming soon */}
-            {(() => {
-              const idx = moreIndex;
-              let posClass = 'deck-card-hidden';
-              if (idx === currentIndex) posClass = 'deck-card-front';
-              else if (idx === (currentIndex - 1 + totalCards) % totalCards) posClass = 'deck-card-left';
-              else if (idx === (currentIndex + 1) % totalCards) posClass = 'deck-card-right';
-
-              return (
-                <div
-                  key="coming-soon"
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`absolute inset-0 rounded-3xl bg-[#FAF8FD] border border-dashed border-[#CDC3E0] p-4 shadow-sm flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer ${posClass}`}
-                >
-                  <div className="w-14 h-14 rounded-2xl bg-white border border-[#E7E1F0] flex items-center justify-center text-emerald-700 mb-3">
-                    <Sparkles size={24} aria-hidden="true" />
-                  </div>
-                  <h3 className="text-base font-bold text-stone-900">更多伴读萌宠</h3>
-                  <span className="text-[11px] text-emerald-700 mt-1">即将加入</span>
-                  <p className="text-xs text-stone-500 mt-2 leading-relaxed px-2">
-                    新伙伴正在准备中，先选一位现有旅伴开始阅读吧。
-                  </p>
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* Carousel controls */}
-          <div className="flex items-center justify-center gap-4 mt-3">
-            <button
-              onClick={handlePrev}
-              className="w-9 h-9 rounded-full bg-[#FFFFFF] hover:bg-[#F0ECF8] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E7E1F0] shadow-xs cursor-pointer"
-              aria-label="上一个旅伴"
-            >
-              <ArrowLeft size={16} />
-            </button>
-
-            <div className="flex items-center gap-1.5">
-              {Array.from({ length: totalCards }).map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setCurrentIndex(i);
-                    if (i < COMPANIONS.length) onSelectCompanion(COMPANIONS[i].id);
-                  }}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === currentIndex ? 'w-5 bg-emerald-600' : 'w-1.5 bg-[#D3CEE0] hover:bg-[#AFA7C5]'
-                  }`}
-                  aria-label={i === moreIndex ? '浏览更多伴读萌宠' : `选择${COMPANIONS[i].name}`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={handleNext}
-              className="w-9 h-9 rounded-full bg-[#FFFFFF] hover:bg-[#F0ECF8] flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors border border-[#E7E1F0] shadow-xs cursor-pointer"
-              aria-label="下一个旅伴"
-            >
-              <ArrowRight size={16} />
-            </button>
-          </div>
-        </div>
-
-        <div className="w-full mt-3">
-          <p className="text-center text-xs text-stone-500 mb-2">
-            {browsingMore ? `当前选择：${selectedCompanion.name}` : `已选择：${selectedCompanion.name}`}
-          </p>
-          <button
-            onClick={onNext}
-            className="w-full min-h-12 px-4 rounded-2xl flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm transition-colors active:scale-[0.99] cursor-pointer"
+      <section className="flex h-[52px] shrink-0 flex-col items-center justify-center text-center">
+        <div className="flex items-center justify-center gap-2">
+          <h2
+            className="text-[20px] font-semibold leading-tight"
+            style={{ fontFamily: '"Songti SC", "STSong", "Iowan Old Style", Georgia, serif' }}
           >
-            <span>{browsingMore ? `继续使用${selectedCompanion.name}` : `让${selectedCompanion.name}陪我出发`}</span>
-            <ArrowRight size={17} />
-          </button>
-
-          <button
-            onClick={handleRandom}
-            className="w-full mt-2 min-h-10 px-4 rounded-xl text-xs text-stone-600 hover:text-stone-900 bg-white hover:bg-[#F5F2FA] border border-[#E7E1F0] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <Shuffle size={13} />
-            <span>帮我随机选一个</span>
-          </button>
+            {selectedCompanion.name}
+          </h2>
+          <span className="text-[14px] font-medium">{selectedCompanion.nameEn}</span>
         </div>
+        <p className="mt-0.5 text-[13px] text-[#596b89]">
+          {COMPANION_TAGLINES[selectedCompanion.id]}
+        </p>
+      </section>
+
+      <div className="grid h-[167px] shrink-0 grid-cols-3 gap-2" role="group" aria-label="选择一位旅伴">
+        {COMPANIONS.map((companion) => {
+          const isSelected = companion.id === selectedCompanionId;
+
+          return (
+            <button
+              key={companion.id}
+              type="button"
+              onClick={() => onSelectCompanion(companion.id)}
+              aria-pressed={isSelected}
+              className={`relative box-border flex h-[167px] min-h-[167px] max-h-[167px] min-w-0 flex-col items-center overflow-hidden rounded-[14px] border-2 px-[7px] pt-[7px] text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a] ${
+                isSelected
+                  ? 'border-[#b43a27] bg-[#fffaf5]'
+                  : 'border-[#d9deea] bg-white'
+              }`}
+            >
+              {isSelected && (
+                <span className="absolute right-[5px] top-[5px] z-10 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#b43a27] text-white shadow-sm">
+                  <Check size={14} strokeWidth={3} aria-hidden="true" />
+                </span>
+              )}
+              <img
+                src={
+                  companion.id === 'wick'
+                    ? `${import.meta.env.BASE_URL}assets/companion-train-scene.png`
+                    : companion.avatarUrl
+                }
+                alt=""
+                className={`h-[108px] w-full shrink-0 rounded-[11px] ${
+                  companion.id === 'wick' ? 'object-cover object-center' : 'object-fill'
+                }`}
+              />
+              <span className="mt-[6px] text-[14px] font-semibold leading-tight text-[#192b4d]">
+                {companion.name}
+              </span>
+              <span className="mt-[5px] text-[11px] leading-none text-[#73809a]">
+                {CARD_TAGLINES[companion.id]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <section className="shrink-0">
+        <h3 className="mb-[7px] text-[14px] font-semibold">你喜欢怎样的陪伴？</h3>
+        <div className="grid grid-cols-3 gap-2" role="group" aria-label="陪伴风格">
+          {COMPANION_STYLES.map((style) => {
+            const isActive = activeStyle === style;
+            return (
+              <button
+                key={style}
+                type="button"
+                onClick={() => onSelectStyle?.(style)}
+                aria-pressed={isActive}
+                className={`h-[39px] rounded-full border px-2 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a] ${
+                  isActive
+                    ? 'border-[#28576b] bg-[#28576b] text-white'
+                    : 'border-[#d9dfeb] bg-[#eef0f6] text-[#273957]'
+                }`}
+              >
+                {style}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <div className="shrink-0 pt-2">
+        <button
+          type="button"
+          onClick={onNext}
+          className="flex h-[51px] w-full items-center justify-center gap-3 rounded-full bg-[#192b4d] px-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#233b64] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a] focus-visible:ring-offset-2"
+        >
+          <span>和{selectedCompanion.name}一起出发</span>
+          <ArrowRight size={20} aria-hidden="true" />
+        </button>
+        <p className="pb-1 pt-[7px] text-center text-[12px] text-[#8792a9]">
+          以后可以更换，已有的共同经历会保留
+        </p>
       </div>
     </div>
   );

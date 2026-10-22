@@ -3,6 +3,7 @@ import { Wifi, Battery, Signal, ZoomIn, ZoomOut, Maximize2, Smartphone } from 'l
 
 interface PhoneSimulatorProps {
   children: React.ReactNode;
+  darkChrome?: boolean;
 }
 
 // iPhone 15 Standard Viewport Dimensions (6.1-inch Super Retina XDR)
@@ -13,7 +14,7 @@ const BEZEL_THICKNESS = 6; // Ultra-thin aerospace-grade aluminum/titanium perim
 const BASE_WIDTH = SCREEN_WIDTH + BEZEL_THICKNESS * 2; // 405px
 const BASE_HEIGHT = SCREEN_HEIGHT + BEZEL_THICKNESS * 2; // 864px
 
-export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
+export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children, darkChrome = false }) => {
   // Stored scale or calculated default
   const [scale, setScale] = useState<number>(() => {
     try {
@@ -217,8 +218,12 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
           {/* iPhone 15 Screen Display Viewport (Warm Paper Ivory #F4F1FA) */}
           <div className="relative w-[393px] h-[852px] rounded-[44px] bg-[#F4F1FA] overflow-hidden flex flex-col shadow-inner border border-[#E7E1F0]">
             {/* iOS Top Status Bar with iPhone 15 Dynamic Island (灵动岛) */}
-            <div className="h-11 px-7 pt-2 flex items-center justify-between text-stone-800 text-xs font-semibold z-40 select-none bg-[#F4F1FA]/95 backdrop-blur-sm shrink-0 border-b border-[#E7E1F0]/60">
-              <span className="font-mono text-[13px] tracking-tight font-bold text-stone-800">9:41</span>
+            <div className={`h-11 px-7 pt-2 flex items-center justify-between text-xs font-semibold z-40 select-none backdrop-blur-sm shrink-0 border-b ${
+              darkChrome
+                ? 'bg-[#101b35]/80 text-white border-white/10'
+                : 'bg-[#F4F1FA]/95 text-stone-800 border-[#E7E1F0]/60'
+            }`}>
+              <span className={`font-mono text-[13px] tracking-tight font-bold ${darkChrome ? 'text-white' : 'text-stone-800'}`}>9:41</span>
               
               {/* Precision iPhone 15 Dynamic Island */}
               <div className="w-[122px] h-[33px] bg-[#000000] rounded-full mx-auto -mt-1 flex items-center justify-between px-3 shadow-md border border-white/10">
@@ -230,9 +235,9 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
 
-              <div className="flex items-center gap-1.5 text-stone-700">
+              <div className={`flex items-center gap-1.5 ${darkChrome ? 'text-white' : 'text-stone-700'}`}>
                 <Wifi size={12} />
-                <Battery size={13} className="text-emerald-600" />
+                <Battery size={13} className={darkChrome ? 'text-white' : 'text-emerald-600'} />
               </div>
             </div>
 
@@ -242,8 +247,8 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children }) => {
             </div>
 
             {/* Bottom Home Indicator Bar (iPhone 15 ergonomic safe area) */}
-            <div className="h-6 bg-[#F4F1FA] flex items-center justify-center shrink-0 z-40 select-none">
-              <div className="w-36 h-1 bg-stone-700/30 rounded-full" />
+            <div className={`h-6 flex items-center justify-center shrink-0 z-40 select-none ${darkChrome ? 'bg-[#101b35]' : 'bg-[#F4F1FA]'}`}>
+              <div className={`w-36 h-1 rounded-full ${darkChrome ? 'bg-white/75' : 'bg-stone-700/30'}`} />
             </div>
           </div>
         </div>

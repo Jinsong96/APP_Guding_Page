@@ -1,4 +1,4 @@
-export type CompanionId = 'pal' | 'wick' | 'nubo' | 'light';
+export type CompanionId = 'wick' | 'pal' | 'tuanzi';
 
 export interface Companion {
   id: CompanionId;

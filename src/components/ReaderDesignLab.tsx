@@ -57,7 +57,7 @@ const styles: ReaderStyle[] = [
   }
 ];
 
-const companion = COMPANIONS.find((item) => item.id === 'light') || COMPANIONS[0];
+const companion = COMPANIONS.find((item) => item.id === 'wick') || COMPANIONS[0];
 const translations = [
   '晚上21:47，整座城市的灯光突然熄灭。玻璃大楼消失在红色尘土中。',
   '玛拉等着应急系统启动。什么也没有发生。随后，一台老旧的维修机器人从街道下方的隧道里出现。',

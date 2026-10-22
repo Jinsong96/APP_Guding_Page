@@ -1,2 +1,4 @@
 export const COMPANION_TYPING_INTERVAL_MS = 28;
+export const CHAT_TYPING_INTERVAL_MS = 55;
+export const CHAT_REPLY_PAUSE_MS = 700;
 export const SPEECH_CONTENT_REVEAL_MS = 120;

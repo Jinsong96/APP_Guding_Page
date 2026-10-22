@@ -130,56 +130,43 @@ export const SEED_SETS: BubbleSeed[][] = [
 
 export const COMPANIONS: Companion[] = [
   {
-    id: 'light',
-    name: '小灯',
-    nameEn: 'Light',
+    id: 'wick',
+    name: '灯芯',
+    nameEn: 'Wick',
     type: '引路型旅伴',
-    quote: '“慢慢来，我在。”',
-    avatarUrl: publicAsset('/assets/light_character.png'),
+    quote: '“安静陪着你，慢慢读。”',
+    avatarUrl: publicAsset('/assets/companion-wick-card.png'),
     celebrateActionName: '喜悦欢呼跃动',
-    celebrateQuote: '“太棒啦！小鹿准备好啦，我们开读吧！🐾”',
-    accentColor: '#558B2F',
-    bgGlow: 'rgba(85, 139, 47, 0.2)',
-    description: '温和细腻的节奏大师，总能帮你找到恰到好处的阅读速度。'
+    celebrateQuote: '“太棒啦！准备好一起出发了吗？”',
+    accentColor: '#B83C2A',
+    bgGlow: 'rgba(184, 60, 42, 0.18)',
+    description: '安静陪着你，慢慢读。'
   },
   {
     id: 'pal',
     name: '帕利',
     nameEn: 'Pal',
     type: '机灵型旅伴',
-    quote: '“我会吐槽难句，不吐槽你。”',
-    avatarUrl: publicAsset('/assets/pal.png'),
+    quote: '“遇到难句，我们一起找线索。”',
+    avatarUrl: publicAsset('/assets/companion-pal-card.png'),
     celebrateActionName: '机智跃动致意',
-    celebrateQuote: '“完美定级！走，看我带你拆解长难句～🦊”',
-    accentColor: '#EA580C',
-    bgGlow: 'rgba(234, 88, 12, 0.2)',
-    description: '对复杂从句有本能的幽默感，会在关键处给你机智提示。'
+    celebrateQuote: '“发现新线索了！继续往前看看吧。”',
+    accentColor: '#C76B3F',
+    bgGlow: 'rgba(199, 107, 63, 0.18)',
+    description: '机灵探索，陪你发现新线索。'
   },
   {
-    id: 'wick',
-    name: '灯芯',
-    nameEn: 'Wick',
+    id: 'tuanzi',
+    name: '团子',
+    nameEn: 'Tuanzi',
     type: '安静型旅伴',
-    quote: '“你读你的，我替你留灯。”',
-    avatarUrl: publicAsset('/assets/wick.png'),
-    celebrateActionName: '轻盈欣喜点亮',
-    celebrateQuote: '“阅读之光为你点亮，享受专属故事之旅吧✨”',
-    accentColor: '#38BDF8',
-    bgGlow: 'rgba(56, 189, 248, 0.15)',
-    description: '默默守护你的阅读专注力，只在真正卡壳时悄悄标注生词。'
-  },
-  {
-    id: 'nubo',
-    name: '努波',
-    nameEn: 'Nubo',
-    type: '活力型旅伴',
-    quote: '“看正文时，我会安静下来。”',
-    avatarUrl: publicAsset('/assets/nubo.png'),
+    quote: '“我在这里，陪你慢慢读。”',
+    avatarUrl: publicAsset('/assets/companion-tuanzi-card.png'),
     celebrateActionName: '元气活力跳跃',
-    celebrateQuote: '“叮！阅读引擎已全功率启动！冲鸭～🚀”',
-    accentColor: '#10B981',
-    bgGlow: 'rgba(168, 185, 129, 0.15)',
-    description: '热情鼓励每一个小突破，陪你一步步解锁更多主题大陆。'
+    celebrateQuote: '“读累了就歇一会儿，我一直都在。”',
+    accentColor: '#6C779B',
+    bgGlow: 'rgba(108, 119, 155, 0.18)',
+    description: '安静在场，按自己的节奏陪你阅读。'
   }
 ];
 
@@ -366,7 +353,7 @@ export const WORLD_STORIES = [
 ];
 
 export const INITIAL_PREFERENCES: UserPreferences = {
-  companionId: 'light',
+  companionId: 'wick',
   interestTheme: '科学',
   pacing: 'relaxed',
   readingRatings: {},
