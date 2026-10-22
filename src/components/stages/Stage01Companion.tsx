@@ -2,25 +2,15 @@ import React from 'react';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { CompanionId } from '../../types';
 import { COMPANIONS } from '../../data';
-
-type CompanionStyle = '热闹一点' | '刚刚好' | '安静一点';
+import { CompanionScene } from '../CompanionScene';
+import { OnboardingProgress } from '../OnboardingProgress';
 
 interface Stage01CompanionProps {
   selectedCompanionId: CompanionId;
-  selectedStyle?: string;
   onSelectCompanion: (id: CompanionId) => void;
-  onSelectStyle?: (style: CompanionStyle) => void;
   onBack?: () => void;
   onNext: () => void;
 }
-
-const COMPANION_STYLES: CompanionStyle[] = ['热闹一点', '刚刚好', '安静一点'];
-
-const COMPANION_TAGLINES: Record<CompanionId, string> = {
-  wick: '安静陪着你，慢慢读。',
-  pal: '机灵探索，陪你发现新线索。',
-  tuanzi: '安静在场，按自己的节奏陪你。'
-};
 
 const CARD_TAGLINES: Record<CompanionId, string> = {
   wick: '静默引路',
@@ -30,17 +20,12 @@ const CARD_TAGLINES: Record<CompanionId, string> = {
 
 export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
   selectedCompanionId,
-  selectedStyle,
   onSelectCompanion,
-  onSelectStyle,
   onBack,
   onNext
 }) => {
   const selectedCompanion =
     COMPANIONS.find((companion) => companion.id === selectedCompanionId) || COMPANIONS[0];
-  const activeStyle = COMPANION_STYLES.includes(selectedStyle as CompanionStyle)
-    ? (selectedStyle as CompanionStyle)
-    : '刚刚好';
 
   return (
     <div className="flex h-full w-full flex-col justify-between overflow-hidden bg-[#fbfbfd] px-4 pb-1 pt-0 text-[#192b4d]">
@@ -56,8 +41,10 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
         <span className="absolute left-1/2 -translate-x-1/2 text-[14px] font-semibold">
           选择旅伴
         </span>
-        <span className="pr-1 text-[13px] font-medium">1 / 2</span>
+        <span className="h-9 w-9" aria-hidden="true" />
       </header>
+
+      <OnboardingProgress phase={0} className="shrink-0 px-1" />
 
       <section className="flex h-[67px] shrink-0 flex-col items-center justify-center text-center">
         <h1
@@ -70,11 +57,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
       </section>
 
       <div className="-mx-4 aspect-[2/1] w-[calc(100%+2rem)] shrink-0 overflow-hidden bg-[#dbe1ea]">
-        <img
-          src={`${import.meta.env.BASE_URL}assets/companion-train-scene.png`}
-          alt="夜行列车 B-01 卧铺包厢，灯芯在月色窗景前安静休息"
-          className="h-full w-full object-fill"
-        />
+        <CompanionScene key={selectedCompanion.id} companion={selectedCompanion} className="h-full w-full" />
       </div>
 
       <section className="flex h-[52px] shrink-0 flex-col items-center justify-center text-center">
@@ -88,7 +71,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
           <span className="text-[14px] font-medium">{selectedCompanion.nameEn}</span>
         </div>
         <p className="mt-0.5 text-[13px] text-[#596b89]">
-          {COMPANION_TAGLINES[selectedCompanion.id]}
+          {selectedCompanion.description}
         </p>
       </section>
 
@@ -114,15 +97,10 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                 </span>
               )}
               <img
-                src={
-                  companion.id === 'wick'
-                    ? `${import.meta.env.BASE_URL}assets/companion-train-scene.png`
-                    : companion.avatarUrl
-                }
+                src={companion.portraitUrl}
                 alt=""
-                className={`h-[108px] w-full shrink-0 rounded-[11px] ${
-                  companion.id === 'wick' ? 'object-cover object-center' : 'object-fill'
-                }`}
+                draggable={false}
+                className="h-[108px] w-full shrink-0 rounded-[11px] object-cover object-center"
               />
               <span className="mt-[6px] text-[14px] font-semibold leading-tight text-[#192b4d]">
                 {companion.name}
@@ -134,30 +112,6 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
           );
         })}
       </div>
-
-      <section className="shrink-0">
-        <h3 className="mb-[7px] text-[14px] font-semibold">你喜欢怎样的陪伴？</h3>
-        <div className="grid grid-cols-3 gap-2" role="group" aria-label="陪伴风格">
-          {COMPANION_STYLES.map((style) => {
-            const isActive = activeStyle === style;
-            return (
-              <button
-                key={style}
-                type="button"
-                onClick={() => onSelectStyle?.(style)}
-                aria-pressed={isActive}
-                className={`h-[39px] rounded-full border px-2 text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a] ${
-                  isActive
-                    ? 'border-[#28576b] bg-[#28576b] text-white'
-                    : 'border-[#d9dfeb] bg-[#eef0f6] text-[#273957]'
-                }`}
-              >
-                {style}
-              </button>
-            );
-          })}
-        </div>
-      </section>
 
       <div className="shrink-0 pt-2">
         <button

@@ -103,7 +103,7 @@ export const SentenceBreakdownModal: React.FC<SentenceBreakdownModalProps> = ({
         {/* Companion Tip */}
         <div className="mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex gap-2.5 items-center">
           <img
-            src={companion.avatarUrl}
+            src={companion.portraitUrl}
             alt={companion.name}
             className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-emerald-300"
           />

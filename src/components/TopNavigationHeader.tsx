@@ -16,14 +16,12 @@ export const APP_SCREENS: AppScreen[] = [
   { index: 3, label: '阅读目标', stage: 2, step: 11 },
   { index: 4, label: '目标场景', stage: 2, step: 12 },
   { index: 5, label: '专注时长', stage: 2, step: 13 },
-  { index: 6, label: '试读 1', stage: 2, step: 3 },
-  { index: 7, label: '试读 2', stage: 2, step: 4 },
-  { index: 8, label: '试读 3', stage: 2, step: 5 },
-  { index: 9, label: '试读 4', stage: 2, step: 6 },
-  { index: 10, label: '定制画像', stage: 8 },
-  { index: 14, label: '成长反馈', stage: 7 },
-  { index: 15, label: '阅读画像', stage: 9 },
-  { index: 16, label: '阅读首页', stage: 10 }
+  { index: 6, label: '推荐文章', stage: 11 },
+  { index: 7, label: '首篇阅读', stage: 12 },
+  { index: 8, label: '旅程到站', stage: 8 },
+  { index: 9, label: '到站(首页)', stage: 7 },
+  { index: 10, label: '阅读首页', stage: 10 },
+  { index: 11, label: '我的旅伴', stage: 13 }
 ];
 
 interface TopNavigationHeaderProps {
@@ -55,9 +53,9 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
           </div>
           <div className="flex min-w-0 items-center gap-1.5 rounded-full border border-[#E7E1F0] bg-[#F0ECF8] px-2 py-1 text-xs">
             <img
-              src={companion.avatarUrl}
+              src={companion.portraitUrl}
               alt=""
-              className="h-5 w-5 shrink-0 object-contain"
+              className="h-5 w-5 shrink-0 rounded-full object-cover"
             />
             <span className="truncate text-[11px] font-medium text-stone-700">
               {companion.name} 同行

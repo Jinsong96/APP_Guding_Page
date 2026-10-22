@@ -101,7 +101,7 @@ export const WordLookupModal: React.FC<WordLookupModalProps> = ({
         {/* Companion Note */}
         <div className="mt-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 flex gap-3 items-start">
           <img
-            src={companion.avatarUrl}
+            src={companion.portraitUrl}
             alt={companion.name}
             className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-emerald-300"
           />

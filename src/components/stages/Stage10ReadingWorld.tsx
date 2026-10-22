@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BookOpen, Bookmark, User, Heart, Clock, Sparkles, ArrowRight, Volume2, Trash2 } from 'lucide-react';
 import { BookmarkedSentence, Companion, Story, UserPreferences } from '../../types';
 import { WORLD_STORIES, FIRST_STORY } from '../../data';
+import { CompanionAvatar } from '../CompanionAvatar';
 
 interface Stage10ReadingWorldProps {
   companion: Companion;
@@ -10,6 +11,8 @@ interface Stage10ReadingWorldProps {
   onToggleBookmark: (word: string) => void;
   onToggleSentenceBookmark: (sentence: BookmarkedSentence) => void;
   onRestartOnboarding: () => void;
+  rideCount?: number;
+  onOpenCompanion?: () => void;
 }
 
 export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
@@ -18,7 +21,9 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
   onOpenStory,
   onToggleBookmark,
   onToggleSentenceBookmark,
-  onRestartOnboarding
+  onRestartOnboarding,
+  rideCount = 0,
+  onOpenCompanion
 }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'vocab' | 'profile'>('home');
   const [activeCollectionTab, setActiveCollectionTab] = useState<'words' | 'sentences'>('words');
@@ -55,20 +60,21 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
           <div>
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <img
-                  src={companion.avatarUrl}
-                  alt={companion.name}
-                  className="w-8 h-8 rounded-full object-cover border border-emerald-500/40"
-                />
+              <button
+                type="button"
+                onClick={onOpenCompanion}
+                aria-label={`查看我的旅伴${companion.name}`}
+                className="flex items-center gap-2 rounded-full pr-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
+              >
+                <CompanionAvatar companion={companion} size={32} alt={companion.name} />
                 <span className="text-xs sm:text-[13px] font-semibold text-stone-900 tracking-wide">
                   {companion.name}与你同行中
                 </span>
-              </div>
+              </button>
 
               <div className="flex items-center gap-1.5">
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-mono border border-emerald-300">
-                  连续打卡 {preferences.streakDays} 天
+                  已走过 {rideCount} 程
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-medium border border-emerald-300">
                   今日精选
@@ -329,11 +335,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
           <div>
             <div className="text-center py-4 mb-4 pb-4 border-b border-[#E7E1F0]">
               <div className="relative w-20 h-20 mx-auto mb-2">
-                <img
-                  src={companion.avatarUrl}
-                  alt={companion.name}
-                  className="w-full h-full object-contain drop-shadow-xs"
-                />
+                <CompanionAvatar companion={companion} size={80} alt={companion.name} />
               </div>
               <h2 className="text-base font-bold text-stone-900">
                 你的伴读者：{companion.name}
@@ -364,8 +366,8 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
               </div>
 
               <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
-                <span className="text-stone-500">已点亮主题大陆</span>
-                <span className="text-emerald-700 font-semibold">科学大陆第 1 段海岸线</span>
+                <span className="text-stone-500">车票册</span>
+                <span className="text-emerald-700 font-semibold">已收集 {rideCount} 张车票</span>
               </div>
 
               {preferences.profile.goalTrack?.targetFocus && (

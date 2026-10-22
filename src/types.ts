@@ -4,9 +4,15 @@ export interface Companion {
   id: CompanionId;
   name: string;
   nameEn: string;
+  // Sleeper berth on the night train (B-04 is reserved for Nubo).
+  seat: string;
   type: string;
   quote: string;
   avatarUrl: string;
+  // Square, head-centred portrait for avatar frames.
+  portraitUrl: string;
+  // Full-width scene illustration; companions without one fall back to a composed portrait scene.
+  sceneUrl?: string;
   celebrateAvatarUrl?: string;
   celebrateActionName?: string;
   celebrateQuote?: string;
@@ -16,6 +22,26 @@ export interface Companion {
 }
 
 export type ReadingLevel = 'easy' | 'mid' | 'hard';
+
+// One finished read = one ride on the night train; each ride leaves a ticket in the ticket book.
+export interface RideTicket {
+  id: string;
+  rideNumber: number;
+  title: string;
+  chineseTitle: string;
+  theme: string;
+  coverUrl: string;
+  date: string;
+}
+
+// A real moment the user and companion shared, shown in the companion's 共同经历.
+export interface SharedEvent {
+  id: string;
+  kind: 'ride' | 'bookmark';
+  date: string;
+  title: string;
+  detail: string;
+}
 
 export interface VocabItem {
   word: string;

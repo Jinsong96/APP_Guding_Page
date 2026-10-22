@@ -4,8 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { BookmarkedSentence, Companion, CompanionId, ReadingLevel, UserPreferences } from './types';
-import { COMPANIONS, INITIAL_PREFERENCES } from './data';
+import { BookmarkedSentence, Companion, CompanionId, ReadingLevel, RideTicket, SharedEvent, UserPreferences } from './types';
+import { COMPANIONS, FIRST_STORY, INITIAL_PREFERENCES } from './data';
 import { APP_SCREENS, AppScreen, TopNavigationHeader } from './components/TopNavigationHeader';
 import { PhoneSimulator } from './components/PhoneSimulator';
 import { BoardView } from './components/BoardView';
@@ -13,10 +13,15 @@ import { Stage01Companion } from './components/stages/Stage01Companion';
 import { Stage02AiChat } from './components/stages/Stage02AiChat';
 import { Stage07GrowthFeedback } from './components/stages/Stage07GrowthFeedback';
 import { Stage08Customizing } from './components/stages/Stage08Customizing';
-import { Stage09ReadingProfile } from './components/stages/Stage09ReadingProfile';
 import { StageReader } from './components/stages/StageReader';
 import { Stage10ReadingWorld } from './components/stages/Stage10ReadingWorld';
 import { Stage00Start } from './components/stages/Stage00Start';
+import { StageRecommend } from './components/stages/StageRecommend';
+import { StageFirstRead } from './components/stages/StageFirstRead';
+import { StageCompanionHome } from './components/stages/StageCompanionHome';
+import { CefrLevelKey } from './components/stages/Stage02AiChat';
+import { CEFR_TO_STARTING_LEVEL } from './components/stages/Stage08Customizing';
+import { FIRST_READ_ARTICLES, FirstReadVocab, startLevelForGoal } from './firstReadArticles';
 
 type EntryScreen = 'start' | 'companion' | 'stage';
 
@@ -28,6 +33,12 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'phone' | 'board'>('phone');
   const [preferences, setPreferences] = useState<UserPreferences>(INITIAL_PREFERENCES);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [firstReadArticleId, setFirstReadArticleId] = useState<string>(FIRST_READ_ARTICLES[0].id);
+  const [learnedWords, setLearnedWords] = useState<FirstReadVocab[]>([]);
+  // The ticket book and shared moments behind the companion line.
+  const [tickets, setTickets] = useState<RideTicket[]>([]);
+  const [sharedEvents, setSharedEvents] = useState<SharedEvent[]>([]);
+  const [companionHomeReturnStage, setCompanionHomeReturnStage] = useState<number>(10);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -38,6 +49,70 @@ export default function App() {
 
   const currentCompanion =
     COMPANIONS.find((c) => c.id === preferences.companionId) || COMPANIONS[0];
+  const firstReadArticle =
+    FIRST_READ_ARTICLES.find((article) => article.id === firstReadArticleId) || FIRST_READ_ARTICLES[0];
+  const firstReadStartLevel = startLevelForGoal(preferences.profile.goalTrack);
+  const favouriteTheme = preferences.selectedThemes?.[0] || preferences.interestTheme;
+
+  const todayLabel = () => {
+    const now = new Date();
+    return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+  };
+
+  // Ticket for a read; reuses the stored one so revisiting an arrival screen never issues a second ticket.
+  const ticketFor = (story: Omit<RideTicket, 'rideNumber' | 'date'>): RideTicket =>
+    tickets.find((ticket) => ticket.id === story.id) || {
+      ...story,
+      rideNumber: tickets.length + 1,
+      date: todayLabel()
+    };
+
+  const recordRide = (ticket: RideTicket) => {
+    if (tickets.some((item) => item.id === ticket.id)) return;
+    setTickets((prev) => [...prev, ticket]);
+    setSharedEvents((prev) => [
+      ...prev,
+      {
+        id: `ride-${ticket.id}`,
+        kind: 'ride',
+        date: ticket.date,
+        title: tickets.length === 0 ? '第一次一起读完一篇' : '又一起走过一程',
+        detail: `我们一起读完了《${ticket.chineseTitle}》。`
+      }
+    ]);
+  };
+
+  const firstReadTicket = ticketFor({
+    id: firstReadArticle.id,
+    title: firstReadArticle.title,
+    chineseTitle: firstReadArticle.chineseTitle,
+    theme: firstReadArticle.themes.find((theme) => preferences.selectedThemes?.includes(theme)) || firstReadArticle.themes[0],
+    coverUrl: firstReadArticle.coverUrl
+  });
+
+  const homeStoryTicket = ticketFor({
+    id: FIRST_STORY.id,
+    title: FIRST_STORY.title,
+    chineseTitle: FIRST_STORY.chineseTitle,
+    theme: '科学探索',
+    coverUrl: FIRST_STORY.coverImage || firstReadArticle.coverUrl
+  });
+
+  const openCompanionHome = (returnStage: number) => {
+    setCompanionHomeReturnStage(returnStage);
+    goToStage(13);
+  };
+
+  // Moves the phone to a stage and keeps the top screen strip in sync (-1 for off-strip stages).
+  const goToStage = (stage: number, step?: number) => {
+    const screen = APP_SCREENS.find(
+      (item) => item.stage === stage && (step === undefined || item.step === step)
+    );
+    setCurrentStage(stage);
+    setCurrentScreen(screen ? screen.index : -1);
+    setEntryScreen(stage === 0 ? 'start' : stage === 1 ? 'companion' : 'stage');
+    if (step !== undefined) setStage02Step(step);
+  };
 
   const handleSelectCompanion = (id: CompanionId, announce = true) => {
     setPreferences((prev) => ({
@@ -48,13 +123,6 @@ export default function App() {
     if (announce && companion) {
       showToast(`已选定伴读萌宠：${companion.name} (${companion.type})`);
     }
-  };
-
-  const handleSelectCompanionStyle = (style: string) => {
-    setPreferences((prev) => ({
-      ...prev,
-      profile: { ...prev.profile, companionStyle: style }
-    }));
   };
 
   const handleToggleBookmark = (word: string) => {
@@ -77,6 +145,20 @@ export default function App() {
       showToast(exists ? '已从词句本移除这句话' : '已收藏到词句本');
       return { ...prev, bookmarkedSentences: nextSentences };
     });
+    const isAdding = !preferences.bookmarkedSentences.some((item) => item.sentence === sentence.sentence);
+    if (isAdding && !sharedEvents.some((event) => event.kind === 'bookmark')) {
+      const excerpt = sentence.sentence.length > 60 ? `${sentence.sentence.slice(0, 60)}…` : sentence.sentence;
+      setSharedEvents((prev) => [
+        ...prev,
+        {
+          id: 'first-bookmark',
+          kind: 'bookmark',
+          date: todayLabel(),
+          title: '收藏了第一句喜欢的话',
+          detail: `“${excerpt}”`
+        }
+      ]);
+    }
   };
 
   const handleUpdatePreferences = (updated: Partial<UserPreferences>) => {
@@ -91,6 +173,8 @@ export default function App() {
     setEntryScreen('start');
     setViewMode('phone');
     setPreferences(INITIAL_PREFERENCES);
+    setTickets([]);
+    setSharedEvents([]);
     showToast('已返回开始页');
   };
 
@@ -159,9 +243,7 @@ export default function App() {
               {entryScreen === 'companion' && currentStage === 1 && (
                 <Stage01Companion
                   selectedCompanionId={preferences.companionId}
-                  selectedStyle={preferences.profile.companionStyle}
                   onSelectCompanion={(id) => handleSelectCompanion(id, false)}
-                  onSelectStyle={handleSelectCompanionStyle}
                   onBack={() => {
                     setCurrentStage(0);
                     setCurrentScreen(0);
@@ -176,7 +258,7 @@ export default function App() {
                 />
               )}
 
-              {/* Stage 02: AI First Onboarding Chat (Includes Interests & Reading Level Evaluation) */}
+              {/* Stage 02: interests + goal/habit questions */}
               {entryScreen === 'stage' && currentStage === 2 && (
                 <Stage02AiChat
                   companion={currentCompanion}
@@ -186,57 +268,73 @@ export default function App() {
                     const screen = APP_SCREENS.find((item) => item.stage === 2 && item.step === step);
                     if (screen) setCurrentScreen(screen.index);
                   }}
-                  bookmarkedSentences={preferences.bookmarkedSentences}
-                  onToggleSentenceBookmark={handleToggleSentenceBookmark}
-                  onBack={() => {
-                    setCurrentStage(1);
-                    setEntryScreen('companion');
-                  }}
-                  onComplete={(themes, cefrLevel, surveyData) => {
-                    // A1- -> L1 (L1-L3), A2 -> L4 (L4-L6), B1 -> L7 (L7-L9), B2+ -> L10 (L10-L12)
-                    const startingLevelCode =
-                      cefrLevel === 'A1-'
-                        ? 'L1'
-                        : cefrLevel === 'A2'
-                        ? 'L4'
-                        : cefrLevel === 'B1'
-                        ? 'L7'
-                        : 'L10';
-                    const mappedLevel: ReadingLevel =
-                      cefrLevel === 'A1-' ? 'easy' : cefrLevel === 'B1' || cefrLevel === 'B2+' ? 'hard' : 'mid';
-
-                    setPreferences((prev) => ({
-                      ...prev,
-                      interestTheme: themes[0] || '科学',
-                      selectedThemes: themes,
-                      determinedCefr: cefrLevel,
-                      currentLevel: mappedLevel,
-                      profile: {
-                        ...prev.profile,
-                        startingLevel: startingLevelCode,
-                        goal: surveyData?.goal || prev.profile.goal,
-                        challenge: surveyData?.challenge || prev.profile.challenge,
-                        durationPreference: surveyData?.duration || prev.profile.durationPreference,
-                        readingState: surveyData?.readingState || prev.profile.readingState,
-                        companionStyle: surveyData?.companionStyle || prev.profile.companionStyle,
-                        sessionDuration: surveyData?.duration?.includes('3-5') || surveyData?.duration?.includes('5') ? 5 : prev.profile.sessionDuration,
-                        goalTrack: surveyData?.goalTrack || prev.profile.goalTrack
-                      }
-                    }));
-                    // Complete dialogue rating and jump directly to Stage 8
-                    setCurrentStage(8);
-                    setCurrentScreen(10);
-                    showToast(`已确定【${themes.slice(0, 2).join('、')}】与 ${startingLevelCode} 起点，正在生成专属阅读画像`);
+                  onBack={() => goToStage(1)}
+                  onComplete={(themes, surveyData) => {
+                    setPreferences((prev) => {
+                      const nextThemes = themes.length ? themes : prev.selectedThemes || [];
+                      return {
+                        ...prev,
+                        interestTheme: nextThemes[0] || prev.interestTheme,
+                        selectedThemes: nextThemes,
+                        profile: {
+                          ...prev.profile,
+                          goal: surveyData?.goal || prev.profile.goal,
+                          durationPreference: surveyData?.duration || prev.profile.durationPreference,
+                          companionStyle: surveyData?.companionStyle || prev.profile.companionStyle,
+                          sessionDuration: surveyData?.duration?.startsWith('3') ? 5 : prev.profile.sessionDuration,
+                          goalTrack: surveyData?.goalTrack || prev.profile.goalTrack
+                        }
+                      };
+                    });
+                    goToStage(11);
                   }}
                   onSkip={() => {
-                    setCurrentStage(8);
-                    setCurrentScreen(10);
-                    showToast('已跳过对话，进入默认推荐定制');
+                    goToStage(11);
+                    showToast('已跳过对话，先为你推荐几篇');
                   }}
                 />
               )}
 
-              {/* Stage 08: Customizing Recommendations & Profile (Merged 08 & 09) */}
+              {/* Stage 11: pick the first article */}
+              {entryScreen === 'stage' && currentStage === 11 && (
+                <StageRecommend
+                  companion={currentCompanion}
+                  selectedThemes={preferences.selectedThemes}
+                  onBack={() => goToStage(2, 13)}
+                  onSelectArticle={(article) => {
+                    setFirstReadArticleId(article.id);
+                    goToStage(12);
+                  }}
+                />
+              )}
+
+              {/* Stage 12: first read — the opening paragraphs set the starting level */}
+              {entryScreen === 'stage' && currentStage === 12 && (
+                <StageFirstRead
+                  key={`${firstReadArticle.id}-${firstReadStartLevel}`}
+                  companion={currentCompanion}
+                  article={firstReadArticle}
+                  startLevel={firstReadStartLevel}
+                  bookmarkedSentences={preferences.bookmarkedSentences}
+                  onToggleSentenceBookmark={handleToggleSentenceBookmark}
+                  onBack={() => goToStage(11)}
+                  onComplete={(finalLevel: CefrLevelKey, words) => {
+                    setLearnedWords(words);
+                    recordRide(firstReadTicket);
+                    const mappedLevel: ReadingLevel =
+                      finalLevel === 'A1-' ? 'easy' : finalLevel === 'B1' || finalLevel === 'B2+' ? 'hard' : 'mid';
+                    setPreferences((prev) => ({
+                      ...prev,
+                      determinedCefr: finalLevel,
+                      currentLevel: mappedLevel,
+                      profile: { ...prev.profile, startingLevel: CEFR_TO_STARTING_LEVEL[finalLevel] }
+                    }));
+                    goToStage(8);
+                  }}
+                />
+              )}
+
+              {/* Stage 08: first read finished — achievement, starting level, reading profile */}
               {entryScreen === 'stage' && currentStage === 8 && (
                 <Stage08Customizing
                   companion={currentCompanion}
@@ -244,18 +342,18 @@ export default function App() {
                   selectedThemes={preferences.selectedThemes}
                   determinedCefr={preferences.determinedCefr || 'A2'}
                   startingLevel={preferences.profile.startingLevel || 'L4'}
+                  ticket={firstReadTicket}
+                  articleMinutes={firstReadArticle.minutes}
+                  paragraphCount={firstReadArticle.paragraphs.length}
+                  learnedWords={learnedWords}
                   preferences={preferences}
                   onUpdatePreferences={handleUpdatePreferences}
-                  onBack={() => {
-                    setCurrentStage(2);
-                    setCurrentScreen(2);
-                    setStage02Step(1);
-                  }}
+                  onBack={() => goToStage(12)}
                   onNext={() => {
-                    setCurrentStage(10);
-                    setCurrentScreen(16);
+                    goToStage(10);
                     showToast('欢迎开启阅读体验！');
                   }}
+                  onOpenTicketBook={() => openCompanionHome(8)}
                 />
               )}
 
@@ -270,18 +368,13 @@ export default function App() {
                   companion={currentCompanion}
                   bookmarkedWords={preferences.bookmarkedWords}
                   onToggleBookmark={handleToggleBookmark}
-                  onBack={() => {
-                    const previousStage = currentStage === 4 ? 10 : currentStage - 1;
-                    setCurrentStage(previousStage);
-                    setCurrentScreen(previousStage === 10 ? 16 : previousStage === 4 ? 11 : 12);
-                  }}
+                  onBack={() => goToStage(currentStage === 4 ? 10 : currentStage - 1)}
                   onRateDifficulty={(_, selectedLevel) => {
                     if (selectedLevel) {
                       setPreferences((prev) => ({ ...prev, currentLevel: selectedLevel }));
                     }
-                    const nextStage = currentStage === 4 ? 5 : currentStage === 5 ? 6 : 7;
-                    setCurrentStage(nextStage);
-                    setCurrentScreen(nextStage === 5 ? 12 : nextStage === 6 ? 13 : 14);
+                    if (currentStage === 6) recordRide(homeStoryTicket);
+                    goToStage(currentStage === 4 ? 5 : currentStage === 5 ? 6 : 7);
                   }}
                 />
               )}
@@ -289,31 +382,11 @@ export default function App() {
               {entryScreen === 'stage' && currentStage === 7 && (
                 <Stage07GrowthFeedback
                   companion={currentCompanion}
-                  onBack={() => {
-                    setCurrentStage(6);
-                    setCurrentScreen(13);
-                  }}
-                  onNext={() => {
-                    setCurrentStage(9);
-                    setCurrentScreen(15);
-                  }}
-                />
-              )}
-
-              {entryScreen === 'stage' && currentStage === 9 && (
-                <Stage09ReadingProfile
-                  companion={currentCompanion}
-                  preferences={preferences}
-                  onUpdatePreferences={handleUpdatePreferences}
-                  onBack={() => {
-                    setCurrentStage(7);
-                    setCurrentScreen(14);
-                  }}
-                  onNext={() => {
-                    setCurrentStage(10);
-                    setCurrentScreen(16);
-                    showToast('阅读画像已更新，继续探索阅读世界');
-                  }}
+                  ticket={homeStoryTicket}
+                  bookmarkCount={preferences.bookmarkedSentences.length}
+                  onBack={() => goToStage(6)}
+                  onNext={() => goToStage(10)}
+                  onOpenTicketBook={() => openCompanionHome(7)}
                 />
               )}
 
@@ -322,14 +395,29 @@ export default function App() {
                 <Stage10ReadingWorld
                   companion={currentCompanion}
                   preferences={preferences}
-                  onOpenStory={(id) => {
-                    setCurrentStage(4);
-                    setCurrentScreen(11);
+                  onOpenStory={() => {
+                    goToStage(4);
                     showToast('开始沉浸阅读');
                   }}
                   onToggleBookmark={handleToggleBookmark}
                   onToggleSentenceBookmark={handleToggleSentenceBookmark}
                   onRestartOnboarding={handleReset}
+                  rideCount={tickets.length}
+                  onOpenCompanion={() => openCompanionHome(10)}
+                />
+              )}
+
+              {/* Stage 13: my companion — berth, ticket book and shared moments */}
+              {entryScreen === 'stage' && currentStage === 13 && (
+                <StageCompanionHome
+                  companion={currentCompanion}
+                  tickets={tickets}
+                  events={sharedEvents}
+                  favouriteTheme={tickets.length ? favouriteTheme : undefined}
+                  onBack={() => goToStage(companionHomeReturnStage)}
+                  onContinue={() => goToStage(10)}
+                  onSwitchCompanion={() => showToast('演示版暂不支持更换旅伴')}
+                  onManageMemory={() => showToast('共同记忆可查看、可删除，演示版暂未开放')}
                 />
               )}
             </PhoneSimulator>

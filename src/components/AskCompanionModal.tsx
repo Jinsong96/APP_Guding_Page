@@ -57,7 +57,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
         <div className="flex items-center justify-between pb-3 border-b border-[#E7E1F0]">
           <div className="flex items-center gap-2">
             <img
-              src={companion.avatarUrl}
+              src={companion.portraitUrl}
               alt={companion.name}
               className="w-6 h-6 rounded-full object-cover border border-emerald-500/40"
             />
@@ -83,7 +83,7 @@ export const AskCompanionModal: React.FC<AskCompanionModalProps> = ({ companion,
             >
               {msg.sender === 'companion' && (
                 <img
-                  src={companion.avatarUrl}
+                  src={companion.portraitUrl}
                   alt={companion.name}
                   className="w-7 h-7 rounded-full object-cover shrink-0 mt-0.5"
                 />

@@ -133,40 +133,49 @@ export const COMPANIONS: Companion[] = [
     id: 'wick',
     name: '灯芯',
     nameEn: 'Wick',
+    seat: 'B-01',
     type: '引路型旅伴',
     quote: '“安静陪着你，慢慢读。”',
     avatarUrl: publicAsset('/assets/companion-wick-card.png'),
+    portraitUrl: publicAsset('/assets/companion-wick-avatar.jpg'),
+    sceneUrl: publicAsset('/assets/companion-wick-scene.webp'),
     celebrateActionName: '喜悦欢呼跃动',
     celebrateQuote: '“太棒啦！准备好一起出发了吗？”',
     accentColor: '#B83C2A',
     bgGlow: 'rgba(184, 60, 42, 0.18)',
-    description: '安静陪着你，慢慢读。'
+    description: '在前面安静引路，走三步回一次头。'
   },
   {
     id: 'pal',
     name: '帕利',
     nameEn: 'Pal',
+    seat: 'B-02',
     type: '机灵型旅伴',
     quote: '“遇到难句，我们一起找线索。”',
     avatarUrl: publicAsset('/assets/companion-pal-card.png'),
+    portraitUrl: publicAsset('/assets/companion-pal-avatar.jpg'),
+    sceneUrl: publicAsset('/assets/companion-pal-scene.webp'),
     celebrateActionName: '机智跃动致意',
     celebrateQuote: '“发现新线索了！继续往前看看吧。”',
     accentColor: '#C76B3F',
     bgGlow: 'rgba(199, 107, 63, 0.18)',
-    description: '机灵探索，陪你发现新线索。'
+    description: '陪你找线索，顺手帮你收藏好句子。'
   },
   {
     id: 'tuanzi',
     name: '团子',
     nameEn: 'Tuanzi',
+    seat: 'B-03',
     type: '安静型旅伴',
     quote: '“我在这里，陪你慢慢读。”',
     avatarUrl: publicAsset('/assets/companion-tuanzi-card.png'),
+    portraitUrl: publicAsset('/assets/companion-tuanzi-avatar.jpg'),
+    sceneUrl: publicAsset('/assets/companion-tuanzi-scene.webp'),
     celebrateActionName: '元气活力跳跃',
     celebrateQuote: '“读累了就歇一会儿，我一直都在。”',
     accentColor: '#6C779B',
     bgGlow: 'rgba(108, 119, 155, 0.18)',
-    description: '安静在场，按自己的节奏陪你阅读。'
+    description: '安静待在你身边，偶尔眨一眨眼。'
   }
 ];
 

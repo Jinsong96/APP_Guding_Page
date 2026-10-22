@@ -7,8 +7,10 @@ import { Stage03AiRecommend } from './stages/Stage03AiRecommend';
 import { StageReader } from './stages/StageReader';
 import { Stage07GrowthFeedback } from './stages/Stage07GrowthFeedback';
 import { Stage08Customizing } from './stages/Stage08Customizing';
-import { Stage09ReadingProfile } from './stages/Stage09ReadingProfile';
 import { Stage10ReadingWorld } from './stages/Stage10ReadingWorld';
+import { StageRecommend } from './stages/StageRecommend';
+import { StageFirstRead } from './stages/StageFirstRead';
+import { FIRST_READ_ARTICLES } from '../firstReadArticles';
 
 interface BoardViewProps {
   companion: Companion;
@@ -29,11 +31,23 @@ export const BoardView: React.FC<BoardViewProps> = ({
   onToggleSentenceBookmark,
   onUpdatePreferences
 }) => {
+  const sampleArticle = FIRST_READ_ARTICLES[0];
+  const sampleTicket = {
+    id: sampleArticle.id,
+    rideNumber: 1,
+    title: sampleArticle.title,
+    chineseTitle: sampleArticle.chineseTitle,
+    theme: sampleArticle.themes[0],
+    coverUrl: sampleArticle.coverUrl,
+    date: '2026.10.22'
+  };
   const STAGE_TITLES = [
     { num: 1, label: '01', title: '选择旅伴', desc: '选一只合拍的萌宠搭子，陪你轻松读英语吧' },
-    { num: 2, label: '02', title: '对话定级', desc: '星盘吸纳兴趣 + 4句自适应微定级 + 底部对话框' },
-    { num: 8, label: '03', title: '定制画像', desc: '智能匹配计算，动态切换为建议起点与阅读画像' },
-    { num: 10, label: '04', title: '阅读首页', desc: '今日精选、专属推荐书架与三大导航' }
+    { num: 2, label: '02', title: '兴趣与目标', desc: '选阅读兴趣，回答目标、场景与每日时长' },
+    { num: 11, label: '03', title: '推荐文章', desc: '按兴趣推荐几篇文章，可换一篇，点开即读' },
+    { num: 12, label: '04', title: '首篇阅读', desc: '前 4 段读完自评难度并自适应换档，之后专心读完' },
+    { num: 8, label: '05', title: '旅程到站', desc: '第一张纪念车票、新认识的词、建议起点与旅伴记住的偏好' },
+    { num: 10, label: '06', title: '阅读首页', desc: '今日精选、专属推荐书架与三大导航' }
   ];
 
   return (
@@ -48,10 +62,10 @@ export const BoardView: React.FC<BoardViewProps> = ({
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
-            一鹿知 · 4 步完整旅程
+            一鹿知 · 6 步完整旅程
           </h1>
           <p className="text-xs sm:text-sm text-stone-600 mt-1 max-w-2xl">
-            涵盖选伴、360°星轨罗盘兴趣吸纳、4 问友好互动、4 句自适应微定级、建议起点定制画像及沉浸阅读首页。
+            涵盖选伴、兴趣与目标问答、按兴趣推荐文章、首篇阅读中的自适应定级、建议起点画像及阅读首页。
           </p>
         </div>
 
@@ -101,11 +115,27 @@ export const BoardView: React.FC<BoardViewProps> = ({
                 {stage.num === 2 && (
                   <Stage02AiChat
                     companion={companion}
+                    onBack={() => {}}
+                    onComplete={() => {}}
+                    onSkip={() => {}}
+                  />
+                )}
+                {stage.num === 11 && (
+                  <StageRecommend
+                    companion={companion}
+                    selectedThemes={preferences.selectedThemes}
+                    onBack={() => {}}
+                    onSelectArticle={() => {}}
+                  />
+                )}
+                {stage.num === 12 && (
+                  <StageFirstRead
+                    companion={companion}
+                    article={FIRST_READ_ARTICLES[0]}
                     bookmarkedSentences={preferences.bookmarkedSentences}
                     onToggleSentenceBookmark={onToggleSentenceBookmark}
                     onBack={() => {}}
                     onComplete={() => {}}
-                    onSkip={() => {}}
                   />
                 )}
                 {stage.num === 3 && (
@@ -165,6 +195,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                 {stage.num === 7 && (
                   <Stage07GrowthFeedback
                     companion={companion}
+                    ticket={sampleTicket}
                     onBack={() => {}}
                     onNext={() => {}}
                   />
@@ -176,15 +207,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                     selectedThemes={preferences.selectedThemes}
                     determinedCefr={preferences.determinedCefr || 'A2'}
                     startingLevel={preferences.profile.startingLevel || 'L2'}
-                    preferences={preferences}
-                    onUpdatePreferences={onUpdatePreferences}
-                    onBack={() => {}}
-                    onNext={() => {}}
-                  />
-                )}
-                {stage.num === 9 && (
-                  <Stage09ReadingProfile
-                    companion={companion}
+                    ticket={sampleTicket}
                     preferences={preferences}
                     onUpdatePreferences={onUpdatePreferences}
                     onBack={() => {}}

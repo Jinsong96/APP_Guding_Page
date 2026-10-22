@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Headphones, MoreHorizontal, Sparkles, Vol
 import { Companion, ReadingLevel } from '../../types';
 import { FIRST_STORY } from '../../data';
 import { WordLookupModal } from '../WordLookupModal';
+import { CompanionAvatar } from '../CompanionAvatar';
 
 interface StageReaderProps {
   stageNumber: 4 | 5 | 6;
@@ -329,10 +330,11 @@ export const StageReader: React.FC<StageReaderProps> = ({
             <ArrowRight size={20} />
           </button>
 
-          <img
-            src={companion.avatarUrl}
+          <CompanionAvatar
+            companion={companion}
+            size={56}
             alt={`${companion.name}陪你阅读`}
-            className="absolute right-2 -top-14 z-10 w-[96px] h-[112px] object-contain pointer-events-none"
+            className="pointer-events-none absolute right-3 -top-10 z-10 shadow-md"
           />
         </main>
       </div>

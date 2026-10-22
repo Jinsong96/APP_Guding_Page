@@ -217,7 +217,7 @@ const ReaderPreview: React.FC<ReaderPreviewProps> = ({ style }) => {
             )}
             {style.id === 'storybook' && (
               <div className="reader-companion">
-                <img src={companion.avatarUrl} alt={`${companion.name}安静地陪伴阅读`} />
+                <img src={companion.portraitUrl} alt={`${companion.name}安静地陪伴阅读`} />
                 <span>慢慢读，我在这里。</span>
               </div>
             )}
