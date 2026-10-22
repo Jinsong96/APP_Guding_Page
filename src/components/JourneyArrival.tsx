@@ -19,8 +19,6 @@ interface JourneyArrivalProps {
   secondaryLabel?: string;
   onSecondary?: () => void;
   onBack: () => void;
-  // Extra sections shown below the keepsake ticket.
-  children?: React.ReactNode;
 }
 
 const SERIF = '"Songti SC", "STSong", "Iowan Old Style", Georgia, serif';
@@ -37,8 +35,7 @@ export const JourneyArrival: React.FC<JourneyArrivalProps> = ({
   onPrimary,
   secondaryLabel,
   onSecondary,
-  onBack,
-  children
+  onBack
 }) => (
   <div className="flex h-full w-full select-none flex-col overflow-hidden text-[#1B2150]" style={{ backgroundColor: PAGE_BG }}>
     <header className="relative flex h-11 shrink-0 items-center justify-center px-3">
@@ -83,8 +80,6 @@ export const JourneyArrival: React.FC<JourneyArrivalProps> = ({
 
       <h3 className="mt-4 text-[13px] font-bold">本次纪念车票</h3>
       <RideTicketCard ticket={ticket} notchColor={PAGE_BG} className="mt-2 h-[132px] shrink-0" />
-
-      {children}
     </div>
 
     <footer className="shrink-0 px-4 pb-2 pt-2" style={{ backgroundColor: PAGE_BG }}>

@@ -4,8 +4,6 @@ import {
   ArrowRight,
   Bookmark,
   Languages,
-  MessageCircle,
-  MessageCircleOff,
   RotateCcw,
   Sparkles,
   Volume2
@@ -98,21 +96,18 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [bubbleText, setBubbleText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [isQuiet, setIsQuiet] = useState(false);
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const paragraph = article.paragraphs[paragraphIdx];
   const text = paragraph.text[level];
   const isRated = paragraphIdx < RATED_PARAGRAPH_COUNT;
   const isLast = paragraphIdx === total - 1;
-  const highlight = text.match(/^.*?[.!?]["”]?(?=\s|$)/)?.[0] ?? text;
-  const remainder = text.slice(highlight.length);
   const bookmark = { sentence: text, translation: paragraph.translation };
   const isBookmarked = bookmarkedSentences.some((item) => item.sentence === text);
   const paragraphVocab = findParagraphVocab(article.vocab, text);
   const lineMoment = lineMomentFor(paragraphIdx, total);
-  const companionLine = isQuiet || !lineMoment ? '' : COMPANION_LINES[companion.id][lineMoment] || '';
-  const suggestCollect = companion.id === 'pal' && lineMoment === 'checkpoint' && !isQuiet && !isBookmarked;
+  const companionLine = !lineMoment ? '' : COMPANION_LINES[companion.id][lineMoment] || '';
+  const suggestCollect = companion.id === 'pal' && lineMoment === 'checkpoint' && !isBookmarked;
   const previousLevel = paragraphIdx > 0 ? levelHistory[paragraphIdx - 1] : undefined;
   const levelShift =
     previousLevel && previousLevel !== level
@@ -323,19 +318,9 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
               </div>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setIsQuiet((quiet) => !quiet)}
-            aria-pressed={isQuiet}
-            aria-label={isQuiet ? `让${companion.name}说话` : `让${companion.name}安静`}
-            className="flex shrink-0 flex-col items-center gap-0.5 rounded-xl px-1.5 py-1 text-[11px] font-medium text-[#77728D] transition-colors hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
-          >
-            {isQuiet ? <MessageCircleOff size={18} /> : <MessageCircle size={18} />}
-            <span>{isQuiet ? '已安静' : '安静'}</span>
-          </button>
         </div>
 
-        <div className="relative flex min-h-[300px] w-[88%] flex-1 self-center py-2">
+        <div className="relative -translate-y-3 my-auto flex h-[min(72%,560px)] min-h-[280px] w-[88%] shrink-0 self-center py-2">
           <div aria-hidden="true" className="absolute inset-x-2 bottom-1 top-5 rotate-[-2deg] rounded-[24px] bg-[#8176A8]/30" />
           <div aria-hidden="true" className="absolute inset-x-1 bottom-2 top-4 rotate-[1.2deg] rounded-[24px] bg-[#C83E26]/75" />
           <article
@@ -357,9 +342,8 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
                     </span>
                   )}
                 </div>
-                <p className="text-[19px] font-medium leading-[1.6] text-[#171A35] selection:bg-[#F9DCD5]">
-                  <span className="sentence-highlight">{highlight}</span>
-                  {remainder}
+                <p className="text-justify text-[19px] font-normal leading-[1.6] text-[#171A35] selection:bg-[#F9DCD5]">
+                  {text}
                 </p>
                 {showTranslation && (
                   <div className="mt-5 border-l-[3px] border-[#C83E26] bg-[#F8F5FC] px-3.5 py-3 animate-in fade-in slide-in-from-bottom-1 duration-200">

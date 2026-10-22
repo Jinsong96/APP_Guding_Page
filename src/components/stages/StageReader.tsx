@@ -170,17 +170,12 @@ export const StageReader: React.FC<StageReaderProps> = ({
         return <React.Fragment key={index}>{part}</React.Fragment>;
       }
 
-      const isBookmarked = bookmarkedWords.includes(matchKey);
       return (
         <button
           key={index}
           type="button"
           onClick={() => setActiveVocabWord(matchKey)}
-          className={`rounded-sm border-b font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 ${
-            isBookmarked
-              ? 'border-emerald-600 bg-emerald-50 text-emerald-900'
-              : 'border-emerald-500/70 text-emerald-800'
-          }`}
+          className="cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600"
           aria-label={`查看词汇 ${part} 的释义`}
         >
           {part}
@@ -296,13 +291,13 @@ export const StageReader: React.FC<StageReaderProps> = ({
             swipeStartX.current = null;
           }}
           aria-label="阅读卡片，向左或向右滑动翻页"
-          className={`absolute left-1/2 top-1/2 h-[82%] w-[min(76%,320px)] -translate-x-1/2 -translate-y-1/2 rounded-[30px] bg-white border border-[#E8E2EF] shadow-[0_10px_0_#C9BEE6,0_18px_28px_rgba(42,32,71,0.08)] overflow-visible touch-pan-y transition-[opacity,transform] duration-300 ${
+          className={`absolute left-1/2 top-1/2 h-[min(72%,560px)] min-h-[320px] w-[min(76%,320px)] -translate-x-1/2 -translate-y-1/2 rounded-[30px] bg-white border border-[#E8E2EF] shadow-[0_10px_0_#C9BEE6,0_18px_28px_rgba(42,32,71,0.08)] overflow-visible touch-pan-y transition-[opacity,transform] duration-300 ${
             animatingText ? 'opacity-50' : 'opacity-100'
           }`}
         >
           <article className="absolute inset-0 overflow-y-auto px-10 py-7">
-            <div className="relative z-10 min-h-full flex flex-col justify-center">
-              <p className="text-[24px] leading-[1.5] font-medium text-[#171A35]">
+            <div className="relative z-10 min-h-full flex flex-col justify-start">
+              <p className="text-justify text-[24px] leading-[1.5] font-normal text-[#171A35]">
                 {renderParagraph(currentParagraph)}
               </p>
               {showTranslation && (

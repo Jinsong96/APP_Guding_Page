@@ -334,20 +334,16 @@ export default function App() {
                 />
               )}
 
-              {/* Stage 08: first read finished — achievement, starting level, reading profile */}
+              {/* Stage 08: first read finished — keepsake ticket and next steps */}
               {entryScreen === 'stage' && currentStage === 8 && (
                 <Stage08Customizing
                   companion={currentCompanion}
                   interestTheme={preferences.interestTheme}
                   selectedThemes={preferences.selectedThemes}
-                  determinedCefr={preferences.determinedCefr || 'A2'}
-                  startingLevel={preferences.profile.startingLevel || 'L4'}
                   ticket={firstReadTicket}
                   articleMinutes={firstReadArticle.minutes}
                   paragraphCount={firstReadArticle.paragraphs.length}
                   learnedWords={learnedWords}
-                  preferences={preferences}
-                  onUpdatePreferences={handleUpdatePreferences}
                   onBack={() => goToStage(12)}
                   onNext={() => {
                     goToStage(10);

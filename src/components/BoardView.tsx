@@ -205,11 +205,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                     companion={companion}
                     interestTheme={preferences.interestTheme}
                     selectedThemes={preferences.selectedThemes}
-                    determinedCefr={preferences.determinedCefr || 'A2'}
-                    startingLevel={preferences.profile.startingLevel || 'L2'}
                     ticket={sampleTicket}
-                    preferences={preferences}
-                    onUpdatePreferences={onUpdatePreferences}
                     onBack={() => {}}
                     onNext={() => {}}
                   />

@@ -99,7 +99,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
         </div>
 
         <div
-          className="speech-content-enter mt-6 grid shrink-0 grid-cols-1 gap-2"
+          className="speech-content-enter mx-2 mt-6 grid shrink-0 grid-cols-1 gap-2"
           role="group"
           aria-label="选择阅读兴趣"
           style={{ animationDuration: '240ms' }}

@@ -578,7 +578,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                 </div>
               </div>
 
-              <div className="speech-content-enter mt-4">
+              <div className="speech-content-enter mx-2 mt-4">
                 <div
                   className="grid grid-cols-1 gap-2"
                   role="radiogroup"
