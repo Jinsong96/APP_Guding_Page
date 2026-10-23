@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeftRight, ArrowRight, Bookmark, ChevronLeft, ChevronRight, MoreHorizontal, Ticket } from 'lucide-react';
+import { ArrowLeftRight, Bookmark, ChevronLeft, ChevronRight, MoreHorizontal, Ticket } from 'lucide-react';
 import { Companion, RideTicket, SharedEvent } from '../../types';
 import { CompanionScene } from '../CompanionScene';
 import { RideTicketCard } from '../RideTicketCard';
@@ -155,7 +155,6 @@ export const StageCompanionHome: React.FC<StageCompanionHomeProps> = ({
           className="flex h-[50px] w-full items-center justify-center gap-2 rounded-full bg-[#23305E] text-[16px] font-semibold text-white shadow-[0_8px_20px_rgba(30,39,104,0.25)] transition-colors hover:bg-[#1B2650] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A3479] focus-visible:ring-offset-2"
         >
           <span>和{companion.name}继续阅读</span>
-          <ArrowRight size={18} />
         </button>
       </footer>
     </div>

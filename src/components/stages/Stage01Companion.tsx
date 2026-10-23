@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, Check } from 'lucide-react';
 import { CompanionId } from '../../types';
 import { COMPANIONS } from '../../data';
 import { CompanionScene } from '../CompanionScene';
@@ -140,7 +140,6 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
           className="flex h-[51px] w-full items-center justify-center gap-3 rounded-full bg-[#192b4d] px-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#233b64] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a] focus-visible:ring-offset-2"
         >
           <span>和{selectedCompanion.name}一起出发</span>
-          <ArrowRight size={20} aria-hidden="true" />
         </button>
         <p className="pb-1 pt-[7px] text-center text-[12px] text-[#8792a9]">
           以后可以更换，已有的共同经历会保留

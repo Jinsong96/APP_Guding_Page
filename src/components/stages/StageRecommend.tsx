@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { ArrowRight, ChevronLeft, Clock3, RefreshCw, Sprout, Telescope } from 'lucide-react';
+import { ChevronLeft, Clock3, RefreshCw, Sprout, Telescope } from 'lucide-react';
 import { Companion } from '../../types';
 import { CompanionScene } from '../CompanionScene';
 import { SceneSpeechBubble } from '../SceneSpeechBubble';
@@ -176,7 +176,6 @@ export const StageRecommend: React.FC<StageRecommendProps> = ({
             style={{ backgroundImage: STARRY_BUTTON_BG }}
           >
             <span>开始这一程</span>
-            <ArrowRight size={19} />
           </button>
           <button
             type="button"

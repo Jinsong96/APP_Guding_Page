@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Check, ArrowRight, Dices } from 'lucide-react';
+import { Sparkles, Check, Dices } from 'lucide-react';
 import { CONTENT_DOMAINS, ContentCategory } from '../data';
 
 interface ElasticBubblePondProps {
@@ -192,11 +192,10 @@ export const ElasticBubblePond: React.FC<ElasticBubblePondProps> = ({
           <span>
             {hasSelected
               ? selectedTags.length === 1
-                ? `就按【${selectedTags[0]}】出发 (选更多更懂你) →`
-                : `就按这 ${selectedTags.length} 个方向出发 →`
+                ? `就按【${selectedTags[0]}】出发 (选更多更懂你)`
+                : `就按这 ${selectedTags.length} 个方向出发`
               : '戳 1 个喜欢的气泡即可出发'}
           </span>
-          {hasSelected && <ArrowRight size={15} />}
         </button>
       </div>
     </div>

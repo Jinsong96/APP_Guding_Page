@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Companion, RideTicket } from '../types';
 import { CompanionScene } from './CompanionScene';
 import { RideTicketCard } from './RideTicketCard';
@@ -89,16 +89,14 @@ export const JourneyArrival: React.FC<JourneyArrivalProps> = ({
         className="flex h-[50px] w-full items-center justify-center gap-2 rounded-full bg-[#23305E] text-[16px] font-semibold text-white shadow-[0_8px_20px_rgba(30,39,104,0.25)] transition-colors hover:bg-[#1B2650] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A3479] focus-visible:ring-offset-2"
       >
         <span>{primaryLabel}</span>
-        <ArrowRight size={18} />
       </button>
       {secondaryLabel && onSecondary && (
         <button
           type="button"
           onClick={onSecondary}
-          className="mx-auto mt-1.5 flex items-center gap-0.5 px-2 py-1 text-[13px] font-medium text-[#3B4170] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A3479]"
+          className="mx-auto mt-1.5 flex items-center px-2 py-1 text-[13px] font-medium text-[#3B4170] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A3479]"
         >
           {secondaryLabel}
-          <ChevronRight size={15} />
         </button>
       )}
     </footer>

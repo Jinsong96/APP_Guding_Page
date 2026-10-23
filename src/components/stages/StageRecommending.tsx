@@ -89,7 +89,7 @@ export const StageRecommending: React.FC<StageRecommendingProps> = ({ companion,
           >
             <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, backgroundImage: STARRY_FILL }} />
           </div>
-          <p className="mt-5 text-center text-[15px] leading-relaxed text-[#2A2F55]" aria-live="polite">
+          <p className="mt-5 text-center text-[16px] leading-relaxed text-[#2A2F55]" aria-live="polite">
             {PICKING_LINES[companion.id]}
           </p>
         </div>

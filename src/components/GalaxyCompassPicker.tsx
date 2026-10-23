@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Sparkles, ArrowRight, Check, Compass } from 'lucide-react';
+import { Sparkles, Check, Compass } from 'lucide-react';
 import { CONTENT_DOMAINS, ContentCategory } from '../data';
 import { StardustCanvas } from './StardustCanvas';
 
@@ -548,7 +548,6 @@ export const GalaxyCompassPicker: React.FC<GalaxyCompassPickerProps> = ({
         >
           <Sparkles size={16} className="text-stone-950" />
           <span>{selectedTags.length > 0 ? `兴趣星盘已就绪 (${selectedTags.length})` : '兴趣星盘已就绪'}</span>
-          <ArrowRight size={16} className="text-stone-950" />
         </button>
       </div>
     </div>

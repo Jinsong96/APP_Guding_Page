@@ -409,19 +409,31 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     }
   };
 
-  // Single-choice questions commit on tap and advance after a short confirmation pause.
+  // V2 difficulty is confirmed with the footer button; other questions advance on tap.
   const handleSelectOption = (opt: SurveyOptionItem) => {
     if (selectedOptionLabel === opt.label) return;
     setSelectedOptionLabel(opt.label);
 
     if (autoAdvanceTimerRef.current) {
       clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
     }
+
+    if (isV2 && step === DIFFICULTY_QUESTION.step) {
+      return;
+    }
+
     const currentStep = step;
     autoAdvanceTimerRef.current = setTimeout(() => {
       autoAdvanceTimerRef.current = null;
       commitOptionAndAdvance(opt, currentStep);
     }, OPTION_ADVANCE_DELAY_MS);
+  };
+
+  const handleContinue = () => {
+    if (!isV2 || step !== DIFFICULTY_QUESTION.step || !selectedOptionLabel) return;
+    const selectedOption = DIFFICULTY_QUESTION.options.find((option) => option.label === selectedOptionLabel);
+    if (selectedOption) commitOptionAndAdvance(selectedOption, step);
   };
 
   // Back Navigation
@@ -647,6 +659,18 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                 </div>
               </div>
             </div>
+            {isV2 && step === DIFFICULTY_QUESTION.step && (
+              <div className="shrink-0 px-4 pb-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleContinue}
+                  disabled={!selectedOptionLabel}
+                  className="min-h-[50px] w-full rounded-[14px] bg-[#B83825] px-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#A52F1D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  继续
+                </button>
+              </div>
+            )}
           </div>
         )}
 

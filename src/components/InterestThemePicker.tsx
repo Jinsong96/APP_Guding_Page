@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   ArrowLeft,
-  ArrowRight,
   BookOpen,
   BriefcaseBusiness,
   Check,
@@ -157,7 +156,6 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
           className="flex h-[50px] w-full items-center justify-center gap-2 rounded-full bg-[#D94C3B] px-4 text-[16px] font-bold text-white transition-colors hover:bg-[#C94032] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94C3B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#C9C3D0]"
         >
           <span>继续</span>
-          <ArrowRight size={19} />
         </button>
         <p className="mt-1 text-center text-[13px] leading-4 text-[#82788A]">
           偏好只影响推荐顺序

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RotateCw, Check, ArrowRight } from 'lucide-react';
+import { RotateCw, Check } from 'lucide-react';
 import { CONTENT_DOMAINS, SEED_SETS, BubbleSeed, ContentCategory } from '../data';
 
 interface ConstellationBubblePickerProps {
@@ -147,12 +147,11 @@ export const ConstellationBubblePicker: React.FC<ConstellationBubblePickerProps>
         >
           <span>
             {canProceed
-              ? '确定这些方向，继续 →'
+              ? '确定这些方向，继续'
               : selectedTags.length === 0
               ? '请点选 2 ~ 4 个气泡'
               : `再选 ${2 - selectedTags.length} 个气泡`}
           </span>
-          {canProceed && <ArrowRight size={15} />}
         </button>
       </div>
     </div>

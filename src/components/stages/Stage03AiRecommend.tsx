@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, RefreshCw, Sparkles, BookOpen, Clock } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Sparkles, BookOpen, Clock } from 'lucide-react';
 import { Companion, Story } from '../../types';
 import { FIRST_STORY } from '../../data';
 
@@ -154,7 +154,6 @@ export const Stage03AiRecommend: React.FC<Stage03AiRecommendProps> = ({
           }}
         >
           <span>开始这篇故事</span>
-          <ArrowRight size={17} />
         </button>
 
         <button

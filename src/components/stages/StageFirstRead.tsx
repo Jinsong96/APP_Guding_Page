@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
-  ArrowRight,
   Bookmark,
   Languages,
   RotateCcw,
@@ -473,7 +472,6 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
             className="flex min-h-[50px] w-full shrink-0 items-center justify-center gap-2 rounded-[14px] bg-[#B83825] text-[15px] font-semibold text-white transition-colors hover:bg-[#A52F1D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-2"
           >
             <span>{isLast ? '读完了' : '下一段'}</span>
-            <ArrowRight size={18} />
           </button>
         )}
       </div>
