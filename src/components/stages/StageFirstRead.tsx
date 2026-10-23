@@ -47,21 +47,21 @@ const getNextLevel = (current: CefrLevelKey, feeling: Feeling): CefrLevelKey => 
 type LineMoment = 'start' | 'checkpoint' | 'end';
 
 // IP rule: a companion speaks up at most three times per read, each in its own voice.
-// Wick looks back once after three paragraphs, Pal nudges to collect a sentence, Mochi barely speaks.
+// Wick checks in after a few paragraphs, Pal encourages collecting a sentence, Tuanzi stays quiet.
 const COMPANION_LINES: Record<CompanionId, Partial<Record<LineMoment, string>>> = {
   wick: {
-    start: '我在前面走，你慢慢跟上。',
-    checkpoint: '（灯芯回头看了你一眼）还跟得上吗？',
-    end: '快到站了，这一段我陪你走完。'
+    start: '准备好了吗？我陪你慢慢读。',
+    checkpoint: '已经读过几段啦，真不错。',
+    end: '快到站啦，我陪你把这一段读完。'
   },
   pal: {
-    start: '出发！遇到好句子，我帮你收藏起来。',
-    checkpoint: '这段有好句子，点右上角收藏它吧？',
-    end: '最后一段，线索收齐就到站啦！'
+    start: '出发吧！遇到好句子，我们就收藏。',
+    checkpoint: '已经读了几段，真不错！喜欢的句子可以收藏。',
+    end: '最后一段啦，你已经读得很棒了！'
   },
   tuanzi: {
-    start: '（团子在你旁边安静地趴下了）',
-    end: '（团子慢慢眨了一下眼）'
+    start: '（团子安静地陪着你，慢慢读就很好）',
+    end: '（团子蹭蹭你：再读一点就到站啦）'
   }
 };
 
