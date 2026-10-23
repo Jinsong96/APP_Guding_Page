@@ -343,6 +343,104 @@ export const FIRST_READ_ARTICLES: FirstReadArticle[] = [
   }
 ];
 
+// Read from the home page only (not offered in onboarding recommendations).
+export const AMAZING_FRIEND_ARTICLE: FirstReadArticle = {
+  id: 'amazing-friend',
+  title: 'An Amazing Friend',
+  chineseTitle: '不可思议的朋友',
+  themes: ['自我成长'],
+  minutes: 4,
+  hook: '一句“早上好”，能改变一个人吗？',
+  coverUrl: publicAsset('/assets/story/friend.webp'),
+  vocab: [
+    { word: 'lonely', phonetic: '/ˈləʊnli/', meaning: 'adj. 孤独的' },
+    { word: 'neighbour', phonetic: '/ˈneɪbə(r)/', meaning: 'n. 邻居', forms: ['neighbour', 'neighbours'] },
+    { word: 'wave', phonetic: '/weɪv/', meaning: 'v. 挥手', forms: ['wave', 'waved', 'waves'] },
+    { word: 'grumpy', phonetic: '/ˈɡrʌmpi/', meaning: 'adj. 脾气坏的，爱发牢骚的' },
+    { word: 'ignore', phonetic: '/ɪɡˈnɔː(r)/', meaning: 'v. 不理会', forms: ['ignored'] },
+    { word: 'stubborn', phonetic: '/ˈstʌbən/', meaning: 'adj. 固执的' },
+    { word: 'persist', phonetic: '/pəˈsɪst/', meaning: 'v. 坚持', forms: ['persisted'] },
+    { word: 'garden', phonetic: '/ˈɡɑːdn/', meaning: 'n. 花园', forms: ['garden'] },
+    { word: 'repair', phonetic: '/rɪˈpeə(r)/', meaning: 'v. 修理', forms: ['repair', 'repaired'] },
+    { word: 'bicycle', phonetic: '/ˈbaɪsɪkl/', meaning: 'n. 自行车' },
+    { word: 'patient', phonetic: '/ˈpeɪʃnt/', meaning: 'adj. 耐心的' },
+    { word: 'smile', phonetic: '/smaɪl/', meaning: 'v./n. 微笑', forms: ['smile', 'smiled', 'smiling'] },
+    { word: 'invite', phonetic: '/ɪnˈvaɪt/', meaning: 'v. 邀请', forms: ['invited'] },
+    { word: 'share', phonetic: '/ʃeə(r)/', meaning: 'v. 分享', forms: ['shared'] },
+    { word: 'kindness', phonetic: '/ˈkaɪndnəs/', meaning: 'n. 善意' },
+    { word: 'change', phonetic: '/tʃeɪndʒ/', meaning: 'v. 改变', forms: ['change', 'changed'] },
+    { word: 'friendship', phonetic: '/ˈfrendʃɪp/', meaning: 'n. 友谊' }
+  ],
+  paragraphs: [
+    {
+      text: {
+        'A1-': 'Mr Hall lived alone on Green Street. He did not talk to anyone. He was old and lonely.',
+        'A2': 'Mr Hall lived alone at the end of Green Street. He rarely spoke to his neighbours, and he looked old and lonely.',
+        'B1': 'Mr Hall lived alone at the end of Green Street. He hardly ever spoke to his neighbours, and most people thought he was simply grumpy.',
+        'B2+': 'Mr Hall lived alone at the far end of Green Street, rarely exchanging a word with his neighbours, who had long since written him off as hopelessly grumpy.'
+      },
+      translation: '霍尔先生独自住在绿街的尽头。他几乎不和邻居说话，大多数人都觉得他就是脾气不好。',
+      note: 'lonely 是“孤独的”，强调心里的感受；alone 只是“独自一人”的状态。',
+      gist: '霍尔先生独居，很少和人说话，大家觉得他很孤僻。'
+    },
+    {
+      text: {
+        'A1-': 'One day, a girl named Lily moved in next door. Every morning, she waved and said, "Good morning!"',
+        'A2': 'One day, a girl named Lily moved in next door. Every morning on her way to school, she waved and said, "Good morning, Mr Hall!"',
+        'B1': 'Then a girl named Lily moved in next door. Every morning on her way to school, she waved and called out, "Good morning, Mr Hall!"',
+        'B2+': 'Then a girl called Lily moved in next door, and every morning on her way to school she would wave cheerfully and call out, "Good morning, Mr Hall!"'
+      },
+      translation: '后来，一个叫莉莉的女孩搬到了隔壁。每天早上上学路上，她都会挥手喊一声：“早上好，霍尔先生！”',
+      note: 'wave 作动词是“挥手”。every morning 说明这是每天重复的习惯。',
+      gist: '新邻居莉莉每天早上都跟他打招呼。'
+    },
+    {
+      text: {
+        'A1-': 'Mr Hall did not answer. He looked away. But Lily did not stop. She waved again the next day.',
+        'A2': 'At first, Mr Hall ignored her. He just looked away. But Lily did not give up. She waved again the next day, and the next.',
+        'B1': 'At first, Mr Hall ignored her completely. But Lily was stubborn in the nicest way, and she kept waving, day after day.',
+        'B2+': 'At first he ignored her entirely, but Lily was stubborn in the nicest possible way and persisted, waving at him day after day as if nothing could discourage her.'
+      },
+      translation: '一开始，霍尔先生完全不理她。可莉莉“倔”得很可爱，一天又一天，她照样向他挥手。',
+      note: 'give up = 放弃。day after day 表示“日复一日”，强调坚持。',
+      gist: '霍尔先生起初不理她，但莉莉一直没有放弃。'
+    },
+    {
+      text: {
+        'A1-': 'One morning, Lily\'s bike was broken. Mr Hall came out. "I can fix that," he said.',
+        'A2': 'One morning, Lily\'s bicycle was broken. To her surprise, Mr Hall came out of his house. "I can fix that," he said quietly.',
+        'B1': 'One morning, Lily\'s bicycle chain broke outside his gate. To her surprise, Mr Hall came out and said quietly, "I can repair that for you."',
+        'B2+': 'One morning Lily\'s bicycle chain snapped right outside his gate, and to her astonishment Mr Hall emerged from the house and offered quietly, "I can repair that for you."'
+      },
+      translation: '一天早上，莉莉的自行车链条在他家门口断了。让她意外的是，霍尔先生走了出来，轻声说：“我可以帮你修。”',
+      note: 'to her surprise = 让她吃惊的是。fix 和 repair 都是“修理”，repair 更正式。',
+      gist: '莉莉的自行车坏了，霍尔先生主动出来帮忙修。'
+    },
+    {
+      text: {
+        'A1-': 'He fixed the bike in his garden. He smiled for the first time. Lily came back with cookies the next day.',
+        'A2': 'He fixed the bike in his garden and even smiled. The next day, Lily came back with cookies, and they talked for an hour.',
+        'B1': 'He was patient and careful, and while he worked he even smiled. The next day Lily came back with cookies, and they talked for an hour.',
+        'B2+': 'He worked patiently and carefully, and somewhere along the way a smile crept onto his face. The following day Lily returned with cookies, and they ended up talking for an hour.'
+      },
+      translation: '他耐心细致地修车，修着修着竟然笑了。第二天，莉莉带着饼干回来，他们聊了整整一个小时。',
+      note: 'for the first time = 第一次。even 表示“甚至”，突出这个笑容来得不容易。',
+      gist: '修车时他笑了，第二天两人聊了很久。'
+    },
+    {
+      text: {
+        'A1-': 'Now Mr Hall says hello to everyone. Lily\'s kindness changed his life. Friends can be amazing.',
+        'A2': 'Now Mr Hall says hello to everyone on Green Street. One small kindness changed his life. A friend can be truly amazing.',
+        'B1': 'Today Mr Hall greets everyone on Green Street and invites children to his garden. One small, stubborn kindness changed his life.',
+        'B2+': 'These days Mr Hall greets everyone on Green Street and invites the local children into his garden — proof that a single, stubborn act of kindness can change a life.'
+      },
+      translation: '如今，霍尔先生会和绿街上的每个人打招呼，还邀请孩子们来他的花园玩。一份小小的、坚持的善意，改变了他的生活。',
+      note: 'kindness = 善意。最后一句点题：友谊和善意的力量。',
+      gist: '霍尔先生变得开朗，一份坚持的善意改变了他。'
+    }
+  ]
+};
+
 // Key words that actually occur in this version of the paragraph, in reading order.
 export const findParagraphVocab = (vocab: FirstReadVocab[], text: string, limit = 4): FirstReadVocab[] => {
   const lower = text.toLowerCase();
@@ -395,6 +493,13 @@ export const collectLearnedWords = (
     }
   }
   return words;
+};
+
+// Home-page story cards (data.ts WORLD_STORIES) open these articles in the same reader as the first read.
+export const HOME_STORY_ARTICLES: Record<string, FirstReadArticle> = {
+  'world-1': FIRST_READ_ARTICLES.find((article) => article.id === 'children-world-game')!,
+  'world-2': AMAZING_FRIEND_ARTICLE,
+  'world-3': FIRST_READ_ARTICLES.find((article) => article.id === 'five-elements')!
 };
 
 // Articles matching the user's interests come first, in the order the interests were picked.

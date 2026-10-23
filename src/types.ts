@@ -13,6 +13,15 @@ export interface Companion {
   portraitUrl: string;
   // Full-width scene illustration; companions without one fall back to a composed portrait scene.
   sceneUrl?: string;
+  // Mouth position in the scene image (0–1 of width/height), where speech bubbles point.
+  sceneMouth?: { x: number; y: number };
+  // Point beside the head to anchor bubbles instead of the mouth, for scenes where a bubble at the
+  // mouth would cover the body.
+  sceneBubbleAnchors?: { side?: { x: number; y: number } };
+  // Selection hero only: shift the scene right (px) and put the bubble left of the mouth.
+  selectionSceneShift?: number;
+  // One-line self-introduction shown in the companion selection hero.
+  intro: string;
   celebrateAvatarUrl?: string;
   celebrateActionName?: string;
   celebrateQuote?: string;

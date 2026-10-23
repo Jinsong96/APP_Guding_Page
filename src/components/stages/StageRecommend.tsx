@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ArrowRight, ChevronLeft, Clock3, RefreshCw, Sprout, Telescope } from 'lucide-react';
 import { Companion } from '../../types';
 import { CompanionScene } from '../CompanionScene';
+import { SceneSpeechBubble } from '../SceneSpeechBubble';
 import { FirstReadArticle, rankArticlesForInterests } from '../../firstReadArticles';
 
 interface StageRecommendProps {
@@ -81,19 +82,14 @@ export const StageRecommend: React.FC<StageRecommendProps> = ({
           </div>
           <span className="pr-1 text-[15px] font-medium drop-shadow">为你推荐</span>
         </header>
-        <div
+        <SceneSpeechBubble
           key={`bubble-${article.id}`}
-          className="speech-content-enter absolute right-5 top-[58px] z-10 max-w-[170px] rounded-[18px] bg-white/95 px-3.5 py-2.5 shadow-[0_6px_18px_rgba(20,24,60,0.18)]"
-          aria-live="polite"
-        >
-          <span
-            aria-hidden="true"
-            className="absolute -left-1.5 bottom-3 h-3 w-3 rotate-45 bg-white/95"
-          />
-          <p className="relative whitespace-pre-line text-[14px] font-medium leading-[1.45] text-[#2A2F55]">
-            {bubbleText}
-          </p>
-        </div>
+          companion={companion}
+          text={bubbleText}
+          frameWidth={393}
+          frameHeight={250}
+          className="speech-content-enter"
+        />
       </section>
 
       <div className="relative z-10 -mt-6 flex min-h-0 flex-1 flex-col">

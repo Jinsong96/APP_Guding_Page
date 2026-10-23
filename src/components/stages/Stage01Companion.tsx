@@ -3,6 +3,11 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { CompanionId } from '../../types';
 import { COMPANIONS } from '../../data';
 import { CompanionScene } from '../CompanionScene';
+import { SceneSpeechBubble } from '../SceneSpeechBubble';
+
+// The selection hero spans the full 393pt screen at 2:1.
+const HERO_WIDTH = 393;
+const HERO_HEIGHT = HERO_WIDTH / 2;
 import { OnboardingProgress } from '../OnboardingProgress';
 
 interface Stage01CompanionProps {
@@ -56,8 +61,23 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
         <p className="mt-1 text-[13px] text-[#344867]">学习功能相同，陪伴方式由你选择。</p>
       </section>
 
-      <div className="-mx-4 aspect-[2/1] w-[calc(100%+2rem)] shrink-0 overflow-hidden bg-[#dbe1ea]">
-        <CompanionScene key={selectedCompanion.id} companion={selectedCompanion} className="h-full w-full" />
+      <div className="relative -mx-4 aspect-[2/1] w-[calc(100%+2rem)] shrink-0 overflow-hidden bg-[#dbe1ea]">
+        <CompanionScene
+          key={selectedCompanion.id}
+          companion={selectedCompanion}
+          shiftX={selectedCompanion.selectionSceneShift}
+          className="h-full w-full"
+        />
+        <SceneSpeechBubble
+          key={`intro-${selectedCompanion.id}`}
+          companion={selectedCompanion}
+          text={selectedCompanion.intro}
+          frameWidth={HERO_WIDTH}
+          frameHeight={HERO_HEIGHT}
+          sceneShiftX={selectedCompanion.selectionSceneShift}
+          typing
+          className="speech-content-enter"
+        />
       </div>
 
       <section className="flex h-[52px] shrink-0 flex-col items-center justify-center text-center">

@@ -6,15 +6,47 @@ interface CompanionSceneProps {
   className?: string;
   // Where the portrait sits when the companion has no dedicated scene illustration.
   portraitPosition?: 'center' | 'left' | 'right';
+  // Shift the scene right by this many px (e.g. to make room for a speech bubble); the gap on the
+  // left is filled by stretching the image's left edge, which is plain wall and bench.
+  shiftX?: number;
 }
+
+// How many source pixels of the scene's left edge get stretched to fill a shift gap.
+const EDGE_SOURCE_PX = 8;
+const SCENE_SOURCE_WIDTH = 1600;
 
 const NIGHT_WINDOW_URL = `${import.meta.env.BASE_URL}assets/night-train-window.png`;
 
 export const CompanionScene: React.FC<CompanionSceneProps> = ({
   companion,
   className = '',
-  portraitPosition = 'center'
+  portraitPosition = 'center',
+  shiftX = 0
 }) => {
+  if (companion.sceneUrl && shiftX > 0) {
+    return (
+      <div className={`overflow-hidden ${className.includes('absolute') ? '' : 'relative'} ${className}`}>
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0"
+          style={{
+            width: shiftX + 2,
+            backgroundImage: `url(${companion.sceneUrl})`,
+            backgroundSize: `${(shiftX * SCENE_SOURCE_WIDTH) / EDGE_SOURCE_PX}px 100%`,
+            backgroundPosition: 'left center',
+            filter: 'blur(1.5px)'
+          }}
+        />
+        <img
+          src={companion.sceneUrl}
+          alt={`夜行列车包厢里的${companion.name}`}
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          style={{ transform: `translateX(${shiftX}px)` }}
+        />
+      </div>
+    );
+  }
+
   if (companion.sceneUrl) {
     return (
       <img

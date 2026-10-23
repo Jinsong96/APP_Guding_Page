@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Wifi, Battery, Signal, ZoomIn, ZoomOut, Maximize2, Smartphone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Wifi, Battery } from 'lucide-react';
 
 interface PhoneSimulatorProps {
   children: React.ReactNode;
@@ -14,181 +14,35 @@ const BEZEL_THICKNESS = 6; // Ultra-thin aerospace-grade aluminum/titanium perim
 const BASE_WIDTH = SCREEN_WIDTH + BEZEL_THICKNESS * 2; // 405px
 const BASE_HEIGHT = SCREEN_HEIGHT + BEZEL_THICKNESS * 2; // 864px
 
+// Vertical breathing room kept around the phone inside the page.
+const PAGE_MARGIN = 24;
+
+// Largest scale at which the whole phone fits the space below the page header.
+const fitScale = () => {
+  if (typeof window === 'undefined') return 0.75;
+  const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 96;
+  const availableHeight = window.innerHeight - headerHeight - PAGE_MARGIN;
+  const availableWidth = window.innerWidth - PAGE_MARGIN;
+  const scale = Math.min(availableHeight / BASE_HEIGHT, availableWidth / BASE_WIDTH, 1);
+  return Math.max(0.4, Math.floor(scale * 100) / 100);
+};
+
 export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({ children, darkChrome = false }) => {
-  // Stored scale or calculated default
-  const [scale, setScale] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem('ai-reader-phone-scale-v3');
-      if (saved) {
-        const val = parseFloat(saved);
-        if (!isNaN(val) && val >= 0.55 && val <= 1.15) return val;
-      }
-    } catch {
-      // ignore
-    }
-    // Default to 0.75 so the entire iPhone 15 (648px rendered) fits easily inside standard browser viewports without scrolling
-    return 0.75;
-  });
+  // Always fits the browser window; recalculated whenever the window size changes.
+  const [scale, setScale] = useState<number>(fitScale);
 
-  const [isAutoFit, setIsAutoFit] = useState<boolean>(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Auto-fit calculator based on available window viewport height
-  const calculateAutoFitScale = useCallback(() => {
-    // Header is ~48px, scale bar ~32px, margins ~24px => available height ~ innerHeight - 110
-    const availableHeight = typeof window !== 'undefined' ? window.innerHeight - 110 : 680;
-    const availableWidth = typeof window !== 'undefined' ? window.innerWidth - 32 : 400;
-
-    const scaleByHeight = availableHeight / BASE_HEIGHT;
-    const scaleByWidth = availableWidth / BASE_WIDTH;
-    const fitScale = Math.min(scaleByHeight, scaleByWidth, 1.0);
-
-    // Clamp between 0.55 and 1.0, rounded to 2 decimals
-    return Math.max(0.55, Math.min(1.0, Math.round(fitScale * 100) / 100));
-  }, []);
-
-  // Update scale on window resize if in auto-fit mode
   useEffect(() => {
-    const handleResize = () => {
-      if (isAutoFit) {
-        setScale(calculateAutoFitScale());
-      }
-    };
+    const handleResize = () => setScale(fitScale());
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isAutoFit, calculateAutoFitScale]);
-
-  // Persist scale
-  const applyScale = (newScale: number, auto = false) => {
-    const clamped = Math.max(0.55, Math.min(1.10, Math.round(newScale * 100) / 100));
-    setScale(clamped);
-    setIsAutoFit(auto);
-    try {
-      localStorage.setItem('ai-reader-phone-scale-v3', clamped.toString());
-    } catch {
-      // ignore
-    }
-  };
-
-  const handleZoomIn = () => {
-    applyScale(scale + 0.05);
-  };
-
-  const handleZoomOut = () => {
-    applyScale(scale - 0.05);
-  };
-
-  const handleAutoFit = () => {
-    const fit = calculateAutoFitScale();
-    applyScale(fit, true);
-  };
+  }, []);
 
   const scaledW = Math.round(BASE_WIDTH * scale);
   const scaledH = Math.round(BASE_HEIGHT * scale);
 
   return (
-    <div ref={containerRef} className="relative flex flex-col items-center select-none py-0.5">
-      {/* Sleek iPhone 15 Model & Scale Adjustment Bar */}
-      <div className="mb-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-[#E7E1F0] text-stone-700 shadow-md backdrop-blur-md text-[11px] font-medium z-30">
-        <div className="flex items-center gap-1 text-stone-500 mr-1 text-[11px] font-medium">
-          <Smartphone size={12} className="text-emerald-600" />
-          <span className="font-semibold text-stone-800">iPhone 15</span>
-          <span className="text-[10px] text-stone-400 font-mono hidden sm:inline">(393×852)</span>
-        </div>
-
-        <span className="w-px h-3 bg-stone-200 mx-0.5" />
-
-        {/* Quick Presets */}
-        <button
-          onClick={() => applyScale(0.75)}
-          className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
-            !isAutoFit && Math.abs(scale - 0.75) < 0.02
-              ? 'bg-emerald-600 text-white font-bold shadow-xs'
-              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
-          }`}
-          title="75% 满屏免滚视图（推荐）"
-        >
-          75% <span className="text-[9px] opacity-80">(推荐)</span>
-        </button>
-
-        <button
-          onClick={() => applyScale(0.80)}
-          className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
-            !isAutoFit && Math.abs(scale - 0.80) < 0.02
-              ? 'bg-emerald-600 text-white font-bold shadow-xs'
-              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
-          }`}
-          title="80% 适中视图"
-        >
-          80%
-        </button>
-
-        <button
-          onClick={() => applyScale(0.90)}
-          className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
-            !isAutoFit && Math.abs(scale - 0.90) < 0.02
-              ? 'bg-emerald-600 text-white font-bold shadow-xs'
-              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
-          }`}
-          title="90% 放大视图"
-        >
-          90%
-        </button>
-
-        <button
-          onClick={() => applyScale(1.0)}
-          className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
-            !isAutoFit && Math.abs(scale - 1.0) < 0.02
-              ? 'bg-emerald-600 text-white font-bold shadow-xs'
-              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
-          }`}
-          title="100% 1:1 原机尺寸"
-        >
-          100%
-        </button>
-
-        <span className="w-px h-3 bg-stone-200 mx-0.5" />
-
-        {/* Auto fit to window height */}
-        <button
-          onClick={handleAutoFit}
-          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
-            isAutoFit
-              ? 'bg-emerald-600 text-white font-bold shadow-xs'
-              : 'hover:bg-stone-100 text-stone-600 hover:text-stone-900'
-          }`}
-          title="根据当前窗口高度自动填充最佳尺寸"
-        >
-          <Maximize2 size={11} />
-          <span>自适应</span>
-        </button>
-
-        <span className="w-px h-3 bg-stone-200 mx-0.5" />
-
-        {/* Fine-tuning +/- */}
-        <div className="flex items-center gap-0.5">
-          <button
-            onClick={handleZoomOut}
-            disabled={scale <= 0.55}
-            className="p-1 rounded hover:bg-stone-100 text-stone-500 hover:text-stone-900 disabled:opacity-30 transition-colors cursor-pointer"
-            title="缩小"
-          >
-            <ZoomOut size={12} />
-          </button>
-          <span className="font-mono text-[10px] text-stone-700 w-8 text-center font-semibold">
-            {Math.round(scale * 100)}%
-          </span>
-          <button
-            onClick={handleZoomIn}
-            disabled={scale >= 1.10}
-            className="p-1 rounded hover:bg-stone-100 text-stone-500 hover:text-stone-900 disabled:opacity-30 transition-colors cursor-pointer"
-            title="放大"
-          >
-            <ZoomIn size={12} />
-          </button>
-        </div>
-      </div>
-
+    <div className="relative flex flex-col items-center select-none py-0.5">
       {/* Scaled Wrapper Container with exact bounded dimensions */}
       <div
         className="relative transition-[width,height] duration-200 ease-out"

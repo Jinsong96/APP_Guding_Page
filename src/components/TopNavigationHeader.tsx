@@ -1,6 +1,13 @@
 import React from 'react';
-import { Smartphone, LayoutGrid, RotateCcw, BookOpen } from 'lucide-react';
+import { RotateCcw, BookOpen } from 'lucide-react';
 import { Companion } from '../types';
+
+export type DemoVersion = 'v1' | 'v2';
+
+export const DEMO_VERSIONS: { id: DemoVersion; label: string }[] = [
+  { id: 'v1', label: 'V1 完整版' },
+  { id: 'v2', label: 'V2 简略版' }
+];
 
 export interface AppScreen {
   index: number;
@@ -8,6 +15,9 @@ export interface AppScreen {
   stage: number;
   step?: number;
 }
+
+// Screen numbers are shared across versions: the same screen keeps the same number.
+export const screenCode = (screen: AppScreen) => String(screen.index).padStart(2, '0');
 
 export const APP_SCREENS: AppScreen[] = [
   { index: 0, label: '启动', stage: 0 },
@@ -24,20 +34,36 @@ export const APP_SCREENS: AppScreen[] = [
   { index: 11, label: '我的旅伴', stage: 13 }
 ];
 
+// V2 (简略版): interests → one difficulty question → a short "picking" beat → reading home,
+// where the first article the user opens is their first read (no ratings, starts at the chosen difficulty).
+export const APP_SCREENS_V2: AppScreen[] = [
+  { index: 0, label: '启动', stage: 0 },
+  { index: 1, label: '选伴', stage: 1 },
+  { index: 2, label: '兴趣', stage: 2, step: 1 },
+  { index: 3, label: '阅读难度', stage: 2, step: 14 },
+  { index: 4, label: '推荐中', stage: 14 },
+  { index: 8, label: '旅程到站', stage: 8 },
+  { index: 9, label: '到站(首页)', stage: 7 },
+  { index: 10, label: '阅读首页', stage: 10 },
+  { index: 11, label: '我的旅伴', stage: 13 }
+];
+
+export const screensForVersion = (version: DemoVersion) => (version === 'v2' ? APP_SCREENS_V2 : APP_SCREENS);
+
 interface TopNavigationHeaderProps {
   currentScreen: number;
-  viewMode: 'phone' | 'board';
+  version: DemoVersion;
+  onSetVersion: (version: DemoVersion) => void;
   companion: Companion;
-  onSetViewMode: (mode: 'phone' | 'board') => void;
   onJumpToScreen: (screen: AppScreen) => void;
   onReset: () => void;
 }
 
 export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
   currentScreen,
-  viewMode,
+  version,
+  onSetVersion,
   companion,
-  onSetViewMode,
   onJumpToScreen,
   onReset
 }) => (
@@ -64,33 +90,22 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <div className="flex items-center rounded-xl border border-[#E7E1F0] bg-[#F0ECF8] p-0.5">
-            <button
-              type="button"
-              onClick={() => onSetViewMode('phone')}
-              aria-pressed={viewMode === 'phone'}
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
-                viewMode === 'phone'
-                  ? 'border border-[#E7E1F0] bg-white text-stone-900 shadow-xs'
-                  : 'text-stone-500 hover:text-stone-800'
-              }`}
-            >
-              <Smartphone size={13} />
-              <span>手机模拟</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onSetViewMode('board')}
-              aria-pressed={viewMode === 'board'}
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
-                viewMode === 'board'
-                  ? 'border border-[#E7E1F0] bg-white text-stone-900 shadow-xs'
-                  : 'text-stone-500 hover:text-stone-800'
-              }`}
-            >
-              <LayoutGrid size={13} />
-              <span>全景故事板</span>
-            </button>
+          <div className="flex items-center rounded-xl border border-[#E7E1F0] bg-[#F0ECF8] p-0.5" role="group" aria-label="版本">
+            {DEMO_VERSIONS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onSetVersion(item.id)}
+                aria-pressed={version === item.id}
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors ${
+                  version === item.id
+                    ? 'bg-[#23305E] text-white shadow-xs'
+                    : 'text-stone-500 hover:text-stone-800'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
           <button
             type="button"
@@ -108,9 +123,9 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
         aria-label="逐屏导航"
         className="no-scrollbar -mx-1 flex w-full items-stretch gap-1 overflow-x-auto px-1 py-0.5"
       >
-        {APP_SCREENS.map((screen, position) => {
-          const isActive = currentScreen === screen.index && viewMode === 'phone';
-          const number = String(position).padStart(2, '0');
+        {screensForVersion(version).map((screen) => {
+          const isActive = currentScreen === screen.index;
+          const number = screenCode(screen);
           return (
             <button
               key={screen.index}

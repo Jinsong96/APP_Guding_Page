@@ -4,7 +4,7 @@ import { Companion, GoalTrackDetails } from '../../types';
 import { InterestThemePicker } from '../InterestThemePicker';
 import { CompanionScene } from '../CompanionScene';
 import { CompanionAvatar } from '../CompanionAvatar';
-import { OnboardingProgress } from '../OnboardingProgress';
+import { ONBOARDING_PHASES, ONBOARDING_PHASES_V2, OnboardingProgress } from '../OnboardingProgress';
 import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
 
 // Pause after a tap so the selection registers visually before the screen advances.
@@ -27,6 +27,7 @@ export interface SurveyOptionItem {
   label: string;
   subtitle?: string;
   category?: GoalCategory;
+  level?: CefrLevelKey;
   isRecommended?: boolean;
   aiReasoning: string; // Dynamic AI insight expressed when selected
 }
@@ -159,6 +160,22 @@ export const getSurveyQuestions = (companionName: string, goalCat: GoalCategory 
   }
 ];
 
+// V2 (简略版): one plain-language difficulty question instead of the goal/scene/duration questions.
+const DIFFICULTY_QUESTION: SurveyQuestionDef = {
+  step: 14,
+  number: 1,
+  total: 1,
+  stageName: '阅读难度',
+  title: '你想读什么难度的文章？',
+  defaultPrompt: '选一个读起来舒服的难度，之后会跟着你慢慢调～',
+  options: [
+    { label: '入门', subtitle: '认识常用词，能读懂简单短句', level: 'A1-', aiReasoning: '' },
+    { label: '基础', subtitle: '能读懂日常话题的短文和小故事', level: 'A2', aiReasoning: '' },
+    { label: '进阶', subtitle: '能读懂简单的英文新闻和科普', level: 'B1', aiReasoning: '' },
+    { label: '高阶', subtitle: '能读外刊级别的原版文章', level: 'B2+', aiReasoning: '' }
+  ]
+};
+
 export const LEVEL_METAS: Record<
   CefrLevelKey,
   { levelLabel: string; code: string; color: string; tagline: string; description: string }
@@ -200,6 +217,7 @@ interface Stage02AiChatProps {
   onBack: () => void;
   onComplete: (selectedInterests: string[], surveyAnswers?: SurveyAnswers) => void;
   onSkip: () => void;
+  version?: 'v1' | 'v2';
 }
 
 export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
@@ -208,8 +226,14 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   onStepChange,
   onBack,
   onComplete,
-  onSkip
+  onSkip,
+  version = 'v1'
 }) => {
+  const isV2 = version === 'v2';
+  const firstQuestionStep = isV2 ? DIFFICULTY_QUESTION.step : 11;
+  const progressPhases = isV2 ? ONBOARDING_PHASES_V2 : ONBOARDING_PHASES;
+  const questionsFor = (goalCat: GoalCategory) =>
+    isV2 ? [DIFFICULTY_QUESTION] : getSurveyQuestions(companion.name, goalCat);
   // Navigation Steps:
   // 1: Interest theme selection
   // 11: Q1 核心目标
@@ -288,8 +312,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     }
     setSelectedOptionLabel(null);
 
-    const questions = getSurveyQuestions(companion.name, goalCategory);
-    const q = questions.find((item) => item.step === step);
+    const q = questionsFor(goalCategory).find((item) => item.step === step);
     if (step === 1) {
       triggerBubbleSpeech(
         '这一程，你想先读点什么？',
@@ -311,7 +334,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const handleConfirmAstrolabe = (tags: string[]) => {
     setSelectedTags(tags);
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      updateStep(11);
+      updateStep(firstQuestionStep);
       return;
     }
 
@@ -319,12 +342,17 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     completionTimerRef.current = window.setTimeout(() => {
       completionTimerRef.current = null;
       setIsConfirmingInterest(false);
-      updateStep(11);
+      updateStep(firstQuestionStep);
     }, 640);
   };
 
   // Auto Commit Helper for Survey Options
   const commitOptionAndAdvance = (opt: SurveyOptionItem, currentStep: number) => {
+    if (currentStep === DIFFICULTY_QUESTION.step) {
+      onComplete(selectedTags, { initialLevel: opt.level });
+      return;
+    }
+
     if (currentStep === 11) {
       const detectedCategory: GoalCategory =
         opt.category ||
@@ -411,7 +439,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       onBack();
       return;
     }
-    if (step === 11) {
+    if (step === 11 || step === DIFFICULTY_QUESTION.step) {
       updateStep(1);
       return;
     }
@@ -426,7 +454,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   };
 
   // Questions dataset
-  const surveyQuestions = getSurveyQuestions(companion.name, goalCategory);
+  const surveyQuestions = questionsFor(goalCategory);
   const currentQ = surveyQuestions.find((q) => q.step === step);
   useEffect(() => {
     if (step === 12 && (goalCategory === 'original' || goalCategory === 'interest')) {
@@ -455,6 +483,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             </h1>
             <OnboardingProgress
               phase={2}
+              phases={progressPhases}
               phaseProgress={(currentQ?.number || 1) / (currentQ?.total || 3)}
               className="mx-auto mt-1 w-[184px]"
             />
@@ -550,6 +579,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                   </h1>
                   <OnboardingProgress
                     phase={2}
+                    phases={progressPhases}
                     phaseProgress={currentQ.number / currentQ.total}
                     tone="dark"
                     className="mt-1 w-[184px]"

@@ -25,6 +25,10 @@ interface StageFirstReadProps {
   companion: Companion;
   article: FirstReadArticle;
   startLevel?: CefrLevelKey;
+  // 'onboarding' shows the onboarding step bar; 'library' (reads opened from home) shows reading progress.
+  mode?: 'onboarding' | 'library';
+  // When false, no difficulty rating: every paragraph is read at startLevel with a plain "下一段".
+  rated?: boolean;
   bookmarkedSentences?: BookmarkedSentence[];
   onToggleSentenceBookmark?: (sentence: BookmarkedSentence) => void;
   onBack: () => void;
@@ -78,6 +82,8 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   companion,
   article,
   startLevel = 'A2',
+  mode = 'onboarding',
+  rated = true,
   bookmarkedSentences = [],
   onToggleSentenceBookmark,
   onBack,
@@ -100,7 +106,7 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
 
   const paragraph = article.paragraphs[paragraphIdx];
   const text = paragraph.text[level];
-  const isRated = paragraphIdx < RATED_PARAGRAPH_COUNT;
+  const isRated = rated && paragraphIdx < RATED_PARAGRAPH_COUNT;
   const isLast = paragraphIdx === total - 1;
   const bookmark = { sentence: text, translation: paragraph.translation };
   const isBookmarked = bookmarkedSentences.some((item) => item.sentence === text);
@@ -299,7 +305,31 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
             <Bookmark size={20} fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
         </div>
-        <OnboardingProgress phase={3} phaseProgress={(paragraphIdx + 1) / total} className="px-1 pt-1.5" />
+        {mode === 'onboarding' ? (
+          <OnboardingProgress phase={3} phaseProgress={(paragraphIdx + 1) / total} className="px-1 pt-1.5" />
+        ) : (
+          <div
+            className="w-full px-1 pt-1.5"
+            role="progressbar"
+            aria-label="阅读进度"
+            aria-valuemin={0}
+            aria-valuemax={total}
+            aria-valuenow={paragraphIdx + 1}
+          >
+            <div className="flex items-center justify-between text-[12px] font-medium leading-4 text-[#596B89]">
+              <span>阅读进度</span>
+              <span className="tabular-nums">
+                {paragraphIdx + 1}/{total} 段
+              </span>
+            </div>
+            <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-[#E1DCEB]">
+              <span
+                className="block h-full rounded-full bg-[#C83E26] transition-[width] duration-500 ease-out"
+                style={{ width: `${((paragraphIdx + 1) / total) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
       </header>
 
       <div className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-2 p-3">
