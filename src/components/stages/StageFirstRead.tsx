@@ -2,13 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   Bookmark,
+  Headphones,
+  Heart,
   Languages,
   RotateCcw,
   Sparkles,
-  Volume2
+  Star,
+  Volume2,
+  X
 } from 'lucide-react';
 import { BookmarkedSentence, Companion, CompanionId } from '../../types';
-import { OnboardingProgress } from '../OnboardingProgress';
 import { CompanionAvatar } from '../CompanionAvatar';
 import { CefrLevelKey } from './Stage02AiChat';
 import {
@@ -29,7 +32,13 @@ interface StageFirstReadProps {
   // When false, no difficulty rating: every paragraph is read at startLevel with a plain "下一段".
   rated?: boolean;
   bookmarkedSentences?: BookmarkedSentence[];
+  bookmarkedWords?: string[];
+  onToggleWordBookmark?: (word: string) => void;
   onToggleSentenceBookmark?: (sentence: BookmarkedSentence) => void;
+  isArticleLiked?: boolean;
+  isArticleBookmarked?: boolean;
+  onToggleArticleLike?: () => void;
+  onToggleArticleBookmark?: () => void;
   onBack: () => void;
   onComplete: (finalLevel: CefrLevelKey, learnedWords: FirstReadVocab[]) => void;
 }
@@ -84,7 +93,13 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   mode = 'onboarding',
   rated = true,
   bookmarkedSentences = [],
+  bookmarkedWords = [],
+  onToggleWordBookmark,
   onToggleSentenceBookmark,
+  isArticleLiked = false,
+  isArticleBookmarked = false,
+  onToggleArticleLike,
+  onToggleArticleBookmark,
   onBack,
   onComplete
 }) => {
@@ -98,7 +113,8 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   const [selectedFeeling, setSelectedFeeling] = useState<Feeling | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [playing, setPlaying] = useState<'card' | 'full' | null>(null);
+  const [lookupWord, setLookupWord] = useState<string | null>(null);
   const [bubbleText, setBubbleText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -112,14 +128,14 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   const paragraphVocab = findParagraphVocab(article.vocab, text);
   const lineMoment = lineMomentFor(paragraphIdx, total);
   const companionLine = !lineMoment ? '' : COMPANION_LINES[companion.id][lineMoment] || '';
-  const suggestCollect = companion.id === 'pal' && lineMoment === 'checkpoint' && !isBookmarked;
-  const previousLevel = paragraphIdx > 0 ? levelHistory[paragraphIdx - 1] : undefined;
-  const levelShift =
-    previousLevel && previousLevel !== level
-      ? LEVEL_ORDER.indexOf(level) < LEVEL_ORDER.indexOf(previousLevel)
-        ? '已调简单一点'
-        : '已调难一点'
-      : '';
+  const lookupVocab = lookupWord ? article.vocab.find((item) =>
+    (item.forms || [item.word]).some((form) => form.toLowerCase() === lookupWord.toLowerCase())
+  ) : undefined;
+  const contextSentence = lookupWord
+    ? text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.find((sentence) =>
+        sentence.toLowerCase().split(/[^a-z]+/).includes(lookupWord.toLowerCase())
+      )?.trim() || text
+    : '';
 
   // Companion line types out when it has something to say, but never blocks reading or rating.
   useEffect(() => {
@@ -150,10 +166,10 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
 
   useEffect(() => {
     setSelectedFeeling(null);
-    setShowTranslation(false);
     setIsCardFlipped(false);
+    setLookupWord(null);
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    setIsPlaying(false);
+    setPlaying(null);
   }, [paragraphIdx]);
 
   useEffect(
@@ -210,25 +226,47 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
     setParagraphIdx(prevIdx);
   };
 
-  const handlePlay = () => {
+  const handlePlay = (kind: 'card' | 'full') => {
     if (!('speechSynthesis' in window)) return;
-    if (isPlaying) {
+    if (playing === kind) {
       window.speechSynthesis.cancel();
-      setIsPlaying(false);
+      setPlaying(null);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(text);
+    const spokenText = kind === 'card' ? text : article.paragraphs.map((part, index) =>
+      part.text[levelHistory[index] || level]
+    ).join(' ');
+    const utterance = new SpeechSynthesisUtterance(spokenText);
     utterance.lang = 'en-US';
     utterance.rate = 0.92;
-    utterance.onend = () => setIsPlaying(false);
-    utterance.onerror = () => setIsPlaying(false);
+    utterance.onend = () => setPlaying(null);
+    utterance.onerror = () => setPlaying(null);
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
-    setIsPlaying(true);
+    setPlaying(kind);
+  };
+
+  const pronounceWord = (accent: 'en-GB' | 'en-US') => {
+    if (!lookupWord || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    setPlaying(null);
+    const utterance = new SpeechSynthesisUtterance(lookupWord);
+    utterance.lang = accent;
+    utterance.rate = 0.9;
+    window.speechSynthesis.speak(utterance);
   };
 
   const renderActions = () => (
-    <div className="grid h-[54px] shrink-0 grid-cols-3 items-center border-t border-[#E5DFF0] bg-white/95 px-2">
+    <div className="grid h-[48px] shrink-0 grid-cols-3 items-center border-t border-[#E7E4EB] bg-white px-2">
+      <button
+        type="button"
+        onClick={() => handlePlay('card')}
+        aria-label={playing === 'card' ? '停止朗读本卡' : '朗读本卡'}
+        className="inline-flex min-h-11 items-center justify-center gap-1 rounded px-1 text-[12px] text-[#27283D] hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
+      >
+        <Volume2 size={15} className={playing === 'card' ? 'animate-pulse text-[#B83825]' : ''} />
+        <span>{playing === 'card' ? '停止' : '朗读'}</span>
+      </button>
       <button
         type="button"
         onClick={() => {
@@ -236,21 +274,10 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
           setShowTranslation((visible) => !visible);
         }}
         aria-pressed={showTranslation}
-        className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-1 text-[14px] font-medium transition-colors hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] ${
-          showTranslation ? 'text-[#B83825]' : 'text-[#34314F]'
-        }`}
+        className={`inline-flex min-h-11 items-center justify-center gap-1 rounded px-1 text-[12px] hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] ${showTranslation ? 'text-[#B83825]' : 'text-[#27283D]'}`}
       >
-        <Languages size={18} />
-        <span>{showTranslation ? '隐藏译文' : '译文'}</span>
-      </button>
-      <button
-        type="button"
-        onClick={handlePlay}
-        aria-label={isPlaying ? '停止朗读' : '朗读这一段'}
-        className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-1 text-[14px] font-medium text-[#34314F] transition-colors hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
-      >
-        <Volume2 size={18} className={isPlaying ? 'animate-pulse text-[#B83825]' : 'text-[#514D6E]'} />
-        <span>{isPlaying ? '停止' : '朗读'}</span>
+        <Languages size={15} />
+        <span>{showTranslation ? '收起' : '译文'}</span>
       </button>
       <button
         type="button"
@@ -259,10 +286,10 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
           setIsCardFlipped((flipped) => !flipped);
         }}
         aria-pressed={isCardFlipped}
-        className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-1 text-[14px] font-medium text-[#34314F] transition-colors hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
+        className="inline-flex min-h-11 items-center justify-center gap-1 rounded px-1 text-[12px] text-[#27283D] hover:bg-[#F5F2FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
       >
-        <RotateCcw size={17} />
-        <span>{isCardFlipped ? '返回原文' : '翻面解读'}</span>
+        <RotateCcw size={15} />
+        <span>{isCardFlipped ? '原文' : '解读'}</span>
       </button>
     </div>
   );
@@ -277,66 +304,53 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
         backgroundSize: '100% auto'
       }}
     >
-      <header className="relative z-30 w-full shrink-0 border-b border-[#E5DFF0] bg-[#F2EFFA]/95 px-3 pb-2 pt-1.5">
+      <header className="relative z-30 w-full shrink-0 bg-[#F2EFFA]/90 px-4 pb-2 pt-1.5">
         <div className="relative flex h-10 items-center justify-between">
           <button
             type="button"
             onClick={handlePrev}
             aria-label="返回上一段"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#171A35] shadow-sm transition-colors hover:bg-[#F7F4FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
+            className="flex h-10 w-9 shrink-0 items-center justify-center text-[#25263C] transition-colors hover:text-[#B83825] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
           >
             <ArrowLeft size={20} />
           </button>
           <h1 className="pointer-events-none absolute left-1/2 max-w-[calc(100%-110px)] -translate-x-1/2 truncate text-center text-[16px] font-semibold">
             {article.title}
           </h1>
-          <button
-            type="button"
-            onClick={() => onToggleSentenceBookmark?.(bookmark)}
-            disabled={!onToggleSentenceBookmark}
-            aria-pressed={isBookmarked}
-            aria-label={isBookmarked ? '取消收藏这一段' : '收藏这一段'}
-            className={`flex h-10 w-10 items-center justify-center rounded-full bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] disabled:opacity-50 ${
-              isBookmarked ? 'text-[#B83825]' : 'text-[#171A35] hover:text-[#B83825]'
-            } ${suggestCollect ? 'animate-pulse' : ''}`}
-            style={suggestCollect ? { boxShadow: '0 0 0 3px rgba(224, 163, 58, 0.55)' } : undefined}
-          >
-            <Bookmark size={20} fill={isBookmarked ? 'currentColor' : 'none'} />
-          </button>
+          <div className="w-9" />
         </div>
-        {mode === 'onboarding' ? (
-          <OnboardingProgress phase={3} phaseProgress={(paragraphIdx + 1) / total} className="px-1 pt-1.5" />
-        ) : (
+        <div className="flex h-9 items-center gap-2.5 px-1">
           <div
-            className="w-full px-1 pt-1.5"
+            className="flex min-w-0 flex-1 items-center gap-2"
             role="progressbar"
-            aria-label="阅读进度"
+            aria-label="文章阅读进度"
             aria-valuemin={0}
             aria-valuemax={total}
             aria-valuenow={paragraphIdx + 1}
           >
-            <div className="flex items-center justify-between text-[12px] font-medium leading-4 text-[#596B89]">
-              <span>阅读进度</span>
-              <span className="tabular-nums">
-                {paragraphIdx + 1}/{total} 段
-              </span>
-            </div>
-            <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-[#E1DCEB]">
+            <div className="h-[3px] min-w-0 flex-1 overflow-hidden rounded-full bg-[#DAD8E3]">
               <span
-                className="block h-full rounded-full bg-[#C83E26] transition-[width] duration-500 ease-out"
+                className="block h-full rounded-full bg-[#B84E42] transition-[width] duration-500 ease-out"
                 style={{ width: `${((paragraphIdx + 1) / total) * 100}%` }}
               />
             </div>
+            <span className="shrink-0 text-[10px] tabular-nums text-[#777689]">{paragraphIdx + 1} / {total}</span>
           </div>
-        )}
+          <button type="button" onClick={onToggleArticleLike} aria-label="喜欢文章" aria-pressed={isArticleLiked} className={`flex h-9 w-7 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] ${isArticleLiked ? 'text-[#B83825]' : 'text-[#626274]'}`}>
+            <Heart size={17} fill={isArticleLiked ? 'currentColor' : 'none'} />
+          </button>
+          <button type="button" onClick={onToggleArticleBookmark} aria-label="收藏文章" aria-pressed={isArticleBookmarked} className={`flex h-9 w-7 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8] ${isArticleBookmarked ? 'text-[#B83825]' : 'text-[#626274]'}`}>
+            <Star size={17} fill={isArticleBookmarked ? 'currentColor' : 'none'} />
+          </button>
+        </div>
       </header>
 
-      <div className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-2 p-3">
-        <div className="flex min-h-[64px] shrink-0 items-center gap-2.5">
-          <CompanionAvatar companion={companion} size={52} alt={companion.name} className="shadow-sm" />
+      <div className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-2 px-3 pb-3">
+        <div className="flex min-h-[68px] shrink-0 items-center gap-3">
+          <CompanionAvatar companion={companion} size={56} alt={companion.name} className="shadow-sm" />
           <div className="min-w-0 flex-1" role="status" aria-live="polite">
             {companionLine && (
-              <div className="relative flex min-h-[52px] w-fit max-w-full items-center rounded-[15px] border border-[#E1DBED] bg-white px-3.5 py-2 shadow-[0_3px_10px_rgba(63,48,90,0.04)] animate-in fade-in duration-200">
+              <div className="relative flex min-h-[56px] w-fit max-w-full items-center rounded-[12px] border border-[#E1DBED] bg-white px-4 py-2 shadow-[0_3px_10px_rgba(63,48,90,0.04)] animate-in fade-in duration-200">
                 <span className="absolute left-[-7px] top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 border-b border-l border-[#E1DBED] bg-white" />
                 <p className="relative text-[15px] font-medium leading-[1.5] text-[#393550]">
                   {bubbleText}
@@ -349,37 +363,36 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
           </div>
         </div>
 
-        <div className="relative -translate-y-3 my-auto flex h-[min(72%,560px)] min-h-[280px] w-[88%] shrink-0 self-center py-2">
-          <div aria-hidden="true" className="absolute inset-x-2 bottom-1 top-5 rotate-[-2deg] rounded-[24px] bg-[#8176A8]/30" />
-          <div aria-hidden="true" className="absolute inset-x-1 bottom-2 top-4 rotate-[1.2deg] rounded-[24px] bg-[#C83E26]/75" />
+        <div className="relative my-auto flex h-[440px] min-h-[300px] w-[78%] shrink-0 self-center py-2">
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-1 top-5 rounded-[17px] bg-[#B84E42]/75" />
           <article
             key={`${paragraphIdx}-${level}`}
-            className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-[24px] border border-[#E5DFF0] bg-white shadow-[0_12px_28px_rgba(50,38,77,0.10)] animate-in fade-in slide-in-from-right-4"
+            className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-[17px] bg-white shadow-[0_12px_28px_rgba(50,38,77,0.10)] animate-in fade-in slide-in-from-right-4"
           >
             <div
               aria-hidden={isCardFlipped}
               className={`absolute inset-0 flex min-h-0 flex-col bg-white ${isCardFlipped ? 'invisible pointer-events-none' : 'animate-in fade-in duration-200'}`}
             >
-              <div className="flex-1 overflow-y-auto px-5 pb-4 pt-6">
-                <div className="mb-3 flex items-center gap-2">
-                  <span className="inline-block rounded-full bg-[#F2EFFA] px-2.5 py-1 text-[12px] font-semibold text-[#766B91]">
-                    第 {paragraphIdx + 1} 段 / 共 {total} 段
-                  </span>
-                  {levelShift && (
-                    <span className="inline-block rounded-full bg-[#EEF3EC] px-2.5 py-1 text-[12px] font-medium text-[#4E6B4A]">
-                      {levelShift}
-                    </span>
-                  )}
-                </div>
-                <p className="text-justify text-[19px] font-normal leading-[1.6] text-[#171A35] selection:bg-[#F9DCD5]">
-                  {text}
+              <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-4 py-5">
+                <div className="max-h-full overflow-y-auto">
+                <p className="text-justify text-[20px] font-normal leading-[1.6] text-[#171A35] selection:bg-[#F9DCD5]">
+                  {text.split(/(\s+)/).map((part, index) => {
+                    const word = part.replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, '');
+                    return word ? (
+                      <React.Fragment key={index}>
+                        {part.slice(0, part.indexOf(word))}
+                        <button type="button" className="inline rounded-sm text-inherit hover:text-[#B83825] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#B83825]" onClick={() => setLookupWord(word)} aria-label={`查询 ${word}`}>
+                          {word}
+                        </button>
+                        {part.slice(part.indexOf(word) + word.length)}
+                      </React.Fragment>
+                    ) : <React.Fragment key={index}>{part}</React.Fragment>;
+                  })}
                 </p>
                 {showTranslation && (
-                  <div className="mt-5 border-l-[3px] border-[#C83E26] bg-[#F8F5FC] px-3.5 py-3 animate-in fade-in slide-in-from-bottom-1 duration-200">
-                    <span className="mb-1 block text-[12px] font-semibold text-[#8176A8]">中文译文</span>
-                    <p className="text-[15px] leading-7 text-[#49445E]">{paragraph.translation}</p>
-                  </div>
+                  <p className="mt-4 text-[12px] leading-[1.6] text-[#92909B] animate-in fade-in duration-200">{paragraph.translation}</p>
                 )}
+                </div>
               </div>
               {renderActions()}
             </div>
@@ -432,11 +445,18 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
 
                 <h2 className="mt-4 text-[13px] font-semibold text-[#B83825]">中文译文</h2>
                 <p className="mt-1 text-[14px] leading-6 text-[#77728D]">{paragraph.translation}</p>
+                <button type="button" onClick={(event) => { event.stopPropagation(); onToggleSentenceBookmark?.(bookmark); }} aria-pressed={isBookmarked} className={`mt-4 inline-flex items-center gap-1.5 text-[13px] ${isBookmarked ? 'text-[#B83825]' : 'text-[#514D6E]'}`}>
+                  <Bookmark size={15} fill={isBookmarked ? 'currentColor' : 'none'} />{isBookmarked ? '已收藏本段' : '收藏本段'}
+                </button>
               </div>
               {renderActions()}
             </div>
           </article>
         </div>
+
+        <button type="button" onClick={() => handlePlay('full')} aria-label={playing === 'full' ? '停止听全文' : '听全文'} className="flex h-8 shrink-0 items-center justify-center gap-1.5 text-[12px] text-[#34314F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]">
+          <Headphones size={15} className={playing === 'full' ? 'animate-pulse text-[#B83825]' : ''} />{playing === 'full' ? '停止' : '听全文'}
+        </button>
 
         {isRated ? (
           <div className="grid min-h-[50px] w-full shrink-0 grid-cols-3 gap-2" role="group" aria-label="这一段的阅读难度">
@@ -475,6 +495,34 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
           </button>
         )}
       </div>
+      {lookupWord && (
+        <div className="absolute inset-0 z-50 flex items-end bg-[#171A35]/25" onClick={() => setLookupWord(null)}>
+          <section role="dialog" aria-modal="true" aria-label={`${lookupWord} 查词`} className="w-full rounded-t-[18px] bg-white px-5 pb-5 pt-2 shadow-[0_-10px_30px_rgba(20,20,40,0.14)]" onClick={(event) => event.stopPropagation()}>
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#DDDAE2]" />
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-[22px] font-semibold text-[#222239]">{lookupWord}</h2>
+                {lookupVocab && <p className="mt-1 text-[13px] text-[#B83825]">{lookupVocab.meaning}</p>}
+                {lookupVocab?.phonetic && <p className="mt-1 text-[11px] text-[#858393]">{lookupVocab.phonetic}</p>}
+              </div>
+              <button type="button" onClick={() => setLookupWord(null)} aria-label="关闭查词" className="flex h-8 w-8 items-center justify-center text-[#858393] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"><X size={16} /></button>
+            </div>
+            <div className="mt-4 flex gap-5 border-b border-[#ECEAF0] pb-4">
+              {([['en-GB', '英'], ['en-US', '美']] as const).map(([accent, label]) => (
+                <button key={accent} type="button" onClick={() => pronounceWord(accent)} className="inline-flex items-center gap-1.5 text-[12px] text-[#55536A]">
+                  <span className="text-[10px]">{label}</span> 听发音 <Volume2 size={14} className="text-[#B84E42]" />
+                </button>
+              ))}
+            </div>
+            <h3 className="mt-4 text-[13px] font-medium text-[#222239]">结合原文理解</h3>
+            <p className="mt-4 text-[12px] leading-5 text-[#777585]">{contextSentence}</p>
+            <p className="mt-1 text-[12px] leading-5 text-[#9997A4]">{paragraph.translation}</p>
+            <button type="button" onClick={() => onToggleWordBookmark?.(lookupVocab?.word || lookupWord.toLowerCase())} aria-pressed={bookmarkedWords.includes(lookupVocab?.word || lookupWord.toLowerCase())} className="mt-4 flex h-10 w-full items-center justify-center gap-1.5 rounded-[6px] bg-[#24253F] text-[12px] text-white">
+              <Bookmark size={14} />{bookmarkedWords.includes(lookupVocab?.word || lookupWord.toLowerCase()) ? '已加入词句本 · 点击移除' : '加入词句本'}
+            </button>
+          </section>
+        </div>
+      )}
     </div>
   );
 };

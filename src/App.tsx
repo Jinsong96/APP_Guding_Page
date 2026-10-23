@@ -37,6 +37,8 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [firstReadArticleId, setFirstReadArticleId] = useState<string>(FIRST_READ_ARTICLES[0].id);
   const [learnedWords, setLearnedWords] = useState<FirstReadVocab[]>([]);
+  const [likedArticleIds, setLikedArticleIds] = useState<string[]>([]);
+  const [bookmarkedArticleIds, setBookmarkedArticleIds] = useState<string[]>([]);
   // Story card last opened from the reading home.
   const [homeStoryId, setHomeStoryId] = useState<string>('world-1');
   // The ticket book and shared moments behind the companion line.
@@ -143,6 +145,10 @@ export default function App() {
     });
   };
 
+  const toggleArticleId = (id: string, update: React.Dispatch<React.SetStateAction<string[]>>) => {
+    update((previous) => previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id]);
+  };
+
   const handleToggleSentenceBookmark = (sentence: BookmarkedSentence) => {
     setPreferences((prev) => {
       const exists = prev.bookmarkedSentences.some((item) => item.sentence === sentence.sentence);
@@ -181,6 +187,8 @@ export default function App() {
     setPreferences(INITIAL_PREFERENCES);
     setTickets([]);
     setSharedEvents([]);
+    setLikedArticleIds([]);
+    setBookmarkedArticleIds([]);
     setV2StartLevel('A2');
     showToast('已返回开始页');
   };
@@ -323,7 +331,13 @@ export default function App() {
                 article={firstReadArticle}
                 startLevel={firstReadStartLevel}
                 bookmarkedSentences={preferences.bookmarkedSentences}
+                bookmarkedWords={preferences.bookmarkedWords}
+                onToggleWordBookmark={handleToggleBookmark}
                 onToggleSentenceBookmark={handleToggleSentenceBookmark}
+                isArticleLiked={likedArticleIds.includes(firstReadArticle.id)}
+                isArticleBookmarked={bookmarkedArticleIds.includes(firstReadArticle.id)}
+                onToggleArticleLike={() => toggleArticleId(firstReadArticle.id, setLikedArticleIds)}
+                onToggleArticleBookmark={() => toggleArticleId(firstReadArticle.id, setBookmarkedArticleIds)}
                 onBack={() => (version === 'v2' ? goToStage(2, 14) : goToStage(11))}
                 onComplete={(finalLevel: CefrLevelKey, words) => {
                   setLearnedWords(words);
@@ -370,7 +384,13 @@ export default function App() {
                 article={homeArticle}
                 startLevel={version === 'v2' ? v2StartLevel : preferences.determinedCefr || firstReadStartLevel}
                 bookmarkedSentences={preferences.bookmarkedSentences}
+                bookmarkedWords={preferences.bookmarkedWords}
+                onToggleWordBookmark={handleToggleBookmark}
                 onToggleSentenceBookmark={handleToggleSentenceBookmark}
+                isArticleLiked={likedArticleIds.includes(homeArticle.id)}
+                isArticleBookmarked={bookmarkedArticleIds.includes(homeArticle.id)}
+                onToggleArticleLike={() => toggleArticleId(homeArticle.id, setLikedArticleIds)}
+                onToggleArticleBookmark={() => toggleArticleId(homeArticle.id, setBookmarkedArticleIds)}
                 onBack={() => goToStage(10)}
                 onComplete={(_, words) => {
                   if (isV2FirstRead) {
