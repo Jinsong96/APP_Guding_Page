@@ -6,7 +6,7 @@ interface DifficultySentencePickerProps {
   onConfirm: (level: CefrLevelKey) => void;
 }
 
-export interface LevelSample {
+interface LevelSample {
   level: CefrLevelKey;
   label: string;
   sentence: string;
@@ -17,8 +17,7 @@ export interface LevelSample {
 }
 
 // The same idea written at four levels, so only the difficulty changes between stops.
-// Also used by the example-list version of the question (DifficultyExampleList).
-export const LEVEL_SAMPLES: LevelSample[] = [
+const LEVEL_SAMPLES: LevelSample[] = [
   {
     level: 'A1-',
     label: '入门',
@@ -279,7 +278,7 @@ export const DifficultySentencePicker: React.FC<DifficultySentencePickerProps> =
 
       <div className="dp-footer">
         <button type="button" className="dp-confirm" onClick={() => onConfirm(sample.level)}>
-          就读「{sample.label}」难度
+          继续
         </button>
       </div>
     </div>

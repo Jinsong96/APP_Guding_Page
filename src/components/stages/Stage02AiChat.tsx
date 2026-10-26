@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { ArrowLeft, Sparkle, Sparkles } from 'lucide-react';
 import { Companion, GoalTrackDetails } from '../../types';
-import { InterestThemePicker } from '../InterestThemePicker';
+import { InterestThemePicker, MAX_INTERESTS } from '../InterestThemePicker';
 import { CompanionScene } from '../CompanionScene';
 import { CompanionAvatar } from '../CompanionAvatar';
 import { DifficultySentencePicker } from '../DifficultySentencePicker';
-import { DifficultyExampleList } from '../DifficultyExampleList';
 import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
 
 // Pause after a tap so the selection registers visually before the screen advances.
@@ -177,14 +176,6 @@ const DIFFICULTY_QUESTION: SurveyQuestionDef = {
   ]
 };
 
-// V2 03B: the same question as an option list with example sentences, kept for comparison with the
-// sentence card. Reached only from the nav; confirming continues like 03.
-const DIFFICULTY_LIST_QUESTION: SurveyQuestionDef = {
-  ...DIFFICULTY_QUESTION,
-  step: 15,
-  title: '你想读什么难度的文章？'
-};
-
 export const LEVEL_METAS: Record<
   CefrLevelKey,
   { levelLabel: string; code: string; color: string; tagline: string; description: string }
@@ -239,7 +230,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   const isV2 = version === 'v2';
   const firstQuestionStep = isV2 ? DIFFICULTY_QUESTION.step : 11;
   const questionsFor = (goalCat: GoalCategory) =>
-    isV2 ? [DIFFICULTY_QUESTION, DIFFICULTY_LIST_QUESTION] : getSurveyQuestions(companion.name, goalCat);
+    isV2 ? [DIFFICULTY_QUESTION] : getSurveyQuestions(companion.name, goalCat);
   // Navigation Steps:
   // 1: Interest theme selection
   // 11: Q1 核心目标
@@ -332,7 +323,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   // Interest selection supports adding and removing themes before the pause completes.
   const handleToggleTag = (tag: string) => {
     setSelectedTags((prev) => {
-      return prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag];
+      if (prev.includes(tag)) return prev.filter((item) => item !== tag);
+      return prev.length >= MAX_INTERESTS ? prev : [...prev, tag];
     });
   };
 
@@ -453,7 +445,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       onBack();
       return;
     }
-    if (step === 11 || step === DIFFICULTY_QUESTION.step || step === DIFFICULTY_LIST_QUESTION.step) {
+    if (step === 11 || step === DIFFICULTY_QUESTION.step) {
       updateStep(1);
       return;
     }
@@ -598,8 +590,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
 
               {isV2 && step === DIFFICULTY_QUESTION.step ? (
                 <DifficultySentencePicker onConfirm={handleConfirmDifficulty} />
-              ) : isV2 && step === DIFFICULTY_LIST_QUESTION.step ? (
-                <DifficultyExampleList options={DIFFICULTY_QUESTION.options} onConfirm={handleConfirmDifficulty} />
               ) : (
               <div className="speech-content-enter mx-2 mt-4">
                 <div

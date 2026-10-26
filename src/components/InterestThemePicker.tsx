@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowLeft,
   BookOpen,
@@ -25,6 +25,10 @@ interface InterestThemePickerProps {
   onBack: () => void;
 }
 
+// Most interests a user can pick; more would dilute the recommendations.
+export const MAX_INTERESTS = 3;
+const LIMIT_HINT_MS = 1800;
+
 const INTERESTS = [
   { name: '世界热点', subtitle: '看见更大的世界', reply: '好，我们一起看看更大的世界。', icon: Globe2 },
   { name: '科学探索', subtitle: '探索奇妙的世界', reply: '好，我们先从科学出发。', icon: Orbit },
@@ -45,6 +49,15 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   onBack
 }) => {
   const selectedNames = selectedTags.filter((tag) => INTERESTS.some((interest) => interest.name === tag));
+  const atLimit = selectedNames.length >= MAX_INTERESTS;
+  // Briefly true after tapping a fourth interest, to explain why nothing happened.
+  const [limitHint, setLimitHint] = useState(false);
+
+  useEffect(() => {
+    if (!limitHint) return;
+    const timer = window.setTimeout(() => setLimitHint(false), LIMIT_HINT_MS);
+    return () => window.clearTimeout(timer);
+  }, [limitHint]);
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col bg-[#F8F5FA] text-[#302A3B]">
@@ -95,18 +108,22 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
         >
           {INTERESTS.map(({ name, subtitle, icon: Icon }) => {
             const isSelected = selectedTags.includes(name);
+            const isBlocked = atLimit && !isSelected;
             return (
               <button
                 key={name}
                 type="button"
                 aria-pressed={isSelected}
+                aria-disabled={isBlocked}
                 aria-label={`${name}，${subtitle}`}
-                onClick={() => onToggleTag(name)}
+                onClick={() => (isBlocked ? setLimitHint(true) : onToggleTag(name))}
                 disabled={isConfirming}
                 className={`flex min-h-[76px] min-w-0 items-center gap-3 rounded-[11px] border bg-white px-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94C3B] disabled:cursor-wait ${
                   isSelected
                     ? 'border-[1.5px] border-[#E64E3D] bg-[#FFF0EC]'
-                    : 'border-[#DCCFE8] hover:border-[#BCA9CE]'
+                    : isBlocked
+                      ? 'border-[#DCCFE8] opacity-50'
+                      : 'border-[#DCCFE8] hover:border-[#BCA9CE]'
                 }`}
               >
                 <span className={`flex h-10 w-10 shrink-0 items-center justify-center ${
@@ -147,8 +164,13 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
         >
           <span>继续</span>
         </button>
-        <p className="mt-1 text-center text-[13px] leading-4 text-[#82788A]">
-          偏好只影响推荐顺序
+        <p
+          className={`mt-1 text-center text-[13px] leading-4 transition-colors ${limitHint ? 'text-[#D94C3B]' : 'text-[#82788A]'}`}
+          aria-live="polite"
+        >
+          {limitHint
+            ? `最多选 ${MAX_INTERESTS} 个，先取消一个再换`
+            : `最多选 ${MAX_INTERESTS} 个 · 已选 ${selectedNames.length}/${MAX_INTERESTS}`}
         </p>
       </footer>
     </div>

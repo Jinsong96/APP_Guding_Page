@@ -14,12 +14,10 @@ export interface AppScreen {
   label: string;
   stage: number;
   step?: number;
-  // Shown instead of the zero-padded index, for extra comparison screens such as 03B.
-  code?: string;
 }
 
 // Screen numbers are shared across versions: the same screen keeps the same number.
-export const screenCode = (screen: AppScreen) => screen.code ?? String(screen.index).padStart(2, '0');
+export const screenCode = (screen: AppScreen) => String(screen.index).padStart(2, '0');
 
 export const APP_SCREENS: AppScreen[] = [
   { index: 0, label: '启动', stage: 0 },
@@ -43,7 +41,6 @@ export const APP_SCREENS_V2: AppScreen[] = [
   { index: 1, label: '选伴', stage: 1 },
   { index: 2, label: '兴趣', stage: 2, step: 1 },
   { index: 3, label: '阅读难度', stage: 2, step: 14 },
-  { index: 31, code: '03B', label: '难度·例句版', stage: 2, step: 15 },
   { index: 4, label: '为你出票', stage: 14 },
   { index: 8, label: '阅读报告', stage: 8 },
   { index: 9, label: '报告(首页)', stage: 7 },
