@@ -7,8 +7,8 @@ import { CefrLevelKey } from './stages/Stage02AiChat';
 interface TicketIssueIntroProps {
   companion: Companion;
   article: FirstReadArticle;
-  // The interest this article matches, shown on the 兴趣 row.
-  theme: string;
+  // The user's picked interests, in order; the 兴趣 row has room for the first two.
+  themes: string[];
   level: CefrLevelKey;
   onDone: () => void;
 }
@@ -21,12 +21,14 @@ const LEVEL_LABELS: Record<CefrLevelKey, string> = {
   'B2+': '高阶'
 };
 
+const MAX_INTEREST_THEMES = 2;
+
 // Whole sequence: print → three ticks → stamp → hold → fly away. Timings mirror recommend-intro.css.
 const INTRO_DURATION_MS = 7400;
 
 // One-shot "your ticket is printed" moment before the recommendation: a 3D ticket slides out of a
 // slot, three reasons tick in (兴趣 / 难度 / 时长), then a 为你挑选 stamp lands. Tap anywhere to skip.
-export const TicketIssueIntro: React.FC<TicketIssueIntroProps> = ({ companion, article, theme, level, onDone }) => {
+export const TicketIssueIntro: React.FC<TicketIssueIntroProps> = ({ companion, article, themes, level, onDone }) => {
   const doneRef = useRef(false);
   const finish = () => {
     if (doneRef.current) return;
@@ -45,7 +47,7 @@ export const TicketIssueIntro: React.FC<TicketIssueIntroProps> = ({ companion, a
   }, []);
 
   const reasons = [
-    { label: '兴趣', value: theme },
+    { label: '兴趣', value: themes.slice(0, MAX_INTEREST_THEMES).join('、') },
     { label: '难度', value: `${LEVEL_LABELS[level]} · 刚刚好` },
     { label: '时长', value: `约 ${article.minutes} 分钟` }
   ];
