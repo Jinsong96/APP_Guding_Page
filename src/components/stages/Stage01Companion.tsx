@@ -1,13 +1,8 @@
-import React from 'react';
-import { ArrowLeft, Check } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import { CompanionId } from '../../types';
 import { COMPANIONS } from '../../data';
-import { CompanionScene } from '../CompanionScene';
-import { SceneSpeechBubble } from '../SceneSpeechBubble';
-
-// The selection hero spans the full 393pt screen at 2:1.
-const HERO_WIDTH = 393;
-const HERO_HEIGHT = HERO_WIDTH / 2;
+import { CompanionFigure } from '../CompanionFigure';
 
 interface Stage01CompanionProps {
   selectedCompanionId: CompanionId;
@@ -16,131 +11,171 @@ interface Stage01CompanionProps {
   onNext: () => void;
 }
 
-const CARD_TAGLINES: Record<CompanionId, string> = {
-  wick: '静默引路',
-  pal: '机灵探索',
-  tuanzi: '安静在场'
+// Three traits per companion, from the IP sheet (signature behaviour + look).
+const COMPANION_TRAITS: Record<CompanionId, string[]> = {
+  wick: ['静默引路', '走三步回头', '角尖微光'],
+  pal: ['机灵探索', '收藏好句', '星图长尾'],
+  tuanzi: ['安静在场', '偶尔眨眼', '书角尾巴']
 };
 
+// Card width plus the gap to the next card; the track moves by this per companion.
+const CARD_STEP_PX = 290 + 18;
+const SWIPE_THRESHOLD_PX = 50;
+// Movement before a press becomes a drag, so taps still reach the card's button.
+const DRAG_START_PX = 6;
+const EDGE_RESISTANCE = 0.3;
+const WHEEL_COOLDOWN_MS = 450;
+
+// 01 选伴: one swipeable card per companion (styles: companion-select.css). Swiping previews a
+// companion; 选TA做旅伴 on the card picks it and moves on.
 export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
   selectedCompanionId,
   onSelectCompanion,
   onBack,
   onNext
 }) => {
-  const selectedCompanion =
-    COMPANIONS.find((companion) => companion.id === selectedCompanionId) || COMPANIONS[0];
+  const [index, setIndex] = useState(() =>
+    Math.max(0, COMPANIONS.findIndex((companion) => companion.id === selectedCompanionId))
+  );
+  const pressStartXRef = useRef<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const wheelDeltaRef = useRef(0);
+  const wheelLockedUntilRef = useRef(0);
+
+  const goTo = (next: number) => {
+    const clamped = Math.max(0, Math.min(COMPANIONS.length - 1, next));
+    if (clamped === index) return;
+    setIndex(clamped);
+    onSelectCompanion(COMPANIONS[clamped].id);
+  };
+
+  const endPress = (commit: boolean) => {
+    pressStartXRef.current = null;
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (commit && Math.abs(dragX) > SWIPE_THRESHOLD_PX) goTo(index + (dragX < 0 ? 1 : -1));
+    setDragX(0);
+  };
+
+  const choose = (id: CompanionId) => {
+    onSelectCompanion(id);
+    onNext();
+  };
 
   return (
-    <div className="flex h-full w-full flex-col justify-between overflow-hidden bg-[#fbfbfd] px-4 pb-1 pt-0 text-[#192b4d]">
-      <header className="relative flex h-[38px] shrink-0 items-center justify-between">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label="返回启动页"
-          className="flex h-9 w-9 items-center justify-center text-[#172747] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a]"
-        >
-          <ArrowLeft size={21} strokeWidth={1.8} />
+    <div className="cs-page">
+      <header className="cs-header">
+        <button type="button" onClick={onBack} aria-label="返回启动页">
+          <ChevronLeft size={24} strokeWidth={1.8} />
         </button>
-        <span className="absolute left-1/2 -translate-x-1/2 text-[14px] font-semibold">
-          选择旅伴
-        </span>
-        <span className="h-9 w-9" aria-hidden="true" />
       </header>
 
-      <section className="flex h-[67px] shrink-0 flex-col items-center justify-center text-center">
-        <h1
-          className="text-[23px] font-semibold leading-[1.2]"
-          style={{ fontFamily: '"Songti SC", "STSong", "Iowan Old Style", Georgia, serif' }}
-        >
-          这一程，想和谁同行？
-        </h1>
-        <p className="mt-1 text-[13px] text-[#344867]">学习功能相同，陪伴方式由你选择。</p>
+      <section className="cs-intro">
+        <h1>选择旅伴</h1>
+        <p>这一程，想和谁同行？</p>
+        <p>学习功能相同，陪伴方式由你选择。</p>
       </section>
 
-      <div className="relative -mx-4 aspect-[2/1] w-[calc(100%+2rem)] shrink-0 overflow-hidden bg-[#dbe1ea]">
-        <CompanionScene
-          key={selectedCompanion.id}
-          companion={selectedCompanion}
-          shiftX={selectedCompanion.selectionSceneShift}
-          className="h-full w-full"
-        />
-        <SceneSpeechBubble
-          key={`intro-${selectedCompanion.id}`}
-          companion={selectedCompanion}
-          text={selectedCompanion.intro}
-          frameWidth={HERO_WIDTH}
-          frameHeight={HERO_HEIGHT}
-          sceneShiftX={selectedCompanion.selectionSceneShift}
-          typing
-          className="speech-content-enter"
-        />
-      </div>
-
-      <section className="flex h-[52px] shrink-0 flex-col items-center justify-center text-center">
-        <div className="flex items-center justify-center gap-2">
-          <h2
-            className="text-[20px] font-semibold leading-tight"
-            style={{ fontFamily: '"Songti SC", "STSong", "Iowan Old Style", Georgia, serif' }}
-          >
-            {selectedCompanion.name}
-          </h2>
-          <span className="text-[14px] font-medium">{selectedCompanion.nameEn}</span>
+      <div
+        className="cs-viewport"
+        role="group"
+        aria-roledescription="carousel"
+        aria-label="选择一位旅伴"
+        onPointerDown={(event) => {
+          pressStartXRef.current = event.clientX;
+        }}
+        onPointerMove={(event) => {
+          if (pressStartXRef.current === null) return;
+          if (event.pointerType === 'mouse' && event.buttons === 0) {
+            endPress(false);
+            return;
+          }
+          const deltaX = event.clientX - pressStartXRef.current;
+          if (!isDragging) {
+            if (Math.abs(deltaX) < DRAG_START_PX) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            setIsDragging(true);
+          }
+          const atEdge = (deltaX > 0 && index === 0) || (deltaX < 0 && index === COMPANIONS.length - 1);
+          setDragX(atEdge ? deltaX * EDGE_RESISTANCE : deltaX);
+        }}
+        onPointerUp={() => endPress(true)}
+        onPointerCancel={() => endPress(false)}
+        onPointerLeave={() => {
+          if (!isDragging) pressStartXRef.current = null;
+        }}
+        onWheel={(event) => {
+          if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+          const now = performance.now();
+          if (now < wheelLockedUntilRef.current) return;
+          wheelDeltaRef.current += event.deltaX;
+          if (Math.abs(wheelDeltaRef.current) > SWIPE_THRESHOLD_PX) {
+            goTo(index + (wheelDeltaRef.current > 0 ? 1 : -1));
+            wheelDeltaRef.current = 0;
+            wheelLockedUntilRef.current = now + WHEEL_COOLDOWN_MS;
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowRight') goTo(index + 1);
+          if (event.key === 'ArrowLeft') goTo(index - 1);
+        }}
+      >
+        <div
+          className={`cs-track ${isDragging ? 'is-dragging' : ''}`}
+          style={{ transform: `translateX(${-index * CARD_STEP_PX + dragX}px)` }}
+        >
+          {COMPANIONS.map((companion, cardIndex) => {
+            const isActive = cardIndex === index;
+            return (
+              <article
+                key={companion.id}
+                className={`cs-card ${isActive ? 'is-active' : ''}`}
+                aria-roledescription="slide"
+                aria-label={`${cardIndex + 1} / ${COMPANIONS.length}：${companion.name}`}
+                aria-hidden={!isActive}
+                onClick={() => !isActive && goTo(cardIndex)}
+              >
+                <CompanionFigure companion={companion} active={isActive} />
+                <h2>
+                  {companion.name}
+                  <span>{companion.nameEn}</span>
+                </h2>
+                <p className="cs-quote">{companion.description}</p>
+                <div className="cs-traits">
+                  {COMPANION_TRAITS[companion.id].map((trait) => (
+                    <span key={trait}>{trait}</span>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="cs-choose"
+                  tabIndex={isActive ? 0 : -1}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    choose(companion.id);
+                  }}
+                >
+                  选TA做旅伴
+                </button>
+              </article>
+            );
+          })}
         </div>
-        <p className="mt-0.5 text-[13px] text-[#596b89]">
-          {selectedCompanion.description}
-        </p>
-      </section>
-
-      <div className="grid h-[167px] shrink-0 grid-cols-3 gap-2" role="group" aria-label="选择一位旅伴">
-        {COMPANIONS.map((companion) => {
-          const isSelected = companion.id === selectedCompanionId;
-
-          return (
-            <button
-              key={companion.id}
-              type="button"
-              onClick={() => onSelectCompanion(companion.id)}
-              aria-pressed={isSelected}
-              className={`relative box-border flex h-[167px] min-h-[167px] max-h-[167px] min-w-0 flex-col items-center overflow-hidden rounded-[14px] border-2 px-[7px] pt-[7px] text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a] ${
-                isSelected
-                  ? 'border-[#b43a27] bg-[#fffaf5]'
-                  : 'border-[#d9deea] bg-white'
-              }`}
-            >
-              {isSelected && (
-                <span className="absolute right-[5px] top-[5px] z-10 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#b43a27] text-white shadow-sm">
-                  <Check size={14} strokeWidth={3} aria-hidden="true" />
-                </span>
-              )}
-              <img
-                src={companion.portraitUrl}
-                alt=""
-                draggable={false}
-                className="h-[108px] w-full shrink-0 rounded-[11px] object-cover object-center"
-              />
-              <span className="mt-[6px] text-[14px] font-semibold leading-tight text-[#192b4d]">
-                {companion.name}
-              </span>
-              <span className="mt-[5px] text-[11px] leading-none text-[#73809a]">
-                {CARD_TAGLINES[companion.id]}
-              </span>
-            </button>
-          );
-        })}
       </div>
 
-      <div className="shrink-0 pt-2">
-        <button
-          type="button"
-          onClick={onNext}
-          className="flex h-[51px] w-full items-center justify-center gap-3 rounded-full bg-[#192b4d] px-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#233b64] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b83c2a] focus-visible:ring-offset-2"
-        >
-          <span>和{selectedCompanion.name}一起出发</span>
-        </button>
-        <p className="pb-1 pt-[7px] text-center text-[12px] text-[#8792a9]">
-          以后可以更换，已有的共同经历会保留
-        </p>
+      <div className="cs-dots" role="tablist" aria-label="旅伴">
+        {COMPANIONS.map((companion, dotIndex) => (
+          <button
+            key={companion.id}
+            type="button"
+            role="tab"
+            aria-selected={dotIndex === index}
+            aria-label={companion.name}
+            className={dotIndex === index ? 'is-active' : undefined}
+            onClick={() => goTo(dotIndex)}
+          />
+        ))}
       </div>
     </div>
   );

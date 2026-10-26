@@ -1,0 +1,323 @@
+/* 10 阅读首页 (Stage10ReadingWorld home tab), matched to the 一鹿知 home mock: serif title with the
+   mini-program capsule, a night-sky banner tucked behind the featured card, two-column story cards. */
+
+.rh-home {
+  padding: 4px 14px 18px;
+  color: #1f2552;
+  font-family: Manrope, 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.rh-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 2px 14px 6px;
+}
+
+.rh-header h1 {
+  color: #1c2048;
+  font-family: 'Songti SC', 'STSong', 'Noto Serif CJK SC', Georgia, serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* ---------- Featured ---------- */
+
+.rh-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 62px;
+  padding: 0 10px 18px 16px;
+  border-radius: 22px 22px 0 0;
+  background-color: #2b2f66;
+  /* Crops the start scene to its moonlit castles. */
+  background-position: center -150px;
+  background-size: 100% auto;
+  overflow: hidden;
+}
+
+.rh-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #2a2e66e6 0%, #2a2e66a6 40%, #2a2e6614 100%);
+}
+
+.rh-banner p {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 15px;
+}
+
+.rh-banner p i {
+  width: 6px;
+  height: 6px;
+  margin-right: 2px;
+  border-radius: 50%;
+  background: #e25a43;
+}
+
+.rh-banner strong {
+  color: #f3c76b;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.rh-pick {
+  position: relative;
+  padding: 6px 14px;
+  border-radius: 18px;
+  background: #fbdccb;
+  color: #c2412f;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 0 #e8b9a3;
+}
+
+.rh-featured-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-top: -18px;
+  padding: 12px 12px 14px;
+  border-radius: 22px;
+  background: #fbfaff;
+  box-shadow: 0 8px 22px #2b25500f;
+  text-align: left;
+}
+
+/* A small turned-up page corner where the card meets the banner. */
+.rh-featured-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 22px;
+  border-radius: 22px 0 14px 0;
+  background: linear-gradient(135deg, #e3e0f2 0 48%, #fbfaff 52%);
+}
+
+/* ---------- Covers ---------- */
+
+.rh-cover {
+  position: relative;
+  overflow: hidden;
+  height: 100px;
+  border-radius: 12px;
+  background: #e8e4f0;
+}
+
+.rh-cover-large {
+  height: 140px;
+  border-radius: 16px;
+}
+
+.rh-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.rh-featured-card:hover .rh-cover img,
+.rh-card:hover .rh-cover img {
+  transform: scale(1.04);
+}
+
+.rh-cover::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, #0000006b);
+}
+
+.rh-cover-meta {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #fff;
+  font-size: 13px;
+  text-shadow: 0 1px 3px #0006;
+}
+
+.rh-cover-meta svg:nth-of-type(2) {
+  margin-left: 9px;
+}
+
+.rh-first-stop {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #23305e;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 0 #0f1638;
+}
+
+/* ---------- Text ---------- */
+
+.rh-title-en {
+  display: -webkit-box;
+  margin-top: 10px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #1f2552;
+  font-family: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.rh-title-en-large {
+  -webkit-line-clamp: 1;
+  font-size: 21px;
+}
+
+.rh-title-zh {
+  margin-top: 4px;
+  color: #1f2552;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.rh-title-zh-large {
+  font-size: 17px;
+}
+
+.rh-hook {
+  margin-top: 4px;
+  color: #8c8a9c;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.rh-hook-small {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 12.5px;
+}
+
+.rh-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.rh-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.rh-card-foot .rh-tags {
+  margin-top: 0;
+}
+
+.rh-tags span {
+  padding: 3px 9px;
+  border: 1px solid #e0ddef;
+  border-radius: 8px;
+  background: #eceaf6;
+  color: #5d5a76;
+  font-size: 12.5px;
+}
+
+.rh-start {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  color: #c2412f;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---------- Two-column cards ---------- */
+
+.rh-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.rh-card {
+  display: block;
+  padding: 6px 6px 10px;
+  border-radius: 18px;
+  background: #fbfaff;
+  box-shadow: 0 6px 18px #2b25500d;
+  text-align: left;
+}
+
+.rh-card .rh-title-en,
+.rh-card .rh-title-zh,
+.rh-card .rh-hook,
+.rh-card .rh-tags {
+  padding: 0 6px;
+}
+
+.rh-featured-card:focus-visible,
+.rh-card:focus-visible {
+  outline: 2px solid #8176a8;
+  outline-offset: 2px;
+}
+
+/* ---------- Tab bar ---------- */
+
+.rh-tabbar {
+  z-index: 30;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-around;
+  height: 66px;
+  padding: 0 24px 4px;
+  border-top: 1px solid #ebe8f3;
+  background: #fff;
+}
+
+.rh-tabbar button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 64px;
+  color: #5d5a76;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.rh-tabbar button.is-active {
+  color: #c2412f;
+  font-weight: 600;
+}
+
+.rh-tabbar button:focus-visible {
+  outline: 2px solid #8176a8;
+  outline-offset: 2px;
+  border-radius: 8px;
+}

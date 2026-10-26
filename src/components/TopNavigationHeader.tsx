@@ -34,14 +34,14 @@ export const APP_SCREENS: AppScreen[] = [
   { index: 11, label: '我的旅伴', stage: 13 }
 ];
 
-// V2 (简略版): interests → one difficulty question → a short "picking" beat → reading home,
+// V2 (简略版): interests → one difficulty question → a ticket printed for the featured story → reading home,
 // where the first article the user opens is their first read (no ratings, starts at the chosen difficulty).
 export const APP_SCREENS_V2: AppScreen[] = [
   { index: 0, label: '启动', stage: 0 },
   { index: 1, label: '选伴', stage: 1 },
   { index: 2, label: '兴趣', stage: 2, step: 1 },
   { index: 3, label: '阅读难度', stage: 2, step: 14 },
-  { index: 4, label: '推荐中', stage: 14 },
+  { index: 4, label: '为你出票', stage: 14 },
   { index: 8, label: '阅读报告', stage: 8 },
   { index: 9, label: '报告(首页)', stage: 7 },
   { index: 10, label: '阅读首页', stage: 10 },

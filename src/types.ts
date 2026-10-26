@@ -11,6 +11,8 @@ export interface Companion {
   avatarUrl: string;
   // Square, head-centred portrait for avatar frames.
   portraitUrl: string;
+  // Full-body front view on a transparent background (companion selection cards).
+  figureUrl: string;
   // Full-width scene illustration; companions without one fall back to a composed portrait scene.
   sceneUrl?: string;
   // Mouth position in the scene image (0–1 of width/height), where speech bubbles point.

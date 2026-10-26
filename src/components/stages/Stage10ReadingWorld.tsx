@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { BookOpen, Bookmark, User, Heart, Clock, Sparkles, ArrowRight, Volume2, Trash2 } from 'lucide-react';
-import { BookmarkedSentence, Companion, CompanionId, Story, UserPreferences } from '../../types';
+import { Bookmark, Heart, Clock, Home, MoreHorizontal, Smile, Sparkles, ArrowRight, Volume2, Trash2 } from 'lucide-react';
+import { BookmarkedSentence, Companion, Story, UserPreferences } from '../../types';
 import { WORLD_STORIES, FIRST_STORY } from '../../data';
+import { HOME_STORY_ARTICLES } from '../../firstReadArticles';
 import { CompanionAvatar } from '../CompanionAvatar';
 
 interface Stage10ReadingWorldProps {
@@ -12,18 +13,14 @@ interface Stage10ReadingWorldProps {
   onToggleSentenceBookmark: (sentence: BookmarkedSentence) => void;
   onRestartOnboarding: () => void;
   rideCount?: number;
+  // Consecutive reading days, shown in the featured banner.
+  streakDays?: number;
   onOpenCompanion?: () => void;
   // Story shown as the large featured card (defaults to the first story).
   featuredStoryId?: string;
   // V2 before the first read: mark the featured story as the user's first ride.
   showFirstRideHint?: boolean;
 }
-
-const FIRST_RIDE_LINES: Record<CompanionId, string> = {
-  wick: '就从这篇开始吧，我陪你读第一站。',
-  pal: '第一站就选它！我已经闻到线索了～',
-  tuanzi: '（团子趴在这张卡片上：先读这篇吧）'
-};
 
 export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
   companion,
@@ -33,24 +30,17 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
   onToggleSentenceBookmark,
   onRestartOnboarding,
   rideCount = 0,
+  streakDays = 0,
   onOpenCompanion,
   featuredStoryId,
   showFirstRideHint = false
 }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'vocab' | 'profile'>('home');
   const [activeCollectionTab, setActiveCollectionTab] = useState<'words' | 'sentences'>('words');
-  const [likes, setLikes] = useState<Record<string, number>>({
+  const likes: Record<string, number> = {
     'world-1': 124,
     'world-2': 89,
     'world-3': 215
-  });
-
-  const handleLike = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    setLikes((prev) => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1
-    }));
   };
 
   const handlePronounce = (word: string) => {
@@ -61,174 +51,91 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
     }
   };
 
+  // Titles, hook and length come from the article each card opens, so the card matches the reader.
+  const storyInfo = (id: string) => HOME_STORY_ARTICLES[id] || HOME_STORY_ARTICLES['world-1'];
+
   const mainStory = WORLD_STORIES.find((story) => story.id === featuredStoryId) || WORLD_STORIES[0];
   const duoStories = WORLD_STORIES.filter((story) => story.id !== mainStory.id);
 
   return (
-    <div className="h-full flex flex-col justify-between text-stone-900 select-none relative overflow-hidden bg-[#F4F1FA]">
+    <div className="h-full flex flex-col justify-between text-stone-900 select-none relative overflow-hidden bg-[#F1F0FA]">
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto p-5 no-scrollbar">
+      <div className={`flex-1 overflow-y-auto no-scrollbar ${activeTab === 'home' ? '' : 'p-5'}`}>
         {activeTab === 'home' && (
-          <div>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-2">
-              <button
-                type="button"
-                onClick={onOpenCompanion}
-                aria-label={`查看我的旅伴${companion.name}`}
-                className="flex items-center gap-2 rounded-full pr-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
+          <div className="rh-home">
+            <header className="rh-header">
+              <h1>今天，想读点什么？</h1>
+              <div className="rj-capsule">
+                <button type="button" aria-label="更多">
+                  <MoreHorizontal size={21} strokeWidth={1.8} />
+                </button>
+                <span aria-hidden="true" />
+                <button type="button" aria-label="关闭">
+                  <i className="rj-close-mark" />
+                </button>
+              </div>
+            </header>
+
+            {/* Featured story: night-sky banner with the ride count, then the card tucked under it */}
+            <section className="rh-featured">
+              <div
+                className="rh-banner"
+                style={{ backgroundImage: `url(${import.meta.env.BASE_URL}assets/readpal-start-scene.png)` }}
               >
-                <CompanionAvatar companion={companion} size={32} alt={companion.name} />
-                <span className="text-xs sm:text-[13px] font-semibold text-stone-900 tracking-wide">
-                  {companion.name}与你同行中
-                </span>
-              </button>
-
-              <div className="flex items-center gap-1.5">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-mono border border-emerald-300">
-                  已到过 {rideCount} 站
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-medium border border-emerald-300">
-                  今日精选
-                </span>
-              </div>
-            </div>
-
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-900 mt-3 mb-1">
-              今天，想读点什么？
-            </h1>
-            <p className="text-xs text-stone-500 mb-3.5">
-              根据你的 {preferences.profile?.startingLevel || 'L4'} 起点与 {preferences.profile?.goalTrack?.targetFocus || '个性化'} 目标定制。
-            </p>
-
-            {showFirstRideHint && (
-              <div className="mb-2.5 flex items-center gap-2 speech-content-enter">
-                <CompanionAvatar companion={companion} size={34} />
-                <div className="relative rounded-[14px] bg-white px-3 py-2 text-[13px] font-medium text-[#2A2F55] shadow-[0_4px_12px_rgba(35,48,94,0.08)]">
-                  <span aria-hidden="true" className="absolute -left-1 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rotate-45 bg-white" />
-                  <span className="relative">{FIRST_RIDE_LINES[companion.id]}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Featured Hero Story Card */}
-            <div
-              onClick={() => onOpenStory(mainStory.id)}
-              className={`rounded-3xl bg-[#FFFFFF] border overflow-hidden mb-4 cursor-pointer group transition-all duration-300 ${
-                showFirstRideHint
-                  ? 'border-[#2A3479] shadow-[0_0_0_3px_rgba(42,52,121,0.15),0_10px_24px_rgba(35,48,94,0.16)]'
-                  : 'border-[#E7E1F0] shadow-md hover:border-emerald-400/80'
-              }`}
-            >
-              <div className="relative h-40 w-full overflow-hidden bg-stone-100">
-                <img
-                  src={mainStory.cover}
-                  alt={mainStory.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    // Fallback to hero.webp if original fails
-                    (e.target as HTMLImageElement).src = mainStory.fallbackCover;
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-                <div className="absolute top-3 left-3 right-3 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5">
-                    {showFirstRideHint && (
-                      <span className="px-2.5 py-0.5 rounded-full bg-[#23305E] text-white text-[11px] font-semibold border border-white/20">
-                        第一站
-                      </span>
-                    )}
-                    <span className="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white font-mono text-[11px] flex items-center gap-1 border border-white/10">
-                      <Clock size={11} className="text-emerald-400" />
-                      <span>{mainStory.duration}</span>
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={(e) => handleLike(e, mainStory.id)}
-                    className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-stone-200 hover:text-rose-400 font-mono text-[11px] flex items-center gap-1 border border-white/10 transition-colors"
-                  >
-                    <Heart size={12} className="text-rose-400 fill-rose-400/20" />
-                    <span>{likes[mainStory.id]}</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-4 pt-2.5">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-medium">
-                    {mainStory.mood}
-                  </span>
-                  {preferences.profile.goalTrack?.targetFocus && (
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-medium flex items-center gap-1">
-                      <span>{preferences.profile.goalTrack.category === 'exam' ? '🎯 考点精选' :
-                             preferences.profile.goalTrack.category === 'workplace' ? '💼 职场实战' :
-                             preferences.profile.goalTrack.category === 'original' ? '🌟 原版前瞻' : '🌱 轻松拾光'}</span>
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-base font-bold text-stone-900 group-hover:text-emerald-700 transition-colors">
-                  {mainStory.title}
-                </h3>
-                <p className="text-xs text-stone-600 line-clamp-2 mt-1 leading-relaxed">
-                  {mainStory.blurb}
+                <p>
+                  <i aria-hidden="true" />
+                  已连续阅读 <strong>{streakDays}</strong> 天
                 </p>
-
-                <div className="mt-3 pt-3 border-t border-[#E7E1F0] flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5 text-[11px] text-stone-500">
-                    {mainStory.tags.map((t, idx) => (
-                      <span key={idx} className="bg-[#F4F1FA] border border-[#E7E1F0] px-1.5 py-0.5 rounded text-stone-600">
-                        {t}
-                      </span>
+                <span className="rh-pick">今日精选</span>
+              </div>
+              <button type="button" className="rh-featured-card" onClick={() => onOpenStory(mainStory.id)}>
+                <div className="rh-cover rh-cover-large">
+                  <img src={mainStory.cover} alt="" draggable={false} onError={(e) => { (e.target as HTMLImageElement).src = mainStory.fallbackCover; }} />
+                  {showFirstRideHint && <span className="rh-first-stop">第一站</span>}
+                  <span className="rh-cover-meta">
+                    <Heart size={17} strokeWidth={1.8} />
+                    {likes[mainStory.id]}
+                    <Clock size={17} strokeWidth={1.8} />
+                    {storyInfo(mainStory.id).minutes}min
+                  </span>
+                </div>
+                <h2 className="rh-title-en rh-title-en-large">{mainStory.title}</h2>
+                <p className="rh-title-zh rh-title-zh-large">{storyInfo(mainStory.id).chineseTitle}</p>
+                <p className="rh-hook">{storyInfo(mainStory.id).hook}</p>
+                <div className="rh-card-foot">
+                  <div className="rh-tags">
+                    {mainStory.tags.map((tag) => (
+                      <span key={tag}>{tag}</span>
                     ))}
                   </div>
-                  <span className="text-emerald-700 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    <span>开始阅读</span>
-                    <ArrowRight size={13} />
+                  <span className="rh-start">
+                    开始阅读 <ArrowRight size={18} strokeWidth={2} />
                   </span>
                 </div>
-              </div>
-            </div>
+              </button>
+            </section>
 
-            {/* Duo Secondary Stories */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="rh-grid">
               {duoStories.map((story) => (
-                <div
-                  key={story.id}
-                  onClick={() => onOpenStory(story.id)}
-                  className="rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] overflow-hidden shadow-xs cursor-pointer group flex flex-col justify-between hover:border-emerald-400/60 transition-all"
-                >
-                  <div className="relative h-24 w-full overflow-hidden bg-stone-100">
-                    <img
-                      src={story.cover}
-                      alt={story.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = story.fallbackCover;
-                      }}
-                    />
-                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] text-white font-mono">
-                      {story.duration}
-                    </div>
+                <button key={story.id} type="button" className="rh-card" onClick={() => onOpenStory(story.id)}>
+                  <div className="rh-cover">
+                    <img src={story.cover} alt="" draggable={false} onError={(e) => { (e.target as HTMLImageElement).src = story.fallbackCover; }} />
+                    <span className="rh-cover-meta">
+                      <Heart size={15} strokeWidth={1.8} />
+                      {likes[story.id]}
+                      <Clock size={15} strokeWidth={1.8} />
+                      {storyInfo(story.id).minutes}min
+                    </span>
                   </div>
-
-                  <div className="p-3 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-stone-900 group-hover:text-emerald-700 transition-colors line-clamp-1">
-                        {story.title}
-                      </h4>
-                      <p className="text-[11px] text-stone-600 mt-1 line-clamp-2 leading-relaxed">
-                        {story.blurb}
-                      </p>
-                    </div>
-
-                    <div className="mt-2.5 pt-2 border-t border-[#E7E1F0] flex items-center justify-between text-[10px] text-stone-500">
-                      <span>{story.tags[0]}</span>
-                      <span className="text-emerald-700 font-medium">阅读 →</span>
-                    </div>
+                  <h3 className="rh-title-en">{story.title}</h3>
+                  <p className="rh-title-zh">{storyInfo(story.id).chineseTitle}</p>
+                  <p className="rh-hook rh-hook-small">{storyInfo(story.id).hook}</p>
+                  <div className="rh-tags">
+                    {story.tags.map((tag) => (
+                      <span key={tag}>{tag}</span>
+                    ))}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -367,9 +274,14 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
         {activeTab === 'profile' && (
           <div>
             <div className="text-center py-4 mb-4 pb-4 border-b border-[#E7E1F0]">
-              <div className="relative w-20 h-20 mx-auto mb-2">
+              <button
+                type="button"
+                onClick={onOpenCompanion}
+                aria-label={`查看我的旅伴${companion.name}`}
+                className="relative mx-auto mb-2 block h-20 w-20 rounded-[22px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
+              >
                 <CompanionAvatar companion={companion} size={80} alt={companion.name} />
-              </div>
+              </button>
               <h2 className="text-base font-bold text-stone-900">
                 你的伴读者：{companion.name}
               </h2>
@@ -466,36 +378,23 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
       </div>
 
       {/* Bottom Fixed Tab Navigation */}
-      <nav className="h-16 border-t border-[#E7E1F0] bg-[#F4F1FA] flex items-center justify-around px-4 shadow-sm z-30">
-        <button
-          onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${
-            activeTab === 'home' ? 'text-emerald-700 font-semibold' : 'text-stone-400 hover:text-stone-700'
-          }`}
-        >
-          <BookOpen size={18} />
-          <span className="text-[10px] font-medium">首页</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('vocab')}
-          className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${
-            activeTab === 'vocab' ? 'text-emerald-700 font-semibold' : 'text-stone-400 hover:text-stone-700'
-          }`}
-        >
-          <Bookmark size={18} />
-          <span className="text-[10px] font-medium">词句本</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${
-            activeTab === 'profile' ? 'text-emerald-700 font-semibold' : 'text-stone-400 hover:text-stone-700'
-          }`}
-        >
-          <User size={18} />
-          <span className="text-[10px] font-medium">我的</span>
-        </button>
+      <nav className="rh-tabbar">
+        {([
+          ['home', '首页', Home],
+          ['vocab', '词句本', Bookmark],
+          ['profile', '我的', Smile]
+        ] as const).map(([tab, label, Icon]) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            aria-current={activeTab === tab ? 'page' : undefined}
+            className={activeTab === tab ? 'is-active' : undefined}
+          >
+            <Icon size={26} strokeWidth={1.8} fill={activeTab === tab && tab === 'home' ? 'currentColor' : 'none'} />
+            <span>{label}</span>
+          </button>
+        ))}
       </nav>
     </div>
   );

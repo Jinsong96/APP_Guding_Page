@@ -15,7 +15,7 @@ import { Stage00Start } from './components/stages/Stage00Start';
 import { StageRecommend } from './components/stages/StageRecommend';
 import { StageFirstRead } from './components/stages/StageFirstRead';
 import { StageCompanionHome } from './components/stages/StageCompanionHome';
-import { StageRecommending } from './components/stages/StageRecommending';
+import { TicketIssueIntro } from './components/TicketIssueIntro';
 import { CefrLevelKey } from './components/stages/Stage02AiChat';
 import { ReadingReport, ReportNextArticle, ReportTotals } from './components/ReadingReport';
 import {
@@ -72,9 +72,21 @@ export default function App() {
   const firstReadStartLevel = version === 'v2' ? v2StartLevel : startLevelForGoal(preferences.profile.goalTrack);
   const favouriteTheme = preferences.selectedThemes?.[0] || preferences.interestTheme;
 
-  const todayLabel = () => {
-    const now = new Date();
-    return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+  const dateLabel = (date: Date) =>
+    `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+  const todayLabel = () => dateLabel(new Date());
+
+  // Consecutive days with a finished read, counting back from today (or from yesterday if today has none yet).
+  const readingStreakDays = () => {
+    const readDays = new Set(tickets.map((ticket) => ticket.date));
+    const day = new Date();
+    if (!readDays.has(dateLabel(day))) day.setDate(day.getDate() - 1);
+    let streak = 0;
+    while (readDays.has(dateLabel(day))) {
+      streak += 1;
+      day.setDate(day.getDate() - 1);
+    }
+    return streak;
   };
 
   // Ticket for a read; reuses the stored one so revisiting an arrival screen never issues a second ticket.
@@ -340,16 +352,6 @@ export default function App() {
               />
             )}
 
-            {/* Stage 14 (V2 only): the companion picks the first article */}
-            {entryScreen === 'stage' && currentStage === 14 && (
-              <StageRecommending
-                companion={currentCompanion}
-                pickTitle={HOME_STORY_ARTICLES[v2FeaturedStoryId].chineseTitle}
-                onBack={() => goToStage(2, 14)}
-                onDone={() => goToStage(10)}
-              />
-            )}
-
             {/* Stage 12: first read — the opening paragraphs set the starting level */}
             {entryScreen === 'stage' && currentStage === 12 && (
               <StageFirstRead
@@ -453,24 +455,42 @@ export default function App() {
               />
             )}
 
-            {/* Stage 10: Reading World Hub */}
-            {entryScreen === 'stage' && currentStage === 10 && (
-              <Stage10ReadingWorld
-                companion={currentCompanion}
-                preferences={preferences}
-                onOpenStory={(storyId) => {
-                  setNextArticleId(null);
-                  setHomeStoryId(storyId);
-                  goToStage(4);
-                }}
-                onToggleBookmark={handleToggleBookmark}
-                onToggleSentenceBookmark={handleToggleSentenceBookmark}
-                onRestartOnboarding={handleReset}
-                rideCount={tickets.length}
-                onOpenCompanion={() => openCompanionHome(10)}
-                featuredStoryId={version === 'v2' ? v2FeaturedStoryId : undefined}
-                showFirstRideHint={version === 'v2' && tickets.length === 0}
-              />
+            {/* Stage 10: Reading World Hub. Stage 14 (V2 only) is the same home with the "ticket printed
+                for you" intro on top, issuing the featured story as the first ride; the home stays
+                mounted when the intro hands over to stage 10. */}
+            {entryScreen === 'stage' && (currentStage === 10 || currentStage === 14) && (
+              <div className="relative h-full w-full">
+                <Stage10ReadingWorld
+                  companion={currentCompanion}
+                  preferences={preferences}
+                  onOpenStory={(storyId) => {
+                    setNextArticleId(null);
+                    setHomeStoryId(storyId);
+                    goToStage(4);
+                  }}
+                  onToggleBookmark={handleToggleBookmark}
+                  onToggleSentenceBookmark={handleToggleSentenceBookmark}
+                  onRestartOnboarding={handleReset}
+                  rideCount={tickets.length}
+                  streakDays={readingStreakDays()}
+                  onOpenCompanion={() => openCompanionHome(10)}
+                  featuredStoryId={version === 'v2' ? v2FeaturedStoryId : undefined}
+                  showFirstRideHint={version === 'v2' && tickets.length === 0}
+                />
+                {currentStage === 14 && (
+                  <TicketIssueIntro
+                    companion={currentCompanion}
+                    article={HOME_STORY_ARTICLES[v2FeaturedStoryId]}
+                    themes={
+                      preferences.selectedThemes?.length
+                        ? preferences.selectedThemes
+                        : [HOME_STORY_ARTICLES[v2FeaturedStoryId].themes[0]]
+                    }
+                    level={v2StartLevel}
+                    onDone={() => goToStage(10)}
+                  />
+                )}
+              </div>
             )}
 
             {/* Stage 13: my companion — berth, ticket book and shared moments */}

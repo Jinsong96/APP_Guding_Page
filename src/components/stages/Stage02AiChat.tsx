@@ -4,6 +4,7 @@ import { Companion, GoalTrackDetails } from '../../types';
 import { InterestThemePicker } from '../InterestThemePicker';
 import { CompanionScene } from '../CompanionScene';
 import { CompanionAvatar } from '../CompanionAvatar';
+import { DifficultySentencePicker } from '../DifficultySentencePicker';
 import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
 
 // Pause after a tap so the selection registers visually before the screen advances.
@@ -165,7 +166,7 @@ const DIFFICULTY_QUESTION: SurveyQuestionDef = {
   number: 1,
   total: 1,
   stageName: '阅读难度',
-  title: '你想读什么难度的文章？',
+  title: '哪一句，你读着最舒服？',
   defaultPrompt: '选一个读起来舒服的难度，之后会跟着你慢慢调～',
   options: [
     { label: '入门', subtitle: '常用词和简单短句', level: 'A1-', aiReasoning: '' },
@@ -405,7 +406,13 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     }
   };
 
-  // V2 difficulty is confirmed with the footer button; other questions advance on tap.
+  // V2 difficulty is picked on the sentence card and confirmed there.
+  const handleConfirmDifficulty = (level: CefrLevelKey) => {
+    const option = DIFFICULTY_QUESTION.options.find((item) => item.level === level);
+    if (option) commitOptionAndAdvance(option, DIFFICULTY_QUESTION.step);
+  };
+
+  // Survey options advance on tap.
   const handleSelectOption = (opt: SurveyOptionItem) => {
     if (selectedOptionLabel === opt.label) return;
     setSelectedOptionLabel(opt.label);
@@ -415,21 +422,11 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       autoAdvanceTimerRef.current = null;
     }
 
-    if (isV2 && step === DIFFICULTY_QUESTION.step) {
-      return;
-    }
-
     const currentStep = step;
     autoAdvanceTimerRef.current = setTimeout(() => {
       autoAdvanceTimerRef.current = null;
       commitOptionAndAdvance(opt, currentStep);
     }, OPTION_ADVANCE_DELAY_MS);
-  };
-
-  const handleContinue = () => {
-    if (!isV2 || step !== DIFFICULTY_QUESTION.step || !selectedOptionLabel) return;
-    const selectedOption = DIFFICULTY_QUESTION.options.find((option) => option.label === selectedOptionLabel);
-    if (selectedOption) commitOptionAndAdvance(selectedOption, step);
   };
 
   // Back Navigation
@@ -590,6 +587,9 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                 </div>
               </div>
 
+              {isV2 && step === DIFFICULTY_QUESTION.step ? (
+                <DifficultySentencePicker onConfirm={handleConfirmDifficulty} />
+              ) : (
               <div className="speech-content-enter mx-2 mt-4">
                 <div
                   className="grid grid-cols-1 gap-2"
@@ -628,19 +628,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                   })}
                 </div>
               </div>
+              )}
             </div>
-            {isV2 && step === DIFFICULTY_QUESTION.step && (
-              <div className="shrink-0 px-4 pb-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleContinue}
-                  disabled={!selectedOptionLabel}
-                  className="min-h-[50px] w-full rounded-[14px] bg-[#B83825] px-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#A52F1D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B83825] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
-                >
-                  继续
-                </button>
-              </div>
-            )}
           </div>
         )}
 
