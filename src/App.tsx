@@ -10,8 +10,6 @@ import { AppScreen, DemoVersion, TopNavigationHeader, screensForVersion } from '
 import { PhoneSimulator } from './components/PhoneSimulator';
 import { Stage01Companion } from './components/stages/Stage01Companion';
 import { Stage02AiChat } from './components/stages/Stage02AiChat';
-import { Stage07GrowthFeedback } from './components/stages/Stage07GrowthFeedback';
-import { Stage08Customizing } from './components/stages/Stage08Customizing';
 import { Stage10ReadingWorld } from './components/stages/Stage10ReadingWorld';
 import { Stage00Start } from './components/stages/Stage00Start';
 import { StageRecommend } from './components/stages/StageRecommend';
@@ -19,8 +17,10 @@ import { StageFirstRead } from './components/stages/StageFirstRead';
 import { StageCompanionHome } from './components/stages/StageCompanionHome';
 import { StageRecommending } from './components/stages/StageRecommending';
 import { CefrLevelKey } from './components/stages/Stage02AiChat';
-import { CEFR_TO_STARTING_LEVEL } from './components/stages/Stage08Customizing';
+import { ReadingReport, ReportNextArticle, ReportTotals } from './components/ReadingReport';
 import {
+  AMAZING_FRIEND_ARTICLE,
+  CEFR_TO_STARTING_LEVEL,
   FIRST_READ_ARTICLES,
   FirstReadArticle,
   HOME_STORY_ARTICLES,
@@ -49,6 +49,10 @@ export default function App() {
   const [bookmarkedArticleIds, setBookmarkedArticleIds] = useState<string[]>([]);
   // Story card last opened from the reading home.
   const [homeStoryId, setHomeStoryId] = useState<string>('world-1');
+  // Article opened from a report's 下一篇推荐; overrides the home story card while set.
+  const [nextArticleId, setNextArticleId] = useState<string | null>(null);
+  // English words read across all finished reads, for the report's 累计阅读词数.
+  const [totalWordsRead, setTotalWordsRead] = useState(0);
   // The ticket book and shared moments behind the companion line.
   const [tickets, setTickets] = useState<RideTicket[]>([]);
   const [sharedEvents, setSharedEvents] = useState<SharedEvent[]>([]);
@@ -90,7 +94,7 @@ export default function App() {
         id: `ride-${ticket.id}`,
         kind: 'ride',
         date: ticket.date,
-        title: tickets.length === 0 ? '第一次一起读完一篇' : '又一起走过一程',
+        title: tickets.length === 0 ? '第一次一起读完一篇' : '又一起到达一站',
         detail: `我们一起读完了《${ticket.chineseTitle}》。`
       }
     ]);
@@ -104,12 +108,28 @@ export default function App() {
     coverUrl: firstReadArticle.coverUrl
   });
 
-  const homeArticle = HOME_STORY_ARTICLES[homeStoryId] || HOME_STORY_ARTICLES['world-1'];
+  const homeArticle =
+    [...FIRST_READ_ARTICLES, AMAZING_FRIEND_ARTICLE].find((article) => article.id === nextArticleId) ||
+    HOME_STORY_ARTICLES[homeStoryId] ||
+    HOME_STORY_ARTICLES['world-1'];
   // V2: the home story featured as the user's first ride (best interest match).
   const v2FeaturedStoryId = rankHomeStoriesForInterests(preferences.selectedThemes)[0];
-  // Tomorrow's teaser on the arrival screen: best unread interest match after this article.
-  const nextRideAfter = (current: FirstReadArticle) =>
+  // 下一篇推荐 on the reading report: best unread interest match after this article.
+  const nextArticleAfter = (current: FirstReadArticle) =>
     pickNextArticle(preferences.selectedThemes, [current.id, ...tickets.map((ticket) => ticket.id)]);
+  const reportNextArticle = (article?: FirstReadArticle): ReportNextArticle | undefined =>
+    article && { title: article.title, coverUrl: article.coverUrl, coverAlt: article.chineseTitle };
+  const openNextArticle = (article?: FirstReadArticle) => {
+    if (!article) return;
+    setNextArticleId(article.id);
+    goToStage(4);
+  };
+  const reportTotals: ReportTotals = {
+    days: Math.max(1, new Set(tickets.map((ticket) => ticket.date)).size),
+    words: totalWordsRead,
+    sentences: preferences.bookmarkedSentences.length,
+    savedWords: preferences.bookmarkedWords.length
+  };
   // V2 has no separate first read: the first article opened from home is the first read.
   const isV2FirstRead = version === 'v2' && tickets.length === 0;
   const homeStoryTicket = ticketFor({
@@ -355,6 +375,7 @@ export default function App() {
                 onBack={() => (version === 'v2' ? goToStage(2, 14) : goToStage(11))}
                 onComplete={(finalLevel: CefrLevelKey, _words, summary) => {
                   setLastReadSummary(summary);
+                  setTotalWordsRead((total) => total + summary.wordsRead);
                   recordRide(firstReadTicket);
                   const mappedLevel: ReadingLevel =
                     finalLevel === 'A1-' ? 'easy' : finalLevel === 'B1' || finalLevel === 'B2+' ? 'hard' : 'mid';
@@ -369,23 +390,21 @@ export default function App() {
               />
             )}
 
-            {/* Stage 08: first read finished — keepsake ticket and next steps */}
+            {/* Stage 08: first read finished — reading report with the first arrival ticket */}
             {entryScreen === 'stage' && currentStage === 8 && (
-              <Stage08Customizing
+              <ReadingReport
                 companion={currentCompanion}
-                interestTheme={preferences.interestTheme}
-                selectedThemes={preferences.selectedThemes}
                 ticket={version === 'v2' ? homeStoryTicket : firstReadTicket}
-                articleMinutes={(version === 'v2' ? homeArticle : firstReadArticle).minutes}
-                paragraphCount={(version === 'v2' ? homeArticle : firstReadArticle).paragraphs.length}
                 summary={lastReadSummary}
-                nextRide={nextRideAfter(version === 'v2' ? homeArticle : firstReadArticle)}
+                quote={(version === 'v2' ? homeArticle : firstReadArticle).quote}
+                totals={reportTotals}
+                nextArticle={reportNextArticle(nextArticleAfter(version === 'v2' ? homeArticle : firstReadArticle))}
+                onStartNext={() => openNextArticle(nextArticleAfter(version === 'v2' ? homeArticle : firstReadArticle))}
                 onBack={() => goToStage(version === 'v2' ? 10 : 12)}
-                onNext={() => {
+                onHome={() => {
                   goToStage(10);
                   showToast('欢迎开启阅读体验！');
                 }}
-                onOpenTicketBook={() => openCompanionHome(8)}
               />
             )}
 
@@ -409,6 +428,7 @@ export default function App() {
                 onBack={() => goToStage(10)}
                 onComplete={(_level, _words, summary) => {
                   setLastReadSummary(summary);
+                  setTotalWordsRead((total) => total + summary.wordsRead);
                   if (isV2FirstRead) {
                     setPreferences((prev) => ({
                       ...prev,
@@ -425,17 +445,18 @@ export default function App() {
               />
             )}
 
+            {/* Stage 07: a later read finished — reading report */}
             {entryScreen === 'stage' && currentStage === 7 && (
-              <Stage07GrowthFeedback
+              <ReadingReport
                 companion={currentCompanion}
                 ticket={homeStoryTicket}
-                paragraphCount={homeArticle.paragraphs.length}
-                minutes={homeArticle.minutes}
                 summary={lastReadSummary}
-                nextRide={nextRideAfter(homeArticle)}
+                quote={homeArticle.quote}
+                totals={reportTotals}
+                nextArticle={reportNextArticle(nextArticleAfter(homeArticle))}
+                onStartNext={() => openNextArticle(nextArticleAfter(homeArticle))}
                 onBack={() => goToStage(4)}
-                onNext={() => goToStage(10)}
-                onOpenTicketBook={() => openCompanionHome(7)}
+                onHome={() => goToStage(10)}
               />
             )}
 
@@ -445,6 +466,7 @@ export default function App() {
                 companion={currentCompanion}
                 preferences={preferences}
                 onOpenStory={(storyId) => {
+                  setNextArticleId(null);
                   setHomeStoryId(storyId);
                   goToStage(4);
                 }}

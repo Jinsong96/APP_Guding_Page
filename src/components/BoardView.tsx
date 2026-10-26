@@ -5,8 +5,7 @@ import { Stage01Companion } from './stages/Stage01Companion';
 import { Stage02AiChat } from './stages/Stage02AiChat';
 import { Stage03AiRecommend } from './stages/Stage03AiRecommend';
 import { StageReader } from './stages/StageReader';
-import { Stage07GrowthFeedback } from './stages/Stage07GrowthFeedback';
-import { Stage08Customizing } from './stages/Stage08Customizing';
+import { ReadingReport } from './ReadingReport';
 import { Stage10ReadingWorld } from './stages/Stage10ReadingWorld';
 import { StageRecommend } from './stages/StageRecommend';
 import { StageFirstRead } from './stages/StageFirstRead';
@@ -46,7 +45,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
     { num: 2, label: '02', title: '兴趣与目标', desc: '选阅读兴趣，回答目标、场景与每日时长' },
     { num: 11, label: '03', title: '推荐文章', desc: '按兴趣推荐几篇文章，可换一篇，点开即读' },
     { num: 12, label: '04', title: '首篇阅读', desc: '前 4 段读完自评难度并自适应换档，之后专心读完' },
-    { num: 8, label: '05', title: '旅程到站', desc: '第一张纪念车票、新认识的词、建议起点与旅伴记住的偏好' },
+    { num: 8, label: '05', title: '阅读报告', desc: '到站车票：阅读词汇与时长、今日好句、一路积累' },
     { num: 10, label: '06', title: '阅读首页', desc: '今日精选、专属推荐书架与三大导航' }
   ];
 
@@ -193,22 +192,10 @@ export const BoardView: React.FC<BoardViewProps> = ({
                   />
                 )}
                 {stage.num === 7 && (
-                  <Stage07GrowthFeedback
-                    companion={companion}
-                    ticket={sampleTicket}
-                    onBack={() => {}}
-                    onNext={() => {}}
-                  />
+                  <ReadingReport companion={companion} ticket={sampleTicket} onBack={() => {}} onHome={() => {}} />
                 )}
                 {stage.num === 8 && (
-                  <Stage08Customizing
-                    companion={companion}
-                    interestTheme={preferences.interestTheme}
-                    selectedThemes={preferences.selectedThemes}
-                    ticket={sampleTicket}
-                    onBack={() => {}}
-                    onNext={() => {}}
-                  />
+                  <ReadingReport companion={companion} ticket={sampleTicket} onBack={() => {}} onHome={() => {}} />
                 )}
                 {stage.num === 10 && (
                   <Stage10ReadingWorld

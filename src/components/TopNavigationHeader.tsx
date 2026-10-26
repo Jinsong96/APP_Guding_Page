@@ -28,8 +28,8 @@ export const APP_SCREENS: AppScreen[] = [
   { index: 5, label: '专注时长', stage: 2, step: 13 },
   { index: 6, label: '推荐文章', stage: 11 },
   { index: 7, label: '首篇阅读', stage: 12 },
-  { index: 8, label: '旅程到站', stage: 8 },
-  { index: 9, label: '到站(首页)', stage: 7 },
+  { index: 8, label: '阅读报告', stage: 8 },
+  { index: 9, label: '报告(首页)', stage: 7 },
   { index: 10, label: '阅读首页', stage: 10 },
   { index: 11, label: '我的旅伴', stage: 13 }
 ];
@@ -42,8 +42,8 @@ export const APP_SCREENS_V2: AppScreen[] = [
   { index: 2, label: '兴趣', stage: 2, step: 1 },
   { index: 3, label: '阅读难度', stage: 2, step: 14 },
   { index: 4, label: '推荐中', stage: 14 },
-  { index: 8, label: '旅程到站', stage: 8 },
-  { index: 9, label: '到站(首页)', stage: 7 },
+  { index: 8, label: '阅读报告', stage: 8 },
+  { index: 9, label: '报告(首页)', stage: 7 },
   { index: 10, label: '阅读首页', stage: 10 },
   { index: 11, label: '我的旅伴', stage: 13 }
 ];

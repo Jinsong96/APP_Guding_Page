@@ -28,7 +28,7 @@ export const RideTicketCard: React.FC<RideTicketCardProps> = ({
       <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.18em] text-[#9A95AE]">
         <span>READPAL</span>
         <span className="text-[#C9C3D8]">·</span>
-        <span className="tracking-normal">第 {ticket.rideNumber} 程</span>
+        <span className="tracking-normal">第 {ticket.rideNumber} 站</span>
       </div>
       <p className="mt-1.5 truncate text-[13px] italic text-[#2A2F55]" style={{ fontFamily: SERIF }}>
         {ticket.title}

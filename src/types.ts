@@ -47,6 +47,8 @@ export interface RideTicket {
 export interface ReadSummary {
   lookedUpWords: number;
   wordsRead: number;
+  // Time spent reading, for the report's 本次阅读时长.
+  seconds: number;
 }
 
 // A real moment the user and companion shared, shown in the companion's 共同经历.

@@ -20,8 +20,8 @@ interface Stage10ReadingWorldProps {
 }
 
 const FIRST_RIDE_LINES: Record<CompanionId, string> = {
-  wick: '就从这篇开始吧，我陪你读第一程。',
-  pal: '第一程就选它！我已经闻到线索了～',
+  wick: '就从这篇开始吧，我陪你读第一站。',
+  pal: '第一站就选它！我已经闻到线索了～',
   tuanzi: '（团子趴在这张卡片上：先读这篇吧）'
 };
 
@@ -86,7 +86,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
 
               <div className="flex items-center gap-1.5">
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-mono border border-emerald-300">
-                  已走过 {rideCount} 程
+                  已到过 {rideCount} 站
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-medium border border-emerald-300">
                   今日精选
@@ -136,7 +136,7 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                   <div className="flex items-center gap-1.5">
                     {showFirstRideHint && (
                       <span className="px-2.5 py-0.5 rounded-full bg-[#23305E] text-white text-[11px] font-semibold border border-white/20">
-                        第一程
+                        第一站
                       </span>
                     )}
                     <span className="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white font-mono text-[11px] flex items-center gap-1 border border-white/10">

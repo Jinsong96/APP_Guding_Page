@@ -28,9 +28,19 @@ export interface FirstReadArticle {
   minutes: number;
   hook: string;
   coverUrl: string;
+  // "今日好句" on the reading report.
+  quote: { text: string; translation: string };
   vocab: FirstReadVocab[];
   paragraphs: FirstReadParagraph[];
 }
+
+// Starting level shown in the user's profile for each CEFR band the first read settles on.
+export const CEFR_TO_STARTING_LEVEL: Record<CefrLevelKey, string> = {
+  'A1-': 'L1',
+  'A2': 'L4',
+  'B1': 'L7',
+  'B2+': 'L10'
+};
 
 // The first N paragraphs ask for a difficulty rating; the rest are read at the settled level.
 export const RATED_PARAGRAPH_COUNT = 4;
@@ -44,6 +54,7 @@ export const FIRST_READ_ARTICLES: FirstReadArticle[] = [
     minutes: 3,
     hook: '在空间站种一棵植物，会发生什么？',
     coverUrl: publicAsset('/assets/story/garden-in-space.jpg'),
+    quote: { text: 'A little more like home.', translation: '更像一个家了。' },
     vocab: [
       { word: 'astronaut', phonetic: '/ˈæstrənɔːt/', meaning: 'n. 宇航员', forms: ['astronaut', 'astronauts'] },
       { word: 'orbit', phonetic: '/ˈɔːbɪt/', meaning: 'v./n. 绕轨道运行；轨道', forms: ['orbit', 'orbiting'] },
@@ -147,6 +158,7 @@ export const FIRST_READ_ARTICLES: FirstReadArticle[] = [
     minutes: 4,
     hook: '一个没有规则的下午，三个孩子能造出什么？',
     coverUrl: publicAsset('/assets/story/hero.webp'),
+    quote: { text: 'Every city needs rules.', translation: '每座城市都需要规则。' },
     vocab: [
       { word: 'stuck', phonetic: '/stʌk/', meaning: 'adj. 被困住的' },
       { word: 'bored', phonetic: '/bɔːd/', meaning: 'adj. 无聊的' },
@@ -248,6 +260,7 @@ export const FIRST_READ_ARTICLES: FirstReadArticle[] = [
     minutes: 5,
     hook: '古人怎样用五个字解释整个世界？',
     coverUrl: publicAsset('/assets/story/five.webp'),
+    quote: { text: 'This keeps everything in balance.', translation: '这让一切保持平衡。' },
     vocab: [
       { word: 'element', phonetic: '/ˈelɪmənt/', meaning: 'n. 元素', forms: ['element', 'elements'] },
       { word: 'thinker', phonetic: '/ˈθɪŋkə(r)/', meaning: 'n. 思想家', forms: ['thinkers'] },
@@ -352,6 +365,7 @@ export const AMAZING_FRIEND_ARTICLE: FirstReadArticle = {
   minutes: 4,
   hook: '一句“早上好”，能改变一个人吗？',
   coverUrl: publicAsset('/assets/story/friend.webp'),
+  quote: { text: 'Good morning, Mr Hall!', translation: '早上好，霍尔先生！' },
   vocab: [
     { word: 'lonely', phonetic: '/ˈləʊnli/', meaning: 'adj. 孤独的' },
     { word: 'neighbour', phonetic: '/ˈneɪbə(r)/', meaning: 'n. 邻居', forms: ['neighbour', 'neighbours'] },
@@ -512,7 +526,7 @@ export const rankHomeStoriesForInterests = (interests: string[] = []): string[] 
   return [...ids].sort((a, b) => rank(a) - rank(b));
 };
 
-// The article teased as tomorrow's "next ride": best interest match the user hasn't read yet.
+// The report's 下一篇推荐: best interest match the user hasn't read yet.
 export const pickNextArticle = (interests: string[] = [], readIds: string[] = []): FirstReadArticle | undefined => {
   const pool = [...FIRST_READ_ARTICLES, AMAZING_FRIEND_ARTICLE].filter((article) => !readIds.includes(article.id));
   const rank = (article: FirstReadArticle) => {
