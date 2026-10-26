@@ -22,7 +22,7 @@ const LEVEL_LABELS: Record<CefrLevelKey, string> = {
 };
 
 // Whole sequence: print → three ticks → stamp → hold → fly away. Timings mirror recommend-intro.css.
-const INTRO_DURATION_MS = 5400;
+const INTRO_DURATION_MS = 7400;
 
 // One-shot "your ticket is printed" moment before the recommendation: a 3D ticket slides out of a
 // slot, three reasons tick in (兴趣 / 难度 / 时长), then a 为你挑选 stamp lands. Tap anywhere to skip.
