@@ -1032,3 +1032,163 @@
     animation: none;
   }
 }
+
+/* ---------- Arrival celebration (ReadingReport) ----------
+   Ticket rises 0–600ms · station number flips 300–870 · metrics count up 400–1300 (JS) ·
+   sparkles 850 · first ride only: companion pops with a line 1300–3700 (JS). */
+
+.rj-celebrate {
+  perspective: 1200px;
+}
+
+.rj-celebrate .rj-ticket {
+  animation: rj-ticket-rise 600ms cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+.rj-flap {
+  position: relative;
+  display: inline-block;
+  perspective: 160px;
+}
+
+.rj-flap strong {
+  display: inline-block;
+}
+
+.rj-flap-new {
+  transform-origin: 50% 55%;
+  animation: rj-flap-in 570ms cubic-bezier(0.3, 1.5, 0.6, 1) 300ms both;
+}
+
+.rj-flap-old {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 50% 55%;
+  animation: rj-flap-out 300ms ease-in 300ms both;
+}
+
+.rj-flap-sparkles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+}
+
+.rj-flap-sparkles i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px;
+  border-radius: 1px;
+  background: #e0a94a;
+  opacity: 0;
+  rotate: var(--rj-a);
+  animation: rj-sparkle 650ms ease-out 850ms forwards;
+}
+
+.rj-flap-sparkles i:nth-child(even) {
+  border-radius: 50%;
+  background: var(--rj-accent);
+}
+
+.rj-ticket-companion {
+  z-index: 2;
+  transition: transform 0.4s cubic-bezier(0.34, 1.7, 0.64, 1);
+}
+
+.rj-ticket-companion.is-popping {
+  transform: translateY(-8px) scale(1.12) rotate(-4deg);
+}
+
+.rj-stub-bubble {
+  position: relative;
+  z-index: 1;
+  padding: 6px 10px;
+  border: 1px solid #d9cfdf;
+  border-radius: 10px;
+  background: #fffdf8;
+  color: #4e405d;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 0 #e4dbcc;
+  animation: rj-bubble-in 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.rj-stub-bubble::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -5px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 1px solid #d9cfdf;
+  border-left: 1px solid #d9cfdf;
+  background: #fffdf8;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+@keyframes rj-ticket-rise {
+  from {
+    opacity: 0;
+    transform: translateY(36px) rotateX(16deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rj-flap-in {
+  from {
+    opacity: 0;
+    transform: rotateX(-100deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rj-flap-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: rotateX(90deg);
+  }
+}
+
+@keyframes rj-sparkle {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(1);
+  }
+}
+
+@keyframes rj-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rj-celebrate .rj-ticket,
+  .rj-flap-new,
+  .rj-flap-sparkles i,
+  .rj-stub-bubble {
+    animation: none;
+  }
+
+  .rj-flap-old {
+    display: none;
+  }
+}

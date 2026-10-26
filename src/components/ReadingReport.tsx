@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Companion, ReadSummary, RideTicket } from '../types';
+import { Companion, CompanionId, ReadSummary, RideTicket } from '../types';
 import { MiniProgramHeader } from './MiniProgramHeader';
 
 export interface ReportQuote {
@@ -38,6 +38,44 @@ interface ReadingReportProps {
 // Past this many characters the quote would wrap at full size, so the ticket uses its compact rows.
 const LONG_QUOTE_LENGTH = 18;
 const TOAST_MS = 2000;
+
+// Arrival celebration (report-celebrate in reading-journey.css): the station number flips like a
+// station board while the metrics count up; on the first ride the companion also pops out of the stub.
+const COUNT_UP_DELAY_MS = 400;
+const COUNT_UP_MS = 900;
+const COMPANION_POP_DELAY_MS = 1300;
+const COMPANION_LINE_MS = 2400;
+
+// Short enough to fit beside the avatar in the ticket stub; IP rule: celebrate arriving together.
+const FIRST_RIDE_LINES: Record<CompanionId, string> = {
+  wick: '第一站，我们一起到了。',
+  pal: '到站啦！下一站我带路～',
+  tuanzi: '（团子慢慢眨了眨眼）'
+};
+
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Counts from 0 to target once, easing out; returns the target straight away for reduced motion.
+const useCountUp = (target: number) => {
+  const [value, setValue] = useState(() => (prefersReducedMotion() ? target : 0));
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    if (startedRef.current || prefersReducedMotion()) return;
+    startedRef.current = true;
+    let frame = 0;
+    const startAt = performance.now() + COUNT_UP_DELAY_MS;
+    const tick = (now: number) => {
+      const progress = Math.min(1, Math.max(0, (now - startAt) / COUNT_UP_MS));
+      setValue(Math.round(target * (1 - Math.pow(1 - progress, 3))));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target]);
+
+  return value;
+};
 
 const formatDuration = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
@@ -99,6 +137,20 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
   const [toast, setToast] = useState<string | null>(null);
   const isLongQuote = quote.text.length > LONG_QUOTE_LENGTH;
   const growth = totals || { days: 1, words: summary?.wordsRead ?? 0, sentences: 0, savedWords: 0 };
+  const wordsShown = useCountUp(summary?.wordsRead ?? 0);
+  const secondsShown = useCountUp(summary?.seconds ?? 0);
+  const isFirstRide = ticket.rideNumber === 1;
+  const [companionLine, setCompanionLine] = useState(false);
+
+  useEffect(() => {
+    if (!isFirstRide || prefersReducedMotion()) return;
+    const show = window.setTimeout(() => setCompanionLine(true), COMPANION_POP_DELAY_MS);
+    const hide = window.setTimeout(() => setCompanionLine(false), COMPANION_POP_DELAY_MS + COMPANION_LINE_MS);
+    return () => {
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+    };
+  }, [isFirstRide]);
 
   useEffect(() => {
     if (!toast) return;
@@ -114,7 +166,7 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
       <MiniProgramHeader title="阅读报告" onBack={onBack} onClose={onHome} onShare={() => setToast('车票链接已复制')} />
 
       <div className="rj-report-scroll">
-        <div className="rj-ticket-wrap">
+        <div className="rj-ticket-wrap rj-celebrate">
           <article className={`rj-ticket ${isLongQuote ? 'is-long-quote' : ''}`} aria-label={`第 ${ticket.rideNumber} 站到站车票`}>
             <img className="rj-ticket-paper" src={`${import.meta.env.BASE_URL}assets/ticket-paper.jpg`} alt="" aria-hidden="true" />
             <TicketEtching />
@@ -126,7 +178,15 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
               </div>
               <p className="rj-ticket-station">
                 <span>第</span>
-                <strong>{ticket.rideNumber}</strong>
+                <span className="rj-flap">
+                  <strong className="rj-flap-old" aria-hidden="true">{ticket.rideNumber - 1}</strong>
+                  <strong className="rj-flap-new">{ticket.rideNumber}</strong>
+                  <span className="rj-flap-sparkles" aria-hidden="true">
+                    {Array.from({ length: 6 }, (_, index) => (
+                      <i key={index} style={{ '--rj-a': `${index * 60 + 15}deg` } as React.CSSProperties} />
+                    ))}
+                  </span>
+                </span>
                 <span>站</span>
               </p>
             </header>
@@ -137,13 +197,13 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
               <div className="rj-ticket-metrics">
                 <div>
                   <b>
-                    {(summary?.wordsRead ?? 0).toLocaleString('en-US')}
+                    {wordsShown.toLocaleString('en-US')}
                     <small> 词</small>
                   </b>
                   <span>本篇阅读词汇</span>
                 </div>
                 <div>
-                  <b>{formatDuration(summary?.seconds ?? 0)}</b>
+                  <b>{formatDuration(secondsShown)}</b>
                   <span>本次阅读时长</span>
                 </div>
               </div>
@@ -188,10 +248,20 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
 
             <footer className="rj-ticket-stub">
               <img className="rj-ticket-landscape" src={`${import.meta.env.BASE_URL}assets/journey-bg.jpg`} alt="" aria-hidden="true" />
-              <div className="rj-ticket-companion" role="img" aria-label={`旅伴${companion.name}`}>
+              <div
+                className={`rj-ticket-companion ${companionLine ? 'is-popping' : ''}`}
+                role="img"
+                aria-label={`旅伴${companion.name}`}
+              >
                 <img src={companion.portraitUrl} alt="" draggable={false} />
               </div>
-              <span className="rj-ticket-companion-name">旅伴 · {companion.name}</span>
+              {companionLine ? (
+                <span className="rj-stub-bubble" role="status">
+                  {FIRST_RIDE_LINES[companion.id]}
+                </span>
+              ) : (
+                <span className="rj-ticket-companion-name">旅伴 · {companion.name}</span>
+              )}
               <b className="rj-ticket-signature">一鹿知</b>
             </footer>
           </article>
