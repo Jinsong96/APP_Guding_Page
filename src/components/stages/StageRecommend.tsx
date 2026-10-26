@@ -198,7 +198,6 @@ export const StageRecommend: React.FC<StageRecommendProps> = ({
 
       {showIntro && (
         <TicketIssueIntro
-          companion={companion}
           article={article}
           themes={selectedThemes.length ? selectedThemes : [displayTheme]}
           level={level}

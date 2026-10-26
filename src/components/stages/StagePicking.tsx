@@ -34,7 +34,7 @@ const PICK_AT_MS = SCAN_START_MS + LOOK_ORDER.length * LOOK_MS;
 const PICKED_HOLD_MS = 1800;
 
 const PICKED_LINES: Record<CompanionId, string> = {
-  wick: '找到了，就从这篇文章出发吧。',
+  wick: '找到了，我们从这篇文章一起出发吧。',
   pal: '破案啦，就是这篇文章！',
   tuanzi: '（团子把这篇文章推到你面前）'
 };

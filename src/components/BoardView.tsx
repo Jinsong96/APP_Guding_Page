@@ -122,6 +122,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                   <StageRecommend
                     companion={companion}
                     selectedThemes={preferences.selectedThemes}
+                    level="A2"
                     onBack={() => {}}
                     onSelectArticle={() => {}}
                   />
@@ -191,10 +192,10 @@ export const BoardView: React.FC<BoardViewProps> = ({
                   />
                 )}
                 {stage.num === 7 && (
-                  <ReadingReport companion={companion} ticket={sampleTicket} onBack={() => {}} onHome={() => {}} />
+                  <ReadingReport ticket={sampleTicket} onBack={() => {}} onHome={() => {}} />
                 )}
                 {stage.num === 8 && (
-                  <ReadingReport companion={companion} ticket={sampleTicket} onBack={() => {}} onHome={() => {}} />
+                  <ReadingReport ticket={sampleTicket} onBack={() => {}} onHome={() => {}} />
                 )}
                 {stage.num === 10 && (
                   <Stage10ReadingWorld

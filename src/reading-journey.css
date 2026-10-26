@@ -849,7 +849,7 @@
   align-items: center;
   gap: 9px;
   overflow: hidden;
-  padding: 0 29px 0 100px;
+  padding: 0 29px;
   border-top: 0.6px solid #baadbf88;
   background: #dcd3e216;
 }
@@ -867,33 +867,6 @@
   -webkit-mask-image: linear-gradient(#0000, #000 60%);
   mask-image: linear-gradient(#0000, #000 60%);
   pointer-events: none;
-}
-
-.rj-ticket-companion {
-  position: absolute;
-  bottom: 12px;
-  left: 29px;
-  overflow: hidden;
-  width: 52px;
-  height: 52px;
-  border: 1px solid #d9cfdf;
-  border-radius: 16px;
-  background: #fff;
-  padding: 2px;
-}
-
-.rj-ticket-companion img {
-  width: 100%;
-  height: 100%;
-  border-radius: 14px;
-  object-fit: cover;
-}
-
-.rj-ticket-companion-name {
-  color: #7b6c82;
-  font-family: 'PingFang SC', sans-serif;
-  font-size: 12px;
-  white-space: nowrap;
 }
 
 .rj-ticket-signature {
@@ -1035,7 +1008,7 @@
 
 /* ---------- Arrival celebration (ReadingReport) ----------
    Ticket rises 0–600ms · station number flips 300–870 · metrics count up 400–1300 (JS) ·
-   sparkles 850 · first ride only: companion pops with a line 1300–3700 (JS). */
+   sparkles 850. */
 
 .rj-celebrate {
   perspective: 1200px;
@@ -1092,43 +1065,6 @@
   background: var(--rj-accent);
 }
 
-.rj-ticket-companion {
-  z-index: 2;
-  transition: transform 0.4s cubic-bezier(0.34, 1.7, 0.64, 1);
-}
-
-.rj-ticket-companion.is-popping {
-  transform: translateY(-8px) scale(1.12) rotate(-4deg);
-}
-
-.rj-stub-bubble {
-  position: relative;
-  z-index: 1;
-  padding: 6px 10px;
-  border: 1px solid #d9cfdf;
-  border-radius: 10px;
-  background: #fffdf8;
-  color: #4e405d;
-  font-family: 'PingFang SC', sans-serif;
-  font-size: 12px;
-  white-space: nowrap;
-  box-shadow: 0 2px 0 #e4dbcc;
-  animation: rj-bubble-in 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-.rj-stub-bubble::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -5px;
-  width: 8px;
-  height: 8px;
-  border-bottom: 1px solid #d9cfdf;
-  border-left: 1px solid #d9cfdf;
-  background: #fffdf8;
-  transform: translateY(-50%) rotate(45deg);
-}
-
 @keyframes rj-ticket-rise {
   from {
     opacity: 0;
@@ -1173,22 +1109,172 @@
   }
 }
 
-@keyframes rj-bubble-in {
-  from {
-    opacity: 0;
-    transform: translateX(-8px) scale(0.85);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .rj-celebrate .rj-ticket,
   .rj-flap-new,
-  .rj-flap-sparkles i,
-  .rj-stub-bubble {
+  .rj-flap-sparkles i {
     animation: none;
   }
 
   .rj-flap-old {
     display: none;
+  }
+}
+
+/* ---------- V2 为你出票 → 阅读报告 (ReadingReport issuing) ----------
+   On a dark screen the report ticket prints out of a slot (0.2–1.1s) and settles (to 1.5s); then the
+   dark layer and slot fade away and the report fades in around the same ticket. The 已完成阅读 stamp
+   lands right after (or ~1.1s after a direct visit). */
+
+.rj-report-scroll {
+  position: relative;
+}
+
+.rj-issue-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: radial-gradient(120% 80% at 50% 38%, #2a3479e6, #141a3df2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.rj-page.is-issuing .rj-issue-backdrop {
+  opacity: 1;
+}
+
+.rj-page .rj-header {
+  transition: opacity 0.5s ease;
+}
+
+.rj-page.is-issuing .rj-header {
+  opacity: 0;
+}
+
+.rj-issue-slot {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  z-index: 22;
+  width: 380px;
+  height: 22px;
+  border-radius: 11px;
+  background: linear-gradient(#3a46a0, #222b6e);
+  box-shadow: 0 5px 0 #10163a, 0 12px 24px #0006;
+  transform: translateX(-50%);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.rj-issue-slot span {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  left: 14px;
+  height: 6px;
+  border-radius: 3px;
+  background: #0b0f2a;
+  box-shadow: 0 1px 0 #ffffff26, inset 0 0 6px #f6c76b55;
+}
+
+.rj-page:not(.is-issuing) .rj-issue-slot {
+  opacity: 0;
+  transform: translate(-50%, -24px) scale(0.94);
+  pointer-events: none;
+}
+
+.rj-printed {
+  position: relative;
+  z-index: 21;
+  perspective: 1200px;
+}
+
+/* Clip only the top edge so the ticket appears to come out of the slot. */
+.rj-printed.is-printing {
+  clip-path: inset(0 -80px -400px -80px);
+}
+
+.rj-printed.is-printing .rj-ticket {
+  transform-origin: 50% 0;
+  animation:
+    rj-print 900ms cubic-bezier(0.22, 0.9, 0.3, 1) 200ms both,
+    /* forwards only: filling backwards would override the print's translate before 1.1s. */
+    rj-print-settle 400ms cubic-bezier(0.34, 1.4, 0.64, 1) 1100ms forwards;
+}
+
+.rj-done-stamp {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  z-index: 4;
+  display: grid;
+  place-content: center;
+  width: 70px;
+  height: 70px;
+  border: 2.5px solid #b43b2d;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px #f4f1ee, inset 0 0 0 4.5px #b43b2d;
+  color: #b43b2d;
+  font-family: 'Songti SC', serif;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 1px;
+  text-align: center;
+  /* Paper fill so the lettering stays clear over the train engraving beneath it. */
+  background: #f4f1eef2;
+  opacity: 0;
+  rotate: -14deg;
+  pointer-events: none;
+}
+
+.rj-done-stamp.is-stamped {
+  animation: rj-stamp 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+}
+
+@keyframes rj-print {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes rj-print-settle {
+  0% {
+    transform: rotateX(-14deg);
+  }
+  55% {
+    transform: rotateX(5deg) scale(1.01);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes rj-stamp {
+  0% {
+    opacity: 0;
+    scale: 2.2;
+  }
+  70% {
+    opacity: 0.95;
+    scale: 0.92;
+  }
+  100% {
+    opacity: 0.88;
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rj-printed.is-printing .rj-ticket,
+  .rj-done-stamp.is-stamped {
+    animation: none;
+  }
+
+  .rj-done-stamp.is-stamped {
+    opacity: 0.88;
   }
 }

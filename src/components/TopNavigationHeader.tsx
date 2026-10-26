@@ -43,10 +43,10 @@ export const APP_SCREENS_V2: AppScreen[] = [
   { index: 3, label: '阅读难度', stage: 2, step: 14 },
   { index: 4, label: '为你挑选', stage: 16 },
   { index: 5, label: '阅读首页', stage: 10 },
-  { index: 6, label: '阅读报告', stage: 8 },
-  { index: 7, label: '我的旅伴', stage: 13 },
-  // Kept for preview only, no longer in the flow: the ticket intro over the home.
-  { index: 8, label: '为你出票', stage: 14 }
+  // Every read prints its ticket here, then becomes 07 阅读报告 without a cut.
+  { index: 6, label: '为你出票', stage: 14 },
+  { index: 7, label: '阅读报告', stage: 8 },
+  { index: 8, label: '我的旅伴', stage: 13 }
 ];
 
 export const screensForVersion = (version: DemoVersion) => (version === 'v2' ? APP_SCREENS_V2 : APP_SCREENS);
