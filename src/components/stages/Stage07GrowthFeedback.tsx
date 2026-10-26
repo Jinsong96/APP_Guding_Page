@@ -1,13 +1,14 @@
 import React from 'react';
-import { Companion, RideTicket } from '../../types';
-import { JourneyArrival } from '../JourneyArrival';
+import { Companion, ReadSummary, RideTicket } from '../../types';
+import { JourneyArrival, NextRide, readEffortStat } from '../JourneyArrival';
 
 interface Stage07GrowthFeedbackProps {
   companion: Companion;
   ticket: RideTicket;
   paragraphCount?: number;
   minutes?: number;
-  bookmarkCount?: number;
+  summary?: ReadSummary;
+  nextRide?: NextRide;
   onBack: () => void;
   onNext: () => void;
   onOpenTicketBook?: () => void;
@@ -19,7 +20,8 @@ export const Stage07GrowthFeedback: React.FC<Stage07GrowthFeedbackProps> = ({
   ticket,
   paragraphCount = 3,
   minutes = 2,
-  bookmarkCount = 0,
+  summary,
+  nextRide,
   onBack,
   onNext,
   onOpenTicketBook
@@ -30,7 +32,7 @@ export const Stage07GrowthFeedback: React.FC<Stage07GrowthFeedbackProps> = ({
     memoryLine={`${companion.name}把这一程记在了车票册里。`}
     stats={[
       { value: `${paragraphCount} 段`, label: '读完全文' },
-      { value: `${bookmarkCount} 句`, label: '收藏的句子' },
+      readEffortStat(summary),
       { value: `约 ${minutes} 分钟`, label: '这一程' }
     ]}
     primaryLabel="回到阅读首页"
@@ -38,5 +40,6 @@ export const Stage07GrowthFeedback: React.FC<Stage07GrowthFeedbackProps> = ({
     secondaryLabel={onOpenTicketBook ? '查看我们的车票册' : undefined}
     onSecondary={onOpenTicketBook}
     onBack={onBack}
+    nextRide={nextRide}
   />
 );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BookOpen, Bookmark, User, Heart, Clock, Sparkles, ArrowRight, Volume2, Trash2 } from 'lucide-react';
-import { BookmarkedSentence, Companion, Story, UserPreferences } from '../../types';
+import { BookmarkedSentence, Companion, CompanionId, Story, UserPreferences } from '../../types';
 import { WORLD_STORIES, FIRST_STORY } from '../../data';
 import { CompanionAvatar } from '../CompanionAvatar';
 
@@ -13,7 +13,17 @@ interface Stage10ReadingWorldProps {
   onRestartOnboarding: () => void;
   rideCount?: number;
   onOpenCompanion?: () => void;
+  // Story shown as the large featured card (defaults to the first story).
+  featuredStoryId?: string;
+  // V2 before the first read: mark the featured story as the user's first ride.
+  showFirstRideHint?: boolean;
 }
+
+const FIRST_RIDE_LINES: Record<CompanionId, string> = {
+  wick: '就从这篇开始吧，我陪你读第一程。',
+  pal: '第一程就选它！我已经闻到线索了～',
+  tuanzi: '（团子趴在这张卡片上：先读这篇吧）'
+};
 
 export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
   companion,
@@ -23,7 +33,9 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
   onToggleSentenceBookmark,
   onRestartOnboarding,
   rideCount = 0,
-  onOpenCompanion
+  onOpenCompanion,
+  featuredStoryId,
+  showFirstRideHint = false
 }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'vocab' | 'profile'>('home');
   const [activeCollectionTab, setActiveCollectionTab] = useState<'words' | 'sentences'>('words');
@@ -49,8 +61,8 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
     }
   };
 
-  const mainStory = WORLD_STORIES[0];
-  const duoStories = WORLD_STORIES.slice(1);
+  const mainStory = WORLD_STORIES.find((story) => story.id === featuredStoryId) || WORLD_STORIES[0];
+  const duoStories = WORLD_STORIES.filter((story) => story.id !== mainStory.id);
 
   return (
     <div className="h-full flex flex-col justify-between text-stone-900 select-none relative overflow-hidden bg-[#F4F1FA]">
@@ -89,10 +101,24 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
               根据你的 {preferences.profile?.startingLevel || 'L4'} 起点与 {preferences.profile?.goalTrack?.targetFocus || '个性化'} 目标定制。
             </p>
 
+            {showFirstRideHint && (
+              <div className="mb-2.5 flex items-center gap-2 speech-content-enter">
+                <CompanionAvatar companion={companion} size={34} />
+                <div className="relative rounded-[14px] bg-white px-3 py-2 text-[13px] font-medium text-[#2A2F55] shadow-[0_4px_12px_rgba(35,48,94,0.08)]">
+                  <span aria-hidden="true" className="absolute -left-1 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rotate-45 bg-white" />
+                  <span className="relative">{FIRST_RIDE_LINES[companion.id]}</span>
+                </div>
+              </div>
+            )}
+
             {/* Featured Hero Story Card */}
             <div
               onClick={() => onOpenStory(mainStory.id)}
-              className="rounded-3xl bg-[#FFFFFF] border border-[#E7E1F0] overflow-hidden shadow-md mb-4 cursor-pointer group transition-all duration-300 hover:border-emerald-400/80"
+              className={`rounded-3xl bg-[#FFFFFF] border overflow-hidden mb-4 cursor-pointer group transition-all duration-300 ${
+                showFirstRideHint
+                  ? 'border-[#2A3479] shadow-[0_0_0_3px_rgba(42,52,121,0.15),0_10px_24px_rgba(35,48,94,0.16)]'
+                  : 'border-[#E7E1F0] shadow-md hover:border-emerald-400/80'
+              }`}
             >
               <div className="relative h-40 w-full overflow-hidden bg-stone-100">
                 <img
@@ -107,10 +133,17 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
                 <div className="absolute top-3 left-3 right-3 flex items-center justify-between text-xs">
-                  <span className="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white font-mono text-[11px] flex items-center gap-1 border border-white/10">
-                    <Clock size={11} className="text-emerald-400" />
-                    <span>{mainStory.duration}</span>
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {showFirstRideHint && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#23305E] text-white text-[11px] font-semibold border border-white/20">
+                        第一程
+                      </span>
+                    )}
+                    <span className="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white font-mono text-[11px] flex items-center gap-1 border border-white/10">
+                      <Clock size={11} className="text-emerald-400" />
+                      <span>{mainStory.duration}</span>
+                    </span>
+                  </div>
 
                   <button
                     onClick={(e) => handleLike(e, mainStory.id)}

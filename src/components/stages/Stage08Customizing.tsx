@@ -1,7 +1,6 @@
 import React from 'react';
-import { Companion, RideTicket } from '../../types';
-import { JourneyArrival } from '../JourneyArrival';
-import type { FirstReadVocab } from '../../firstReadArticles';
+import { Companion, ReadSummary, RideTicket } from '../../types';
+import { JourneyArrival, NextRide, readEffortStat } from '../JourneyArrival';
 
 interface Stage08CustomizingProps {
   companion: Companion;
@@ -10,7 +9,8 @@ interface Stage08CustomizingProps {
   ticket: RideTicket;
   articleMinutes?: number;
   paragraphCount?: number;
-  learnedWords?: FirstReadVocab[];
+  summary?: ReadSummary;
+  nextRide?: NextRide;
   onBack: () => void;
   onNext: () => void;
   onOpenTicketBook?: () => void;
@@ -31,7 +31,8 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
   ticket,
   articleMinutes = 3,
   paragraphCount = 6,
-  learnedWords = [],
+  summary,
+  nextRide,
   onBack,
   onNext,
   onOpenTicketBook
@@ -42,7 +43,7 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
       ticket={ticket}
       stats={[
         { value: `${paragraphCount} 段`, label: '读完全文' },
-        { value: `${learnedWords.length} 个`, label: '新认识的词' },
+        readEffortStat(summary),
         { value: `约 ${articleMinutes} 分钟`, label: '这一程' }
       ]}
       primaryLabel="开启阅读世界"
@@ -50,6 +51,7 @@ export const Stage08Customizing: React.FC<Stage08CustomizingProps> = ({
       secondaryLabel={onOpenTicketBook ? '查看我们的车票册' : undefined}
       onSecondary={onOpenTicketBook}
       onBack={onBack}
+      nextRide={nextRide}
     />
   );
 };

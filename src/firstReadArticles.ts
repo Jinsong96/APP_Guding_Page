@@ -502,6 +502,26 @@ export const HOME_STORY_ARTICLES: Record<string, FirstReadArticle> = {
   'world-3': FIRST_READ_ARTICLES.find((article) => article.id === 'five-elements')!
 };
 
+// Home story card ids, interest matches first (used to feature V2's first ride).
+export const rankHomeStoriesForInterests = (interests: string[] = []): string[] => {
+  const ids = Object.keys(HOME_STORY_ARTICLES);
+  const rank = (id: string) => {
+    const first = interests.findIndex((interest) => HOME_STORY_ARTICLES[id].themes.includes(interest));
+    return first === -1 ? interests.length : first;
+  };
+  return [...ids].sort((a, b) => rank(a) - rank(b));
+};
+
+// The article teased as tomorrow's "next ride": best interest match the user hasn't read yet.
+export const pickNextArticle = (interests: string[] = [], readIds: string[] = []): FirstReadArticle | undefined => {
+  const pool = [...FIRST_READ_ARTICLES, AMAZING_FRIEND_ARTICLE].filter((article) => !readIds.includes(article.id));
+  const rank = (article: FirstReadArticle) => {
+    const first = interests.findIndex((interest) => article.themes.includes(interest));
+    return first === -1 ? interests.length : first;
+  };
+  return pool.sort((a, b) => rank(a) - rank(b))[0];
+};
+
 // Articles matching the user's interests come first, in the order the interests were picked.
 export const rankArticlesForInterests = (interests: string[] = []): FirstReadArticle[] => {
   const rank = (article: FirstReadArticle) => {

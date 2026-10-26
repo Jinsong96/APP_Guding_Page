@@ -5,6 +5,8 @@ import { CompanionScene } from '../CompanionScene';
 
 interface StageRecommendingProps {
   companion: Companion;
+  // Title of the article the companion picked, revealed when the bar fills.
+  pickTitle?: string;
   onBack: () => void;
   onDone: () => void;
 }
@@ -12,6 +14,8 @@ interface StageRecommendingProps {
 const SERIF = '"Songti SC", "STSong", "Iowan Old Style", Georgia, serif';
 const PAGE_BG = '#F7F6FB';
 const DURATION_MS = 2600;
+// How long the "found it" line stays before moving on.
+const REVEAL_MS = 1100;
 
 const PICKING_LINES: Record<CompanionId, string> = {
   wick: '灯芯正踮着小蹄子，在书架间帮你挑文章…',
@@ -28,7 +32,7 @@ const STARRY_FILL = [
 ].join(', ');
 
 // V2 only: a short beat after the questions while the companion "picks" the first article.
-export const StageRecommending: React.FC<StageRecommendingProps> = ({ companion, onBack, onDone }) => {
+export const StageRecommending: React.FC<StageRecommendingProps> = ({ companion, pickTitle, onBack, onDone }) => {
   const [progress, setProgress] = useState(0);
   // Keep the latest callback without restarting the timer on every progress re-render.
   const onDoneRef = useRef(onDone);
@@ -43,7 +47,7 @@ export const StageRecommending: React.FC<StageRecommendingProps> = ({ companion,
       if (ratio < 1) frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
-    const doneTimer = window.setTimeout(() => onDoneRef.current(), DURATION_MS + 350);
+    const doneTimer = window.setTimeout(() => onDoneRef.current(), DURATION_MS + (pickTitle ? REVEAL_MS : 350));
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(doneTimer);
@@ -90,7 +94,13 @@ export const StageRecommending: React.FC<StageRecommendingProps> = ({ companion,
             <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, backgroundImage: STARRY_FILL }} />
           </div>
           <p className="mt-5 text-center text-[16px] leading-relaxed text-[#2A2F55]" aria-live="polite">
-            {PICKING_LINES[companion.id]}
+            {progress >= 1 && pickTitle ? (
+              <span key="found" className="speech-content-enter inline-block">
+                找到啦！给你挑了<strong className="font-semibold">《{pickTitle}》</strong>，就从这篇开始吧～
+              </span>
+            ) : (
+              PICKING_LINES[companion.id]
+            )}
           </p>
         </div>
       </div>

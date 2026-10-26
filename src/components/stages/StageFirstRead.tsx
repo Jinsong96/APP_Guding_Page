@@ -11,7 +11,7 @@ import {
   Volume2,
   X
 } from 'lucide-react';
-import { BookmarkedSentence, Companion, CompanionId } from '../../types';
+import { BookmarkedSentence, Companion, CompanionId, ReadSummary } from '../../types';
 import { CompanionAvatar } from '../CompanionAvatar';
 import { CefrLevelKey } from './Stage02AiChat';
 import {
@@ -40,7 +40,7 @@ interface StageFirstReadProps {
   onToggleArticleLike?: () => void;
   onToggleArticleBookmark?: () => void;
   onBack: () => void;
-  onComplete: (finalLevel: CefrLevelKey, learnedWords: FirstReadVocab[]) => void;
+  onComplete: (finalLevel: CefrLevelKey, learnedWords: FirstReadVocab[], summary: ReadSummary) => void;
 }
 
 type Feeling = 'down' | 'keep' | 'up';
@@ -59,21 +59,22 @@ const getNextLevel = (current: CefrLevelKey, feeling: Feeling): CefrLevelKey => 
 type LineMoment = 'start' | 'checkpoint' | 'end';
 
 // IP rule: a companion speaks up at most three times per read, each in its own voice.
-// Wick checks in after a few paragraphs, Pal encourages collecting a sentence, Tuanzi stays quiet.
+// The first line always teaches tapping a word for help, the core "stuck? someone helps" moment.
+// Wick guides quietly and looks back now and then; Pal plays detective and collects; Tuanzi barely speaks.
 const COMPANION_LINES: Record<CompanionId, Partial<Record<LineMoment, string>>> = {
   wick: {
-    start: '准备好了吗？我陪你慢慢读。',
-    checkpoint: '已经读过几段啦，真不错。',
-    end: '快到站啦，我陪你把这一段读完。'
+    start: '遇到不认识的词，点一下，我在旁边轻声告诉你。',
+    checkpoint: '（灯芯回头看了看你）走得很稳，我们继续。',
+    end: '最后一段了，我在前面等你到站。'
   },
   pal: {
-    start: '出发吧！遇到好句子，我们就收藏。',
-    checkpoint: '已经读了几段，真不错！喜欢的句子可以收藏。',
-    end: '最后一段啦，你已经读得很棒了！'
+    start: '发现不认识的词？点它！我来帮你破案～',
+    checkpoint: '线索越来越多啦！查到的词可以加入词句本，我帮你收着。',
+    end: '最后一段，线索集齐就到站！'
   },
   tuanzi: {
-    start: '（团子安静地陪着你，慢慢读就很好）',
-    end: '（团子蹭蹭你：再读一点就到站啦）'
+    start: '（团子用尾巴轻轻点了点一个词：卡住了就点一下）',
+    end: '（团子慢慢眨了一下眼，陪你读完最后一段）'
   }
 };
 
@@ -115,6 +116,8 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [playing, setPlaying] = useState<'card' | 'full' | null>(null);
   const [lookupWord, setLookupWord] = useState<string | null>(null);
+  // Words the user looked up (lowercased); the first lookup also ends the "tap a word" hint.
+  const [lookedUpWords, setLookedUpWords] = useState<string[]>([]);
   const [bubbleText, setBubbleText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -126,6 +129,13 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   const bookmark = { sentence: text, translation: paragraph.translation };
   const isBookmarked = bookmarkedSentences.some((item) => item.sentence === text);
   const paragraphVocab = findParagraphVocab(article.vocab, text);
+  // Until the first lookup, gently pulse the first key word of paragraph 1 to show words are tappable.
+  const hintWord =
+    paragraphIdx === 0 && lookedUpWords.length === 0
+      ? findParagraphVocab(article.vocab, text, 1)[0]
+      : undefined;
+  const isHintWord = (word: string) =>
+    !!hintWord && (hintWord.forms || [hintWord.word]).some((form) => form.toLowerCase() === word.toLowerCase());
   const lineMoment = lineMomentFor(paragraphIdx, total);
   const companionLine = !lineMoment ? '' : COMPANION_LINES[companion.id][lineMoment] || '';
   const lookupVocab = lookupWord ? article.vocab.find((item) =>
@@ -192,6 +202,12 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
 
   const markHelped = () => helpedParagraphsRef.current.add(paragraphIdx);
 
+  const openLookup = (word: string) => {
+    markHelped();
+    setLookupWord(word);
+    setLookedUpWords((prev) => (prev.includes(word.toLowerCase()) ? prev : [...prev, word.toLowerCase()]));
+  };
+
   const handleRate = (feeling: Feeling) => {
     setSelectedFeeling(feeling);
     if (feeling === 'down') markHelped();
@@ -206,7 +222,14 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
 
   const handleNext = () => {
     if (isLast) {
-      onComplete(level, collectLearnedWords(article, levelHistory, [...helpedParagraphsRef.current]));
+      const wordsRead = article.paragraphs.reduce((sum, part, index) => {
+        const shownLevel = levelHistory[index] || level;
+        return sum + (part.text[shownLevel].match(/[A-Za-z']+/g)?.length ?? 0);
+      }, 0);
+      onComplete(level, collectLearnedWords(article, levelHistory, [...helpedParagraphsRef.current]), {
+        lookedUpWords: lookedUpWords.length,
+        wordsRead
+      });
       return;
     }
     goToParagraph(paragraphIdx + 1, level);
@@ -381,7 +404,14 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
                     return word ? (
                       <React.Fragment key={index}>
                         {part.slice(0, part.indexOf(word))}
-                        <button type="button" className="inline rounded-sm text-inherit hover:text-[#B83825] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#B83825]" onClick={() => setLookupWord(word)} aria-label={`查询 ${word}`}>
+                        <button
+                          type="button"
+                          className={`inline rounded-sm text-inherit hover:text-[#B83825] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#B83825] ${
+                            isHintWord(word) ? 'tap-hint-word' : ''
+                          }`}
+                          onClick={() => openLookup(word)}
+                          aria-label={`查询 ${word}`}
+                        >
                           {word}
                         </button>
                         {part.slice(part.indexOf(word) + word.length)}

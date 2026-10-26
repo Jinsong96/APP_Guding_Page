@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { BookmarkedSentence, Companion, CompanionId, ReadingLevel, RideTicket, SharedEvent, UserPreferences } from './types';
+import { BookmarkedSentence, Companion, CompanionId, ReadSummary, ReadingLevel, RideTicket, SharedEvent, UserPreferences } from './types';
 import { COMPANIONS, INITIAL_PREFERENCES } from './data';
 import { AppScreen, DemoVersion, TopNavigationHeader, screensForVersion } from './components/TopNavigationHeader';
 import { PhoneSimulator } from './components/PhoneSimulator';
@@ -20,7 +20,14 @@ import { StageCompanionHome } from './components/stages/StageCompanionHome';
 import { StageRecommending } from './components/stages/StageRecommending';
 import { CefrLevelKey } from './components/stages/Stage02AiChat';
 import { CEFR_TO_STARTING_LEVEL } from './components/stages/Stage08Customizing';
-import { FIRST_READ_ARTICLES, FirstReadVocab, HOME_STORY_ARTICLES, startLevelForGoal } from './firstReadArticles';
+import {
+  FIRST_READ_ARTICLES,
+  FirstReadArticle,
+  HOME_STORY_ARTICLES,
+  pickNextArticle,
+  rankHomeStoriesForInterests,
+  startLevelForGoal
+} from './firstReadArticles';
 
 type EntryScreen = 'start' | 'companion' | 'stage';
 
@@ -36,7 +43,8 @@ export default function App() {
   const [preferences, setPreferences] = useState<UserPreferences>(INITIAL_PREFERENCES);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [firstReadArticleId, setFirstReadArticleId] = useState<string>(FIRST_READ_ARTICLES[0].id);
-  const [learnedWords, setLearnedWords] = useState<FirstReadVocab[]>([]);
+  // What happened during the latest finished read, for the arrival screen's stats.
+  const [lastReadSummary, setLastReadSummary] = useState<ReadSummary | undefined>();
   const [likedArticleIds, setLikedArticleIds] = useState<string[]>([]);
   const [bookmarkedArticleIds, setBookmarkedArticleIds] = useState<string[]>([]);
   // Story card last opened from the reading home.
@@ -97,6 +105,11 @@ export default function App() {
   });
 
   const homeArticle = HOME_STORY_ARTICLES[homeStoryId] || HOME_STORY_ARTICLES['world-1'];
+  // V2: the home story featured as the user's first ride (best interest match).
+  const v2FeaturedStoryId = rankHomeStoriesForInterests(preferences.selectedThemes)[0];
+  // Tomorrow's teaser on the arrival screen: best unread interest match after this article.
+  const nextRideAfter = (current: FirstReadArticle) =>
+    pickNextArticle(preferences.selectedThemes, [current.id, ...tickets.map((ticket) => ticket.id)]);
   // V2 has no separate first read: the first article opened from home is the first read.
   const isV2FirstRead = version === 'v2' && tickets.length === 0;
   const homeStoryTicket = ticketFor({
@@ -318,6 +331,7 @@ export default function App() {
             {entryScreen === 'stage' && currentStage === 14 && (
               <StageRecommending
                 companion={currentCompanion}
+                pickTitle={HOME_STORY_ARTICLES[v2FeaturedStoryId].chineseTitle}
                 onBack={() => goToStage(2, 14)}
                 onDone={() => goToStage(10)}
               />
@@ -339,8 +353,8 @@ export default function App() {
                 onToggleArticleLike={() => toggleArticleId(firstReadArticle.id, setLikedArticleIds)}
                 onToggleArticleBookmark={() => toggleArticleId(firstReadArticle.id, setBookmarkedArticleIds)}
                 onBack={() => (version === 'v2' ? goToStage(2, 14) : goToStage(11))}
-                onComplete={(finalLevel: CefrLevelKey, words) => {
-                  setLearnedWords(words);
+                onComplete={(finalLevel: CefrLevelKey, _words, summary) => {
+                  setLastReadSummary(summary);
                   recordRide(firstReadTicket);
                   const mappedLevel: ReadingLevel =
                     finalLevel === 'A1-' ? 'easy' : finalLevel === 'B1' || finalLevel === 'B2+' ? 'hard' : 'mid';
@@ -364,7 +378,8 @@ export default function App() {
                 ticket={version === 'v2' ? homeStoryTicket : firstReadTicket}
                 articleMinutes={(version === 'v2' ? homeArticle : firstReadArticle).minutes}
                 paragraphCount={(version === 'v2' ? homeArticle : firstReadArticle).paragraphs.length}
-                learnedWords={learnedWords}
+                summary={lastReadSummary}
+                nextRide={nextRideAfter(version === 'v2' ? homeArticle : firstReadArticle)}
                 onBack={() => goToStage(version === 'v2' ? 10 : 12)}
                 onNext={() => {
                   goToStage(10);
@@ -392,9 +407,9 @@ export default function App() {
                 onToggleArticleLike={() => toggleArticleId(homeArticle.id, setLikedArticleIds)}
                 onToggleArticleBookmark={() => toggleArticleId(homeArticle.id, setBookmarkedArticleIds)}
                 onBack={() => goToStage(10)}
-                onComplete={(_, words) => {
+                onComplete={(_level, _words, summary) => {
+                  setLastReadSummary(summary);
                   if (isV2FirstRead) {
-                    setLearnedWords(words);
                     setPreferences((prev) => ({
                       ...prev,
                       determinedCefr: v2StartLevel,
@@ -416,7 +431,8 @@ export default function App() {
                 ticket={homeStoryTicket}
                 paragraphCount={homeArticle.paragraphs.length}
                 minutes={homeArticle.minutes}
-                bookmarkCount={preferences.bookmarkedSentences.length}
+                summary={lastReadSummary}
+                nextRide={nextRideAfter(homeArticle)}
                 onBack={() => goToStage(4)}
                 onNext={() => goToStage(10)}
                 onOpenTicketBook={() => openCompanionHome(7)}
@@ -437,6 +453,8 @@ export default function App() {
                 onRestartOnboarding={handleReset}
                 rideCount={tickets.length}
                 onOpenCompanion={() => openCompanionHome(10)}
+                featuredStoryId={version === 'v2' ? v2FeaturedStoryId : undefined}
+                showFirstRideHint={version === 'v2' && tickets.length === 0}
               />
             )}
 

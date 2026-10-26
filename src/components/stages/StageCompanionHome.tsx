@@ -60,7 +60,7 @@ export const StageCompanionHome: React.FC<StageCompanionHomeProps> = ({
         <div className="relative z-10 mx-4 -mt-8 flex shrink-0 items-center justify-between gap-3 rounded-2xl bg-white/95 px-4 py-3 shadow-[0_8px_20px_rgba(35,48,94,0.10)]">
           <div className="min-w-0">
             <p className="text-[20px] font-bold leading-tight" style={{ fontFamily: SERIF }}>
-              {companion.seat} {companion.name} {companion.nameEn}
+              {companion.name} {companion.nameEn}
             </p>
             <p className="mt-1.5 w-fit rounded-full bg-[#EEEDF7] px-2.5 py-1 text-[12px] text-[#3B4170]">
               {favouriteTheme ? `它开始记得，你喜欢${favouriteTheme}。` : '它安静地待在你的铺位旁。'}

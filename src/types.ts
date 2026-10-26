@@ -43,6 +43,12 @@ export interface RideTicket {
   date: string;
 }
 
+// What happened during one read, for the arrival screen's stats.
+export interface ReadSummary {
+  lookedUpWords: number;
+  wordsRead: number;
+}
+
 // A real moment the user and companion shared, shown in the companion's 共同经历.
 export interface SharedEvent {
   id: string;
