@@ -16,7 +16,7 @@ export interface AppScreen {
   step?: number;
 }
 
-// Screen numbers are shared across versions: the same screen keeps the same number.
+// Each version numbers its screens in its own flow order.
 export const screenCode = (screen: AppScreen) => String(screen.index).padStart(2, '0');
 
 export const APP_SCREENS: AppScreen[] = [
@@ -42,10 +42,9 @@ export const APP_SCREENS_V2: AppScreen[] = [
   { index: 2, label: '兴趣', stage: 2, step: 1 },
   { index: 3, label: '阅读难度', stage: 2, step: 14 },
   { index: 4, label: '为你出票', stage: 14 },
-  { index: 8, label: '阅读报告', stage: 8 },
-  { index: 9, label: '报告(首页)', stage: 7 },
-  { index: 10, label: '阅读首页', stage: 10 },
-  { index: 11, label: '我的旅伴', stage: 13 }
+  { index: 5, label: '阅读首页', stage: 10 },
+  { index: 6, label: '阅读报告', stage: 8 },
+  { index: 7, label: '我的旅伴', stage: 13 }
 ];
 
 export const screensForVersion = (version: DemoVersion) => (version === 'v2' ? APP_SCREENS_V2 : APP_SCREENS);

@@ -385,7 +385,7 @@ export default function App() {
               />
             )}
 
-            {/* Stage 08: first read finished — reading report with the first arrival ticket */}
+            {/* Stage 08: reading report. V1: after the first read. V2: after every read (V2 has no stage 7). */}
             {entryScreen === 'stage' && currentStage === 8 && (
               <ReadingReport
                 companion={currentCompanion}
@@ -398,7 +398,9 @@ export default function App() {
                 onBack={() => goToStage(version === 'v2' ? 10 : 12)}
                 onHome={() => {
                   goToStage(10);
-                  showToast('欢迎开启阅读体验！');
+                  if ((version === 'v2' ? homeStoryTicket : firstReadTicket).rideNumber === 1) {
+                    showToast('欢迎开启阅读体验！');
+                  }
                 }}
               />
             )}
@@ -435,7 +437,8 @@ export default function App() {
                     return;
                   }
                   recordRide(homeStoryTicket);
-                  goToStage(7);
+                  // V2 has one reading report for every read; V1 keeps a separate one for later reads.
+                  goToStage(version === 'v2' ? 8 : 7);
                 }}
               />
             )}
