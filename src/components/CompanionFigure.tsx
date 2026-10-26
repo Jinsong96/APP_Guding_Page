@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Companion, CompanionId } from '../types';
 
 interface CompanionFigureProps {
   companion: Companion;
   // Idle motion and the tap reaction run only on the card in focus.
   active: boolean;
+  // Bumping this number plays the happy bounce, as if the figure were tapped.
+  cheerSignal?: number;
 }
 
 // Figure height per companion so each sits at a similar visual size on the card.
@@ -18,8 +20,12 @@ const CHEER_MS = 650;
 // A companion standing on the card, front view, with a light idle motion in its own character
 // (companion-select.css): Wick breathes slowly under softly glowing antlers, Pal hops now and then,
 // Tuanzi breathes in a slow squish. Tap for a small happy bounce.
-export const CompanionFigure: React.FC<CompanionFigureProps> = ({ companion, active }) => {
+export const CompanionFigure: React.FC<CompanionFigureProps> = ({ companion, active, cheerSignal = 0 }) => {
   const [cheerKey, setCheerKey] = useState(0);
+
+  useEffect(() => {
+    if (cheerSignal) setCheerKey((key) => key + 1);
+  }, [cheerSignal]);
 
   return (
     <button

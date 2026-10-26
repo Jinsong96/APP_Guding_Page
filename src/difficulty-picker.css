@@ -17,8 +17,8 @@
 .dp-card-area {
   position: relative;
   flex: 1;
-  min-height: 230px;
-  max-height: 340px;
+  min-height: 260px;
+  max-height: 440px;
   margin: 0 30px 26px;
   touch-action: pan-y;
   perspective: 900px;
@@ -95,7 +95,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   height: 50px;
-  margin: 0 24px;
+  margin: 0 24px 16px;
   padding: 4px;
   border: 1.5px solid #e3dcea;
   border-radius: 16px;
@@ -132,13 +132,6 @@
 .dp-stops button:focus-visible {
   outline: 2px solid #8176a8;
   outline-offset: 2px;
-}
-
-.dp-tip {
-  margin-top: 10px;
-  color: #9a93a8;
-  font-size: 12px;
-  text-align: center;
 }
 
 /* Same as the 继续 button on the 02 interest step. */
@@ -201,4 +194,26 @@
   .dp-thumb {
     transition: none;
   }
+}
+
+/* V2 03 on the reader page layout (.rj-page): the card fills the space and the footer sits on the
+   page background instead of the questionnaire's panel. */
+.rj-page .dp-root {
+  padding-top: 8px;
+}
+
+.rj-page .dp-card-area {
+  max-height: none;
+  margin: 0 36px 28px;
+}
+
+.rj-page .dp-footer {
+  margin: 0;
+  padding: 4px 16px 14px;
+  border-top: 0;
+  background: none;
+}
+
+.dp-companion-row {
+  margin-top: 4px;
 }

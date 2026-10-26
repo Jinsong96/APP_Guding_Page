@@ -1,0 +1,218 @@
+/* V2 04 为你挑选 (StagePicking). Same light palette as 01 选伴.
+   0–500ms covers pop in · from 700ms the companion looks at covers one by one (each lifts and glows,
+   the pile reshuffles every two looks) · ~3.3s the pick glows and lands beside the companion, the
+   others fade back · ~5.1s hand over to the reading home. */
+
+.pk-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(180deg, #eef1f8 0%, #fbfbfd 50%, #f4f5fa 100%);
+  color: #192b4d;
+  cursor: pointer;
+  user-select: none;
+  animation: pk-fade-in 300ms ease-out both;
+}
+
+.pk-page:focus-visible {
+  outline: none;
+}
+
+.pk-stage {
+  position: relative;
+  width: 330px;
+  height: 340px;
+}
+
+/* ---------- Covers ---------- */
+
+.pk-cover {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  z-index: 1;
+  width: 84px;
+  height: 112px;
+  transform: translate(-50%, -50%) translate(var(--pk-x), var(--pk-y)) rotate(var(--pk-r));
+  transition:
+    transform 0.42s cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 0.3s ease;
+  /* backwards only, so once it ends the transition can move the cover. */
+  animation: pk-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--pk-delay) backwards;
+}
+
+.pk-cover-float {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: pk-drift 2.4s ease-in-out infinite;
+}
+
+.pk-cover img {
+  width: 100%;
+  height: 100%;
+  border: 3px solid #fff;
+  border-radius: 14px;
+  background: #e8ecf4;
+  box-shadow: 0 10px 22px #192b4d24;
+  object-fit: cover;
+  transition: box-shadow 0.3s;
+}
+
+/* The cover being considered lifts, straightens and glows; the rest step back a little. */
+.pk-cover.is-looking {
+  z-index: 2;
+  transform: translate(-50%, -50%) translate(var(--pk-x), calc(var(--pk-y) - 16px)) rotate(0deg) scale(1.18);
+}
+
+.pk-cover.is-looking img {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 20px #ffffffd9, 0 16px 28px #192b4d33;
+}
+
+.pk-stage:has(.is-looking) .pk-cover:not(.is-looking) {
+  opacity: 0.7;
+}
+
+.pk-page.is-picked .pk-cover {
+  opacity: 0.25;
+}
+
+/* The chosen cover lands beside the companion (clear of its face), slightly larger, with a warm glow. */
+.pk-page.is-picked .pk-cover.is-chosen {
+  z-index: 3;
+  opacity: 1;
+  transform: translate(-50%, -50%) translate(114px, 82px) rotate(7deg) scale(1.18);
+}
+
+.pk-page.is-picked .pk-cover.is-chosen .pk-cover-float {
+  animation: none;
+}
+
+.pk-page.is-picked .pk-cover.is-chosen img {
+  box-shadow: 0 0 0 3px #f3c76b, 0 0 26px #f3c76bb3, 0 12px 24px #192b4d2e;
+}
+
+.pk-page.is-picked .pk-cover.is-chosen::after {
+  content: '✦';
+  position: absolute;
+  top: -14px;
+  right: -10px;
+  color: #e0a94a;
+  font-size: 18px;
+  animation: pk-twinkle 0.9s ease-out both;
+}
+
+/* ---------- Companion ---------- */
+
+.pk-figure {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: 2;
+  width: 220px;
+  transform: translateX(-50%);
+}
+
+/* ---------- Text ---------- */
+
+.pk-caption {
+  min-height: 24px;
+  margin-top: 26px;
+  color: #192b4d;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+  animation: pk-fade-in 300ms ease-out both;
+}
+
+.pk-page.is-picked .pk-caption {
+  animation: pk-caption-in 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.pk-progress {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.pk-progress i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #dde2ec;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.pk-progress i.is-on {
+  background: #b43a27;
+  transform: scale(1.15);
+}
+
+.pk-skip {
+  position: absolute;
+  bottom: 40px;
+  color: #8792a9;
+  font-size: 12px;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes pk-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pk-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(0, 0) rotate(0) scale(0.5);
+  }
+}
+
+@keyframes pk-drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+}
+
+@keyframes pk-twinkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-30deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pk-caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-page,
+  .pk-cover,
+  .pk-cover-float,
+  .pk-caption,
+  .pk-page.is-picked .pk-caption {
+    transition: none;
+    animation: none;
+  }
+}

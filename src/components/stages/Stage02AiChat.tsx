@@ -5,6 +5,7 @@ import { InterestThemePicker, MAX_INTERESTS } from '../InterestThemePicker';
 import { CompanionScene } from '../CompanionScene';
 import { CompanionAvatar } from '../CompanionAvatar';
 import { DifficultySentencePicker } from '../DifficultySentencePicker';
+import { MiniProgramHeader } from '../MiniProgramHeader';
 import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
 
 // Pause after a tap so the selection registers visually before the screen advances.
@@ -470,6 +471,33 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
 
   const isHabitSurvey = Boolean(currentQ);
 
+  // V2 03: laid out like the reader (mini-program header, companion bubble, reading card) so the
+  // difficulty pick already feels like reading.
+  if (isV2 && step === DIFFICULTY_QUESTION.step) {
+    return (
+      <div
+        className="rj-page"
+        style={{ '--rj-bg': `url(${import.meta.env.BASE_URL}assets/journey-bg.jpg)` } as React.CSSProperties}
+      >
+        <MiniProgramHeader title="选择阅读难度" onBack={handlePrevStep} />
+        <div className="rj-companion-row dp-companion-row">
+          <CompanionAvatar companion={companion} size={52} alt={companion.name} />
+          <div className="min-w-0 flex-1" role="status" aria-live="polite">
+            <div className="rj-bubble">
+              <p>
+                {companionBubbleText}
+                {isTyping && (
+                  <span aria-hidden="true" className="ml-1 inline-block h-3.5 w-[2px] translate-y-[2px] animate-pulse bg-[#C83E26] motion-reduce:animate-none" />
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+        <DifficultySentencePicker onConfirm={handleConfirmDifficulty} />
+      </div>
+    );
+  }
+
   return (
     <div
       className={`w-full h-full flex flex-col ${isHabitSurvey ? 'bg-[#FBFAFD] text-[#25243C]' : 'bg-[#F4F1FA] text-stone-900'} select-none overflow-hidden relative font-sans`}
@@ -545,6 +573,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             onToggleTag={handleToggleTag}
             onConfirm={handleConfirmAstrolabe}
             onBack={handlePrevStep}
+            layout={isV2 ? 'reader' : 'scene'}
           />
         )}
 

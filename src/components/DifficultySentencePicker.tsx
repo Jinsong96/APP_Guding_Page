@@ -274,7 +274,6 @@ export const DifficultySentencePicker: React.FC<DifficultySentencePickerProps> =
           </button>
         ))}
       </div>
-      <p className="dp-tip">左右滑动卡片，换一档看看</p>
 
       <div className="dp-footer">
         <button type="button" className="dp-confirm" onClick={() => onConfirm(sample.level)}>

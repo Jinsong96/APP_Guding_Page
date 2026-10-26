@@ -15,6 +15,7 @@ import { Stage00Start } from './components/stages/Stage00Start';
 import { StageRecommend } from './components/stages/StageRecommend';
 import { StageFirstRead } from './components/stages/StageFirstRead';
 import { StageCompanionHome } from './components/stages/StageCompanionHome';
+import { StagePicking } from './components/stages/StagePicking';
 import { TicketIssueIntro } from './components/TicketIssueIntro';
 import { CefrLevelKey } from './components/stages/Stage02AiChat';
 import { ReadingReport, ReportNextArticle, ReportTotals } from './components/ReadingReport';
@@ -330,7 +331,7 @@ export default function App() {
                   });
                   if (version === 'v2') {
                     setV2StartLevel(surveyData?.initialLevel || 'A2');
-                    goToStage(14);
+                    goToStage(16);
                     return;
                   }
                   goToStage(11);
@@ -455,6 +456,19 @@ export default function App() {
                 onStartNext={() => openNextArticle(nextArticleAfter(homeArticle))}
                 onBack={() => goToStage(4)}
                 onHome={() => goToStage(10)}
+              />
+            )}
+
+            {/* Stage 16 (V2 only): the companion picks the first article, then the reading home */}
+            {entryScreen === 'stage' && currentStage === 16 && (
+              <StagePicking
+                companion={currentCompanion}
+                covers={[
+                  HOME_STORY_ARTICLES[v2FeaturedStoryId],
+                  ...Object.values(HOME_STORY_ARTICLES),
+                  ...FIRST_READ_ARTICLES
+                ].filter((article, index, all) => all.findIndex((item) => item.id === article.id) === index)}
+                onDone={() => goToStage(10)}
               />
             )}
 

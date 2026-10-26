@@ -34,17 +34,19 @@ export const APP_SCREENS: AppScreen[] = [
   { index: 11, label: '我的旅伴', stage: 13 }
 ];
 
-// V2 (简略版): interests → one difficulty question → a ticket printed for the featured story → reading home,
+// V2 (简略版): interests → one difficulty question → the companion picks the featured story → reading home,
 // where the first article the user opens is their first read (no ratings, starts at the chosen difficulty).
 export const APP_SCREENS_V2: AppScreen[] = [
   { index: 0, label: '启动', stage: 0 },
   { index: 1, label: '选伴', stage: 1 },
   { index: 2, label: '兴趣', stage: 2, step: 1 },
   { index: 3, label: '阅读难度', stage: 2, step: 14 },
-  { index: 4, label: '为你出票', stage: 14 },
+  { index: 4, label: '为你挑选', stage: 16 },
   { index: 5, label: '阅读首页', stage: 10 },
   { index: 6, label: '阅读报告', stage: 8 },
-  { index: 7, label: '我的旅伴', stage: 13 }
+  { index: 7, label: '我的旅伴', stage: 13 },
+  // Kept for preview only, no longer in the flow: the ticket intro over the home.
+  { index: 8, label: '为你出票', stage: 14 }
 ];
 
 export const screensForVersion = (version: DemoVersion) => (version === 'v2' ? APP_SCREENS_V2 : APP_SCREENS);

@@ -9,6 +9,7 @@ import './start-arrival.css';
 import './difficulty-picker.css';
 import './reading-home.css';
 import './companion-select.css';
+import './picking-transition.css';
 
 const isReaderLab = new URLSearchParams(window.location.search).has('reader-lab');
 
