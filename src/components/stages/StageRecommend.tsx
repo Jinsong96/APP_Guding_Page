@@ -4,10 +4,14 @@ import { Companion } from '../../types';
 import { CompanionScene } from '../CompanionScene';
 import { SceneSpeechBubble } from '../SceneSpeechBubble';
 import { FirstReadArticle, rankArticlesForInterests } from '../../firstReadArticles';
+import { TicketIssueIntro } from '../TicketIssueIntro';
+import { CefrLevelKey } from './Stage02AiChat';
 
 interface StageRecommendProps {
   companion: Companion;
   selectedThemes?: string[];
+  // Starting level the first read will use, shown on the intro ticket.
+  level: CefrLevelKey;
   onBack: () => void;
   onSelectArticle: (article: FirstReadArticle) => void;
 }
@@ -36,11 +40,14 @@ const STARRY_BUTTON_BG = [
 export const StageRecommend: React.FC<StageRecommendProps> = ({
   companion,
   selectedThemes = [],
+  level,
   onBack,
   onSelectArticle
 }) => {
   const articles = rankArticlesForInterests(selectedThemes);
   const [index, setIndex] = useState(0);
+  // The ticket-printing intro plays each time the screen opens, then reveals the recommendation.
+  const [showIntro, setShowIntro] = useState(true);
   const pointerStartX = useRef<number | null>(null);
   const article = articles[index];
 
@@ -188,6 +195,16 @@ export const StageRecommend: React.FC<StageRecommendProps> = ({
           <p className="mt-1.5 text-center text-[12px] text-[#8A8CA3]">阅读时可随时切换难度</p>
         </footer>
       </div>
+
+      {showIntro && (
+        <TicketIssueIntro
+          companion={companion}
+          article={article}
+          theme={displayTheme}
+          level={level}
+          onDone={() => setShowIntro(false)}
+        />
+      )}
     </div>
   );
 };

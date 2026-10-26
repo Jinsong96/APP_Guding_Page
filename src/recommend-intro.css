@@ -1,0 +1,438 @@
+/* V1 06 推荐文章: "ticket printed for you" intro (TicketIssueIntro).
+   Timeline: slot drops 0–450ms · ticket prints 400–1300 · settles 1300–1850 · reasons tick one by one
+   from 1800 (every 400ms) · stamp + sparkles + caption 3300 · hold · fly away 4900–5400. */
+
+.ti-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(120% 80% at 50% 38%, #2a3479e6, #141a3df2);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+  animation:
+    ti-fade-in 300ms ease-out both,
+    ti-fade-out 500ms ease-in 4900ms forwards;
+}
+
+.ti-overlay:focus-visible {
+  outline: none;
+}
+
+.ti-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -40px;
+  animation: ti-fly-away 500ms cubic-bezier(0.5, 0, 0.75, 0) 4900ms forwards;
+}
+
+/* ---------- Slot the ticket prints out of ---------- */
+
+.ti-slot {
+  position: relative;
+  z-index: 2;
+  width: 318px;
+  height: 22px;
+  border-radius: 11px;
+  background: linear-gradient(#3a46a0, #222b6e);
+  box-shadow: 0 5px 0 #10163a, 0 12px 24px #0006;
+  animation:
+    ti-slot-drop 450ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    ti-slot-leave 300ms ease-in 1350ms forwards;
+}
+
+.ti-slot span {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  left: 14px;
+  height: 6px;
+  border-radius: 3px;
+  background: #0b0f2a;
+  box-shadow: 0 1px 0 #ffffff26, inset 0 0 6px #f6c76b55;
+}
+
+/* Clips only the top edge so the ticket appears to come out of the slot. */
+.ti-print-window {
+  position: relative;
+  z-index: 1;
+  margin-top: -11px;
+  padding-top: 0;
+  clip-path: inset(0 -60px -120px -60px);
+  animation: ti-impact 360ms ease-out 3400ms both;
+}
+
+/* ---------- Ticket ---------- */
+
+.ti-ticket {
+  position: relative;
+  width: 290px;
+  padding: 14px 16px 12px;
+  border-radius: 0 0 14px 14px;
+  background: radial-gradient(at 50% 30%, #fffdf8, #f4efe6);
+  color: #3d3550;
+  box-shadow: 0 6px 0 #d9cebd, 0 22px 36px #0007;
+  translate: 0 -100%;
+  transform-origin: 50% 0;
+  animation:
+    ti-print 900ms cubic-bezier(0.22, 0.9, 0.3, 1) 400ms forwards,
+    ti-settle 550ms cubic-bezier(0.34, 1.4, 0.64, 1) 1300ms both;
+}
+
+.ti-ticket-head {
+  display: flex;
+  justify-content: space-between;
+  color: #8a7b90;
+  font-family: 'Songti SC', serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+
+.ti-ticket-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ti-ticket-title img {
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 3px 0 #e2d8c8;
+}
+
+.ti-ticket-title div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ti-ticket-title strong {
+  color: #2b2440;
+  font-family: 'Songti SC', serif;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ti-ticket-title em {
+  color: #6f6280;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.ti-perforation {
+  position: relative;
+  height: 1px;
+  margin: 13px -16px 10px;
+  background: repeating-linear-gradient(90deg, #c4b5c8 0 4px, #0000 4px 8px);
+}
+
+.ti-perforation::before,
+.ti-perforation::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #1f2766;
+}
+
+.ti-perforation::before {
+  left: -8px;
+}
+
+.ti-perforation::after {
+  right: -8px;
+}
+
+/* ---------- The three reasons ---------- */
+
+.ti-reasons {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ti-reasons li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 8px 0 12px;
+  border: 1.5px solid #e7dfd2;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 0 #e4dbcc;
+  opacity: 0;
+  animation: ti-drop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(1800ms + var(--ti-i) * 400ms) forwards;
+}
+
+.ti-reason-label {
+  color: #9a8ea3;
+  font-size: 12px;
+}
+
+.ti-reason-value {
+  flex: 1;
+  color: #2b2440;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ti-check {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #58b65b;
+  color: #fff;
+  box-shadow: 0 2px 0 #3e8f42;
+  scale: 0;
+  animation: ti-pop 380ms cubic-bezier(0.34, 1.8, 0.64, 1) calc(2100ms + var(--ti-i) * 400ms) forwards;
+}
+
+.ti-ticket-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 11px;
+  color: #8a7b90;
+  font-size: 11px;
+}
+
+.ti-ticket-foot img {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* ---------- Stamp, sparkles, caption ---------- */
+
+/* Hangs off the bottom-right corner so it never covers the title or the ticks. */
+.ti-stamp {
+  position: absolute;
+  right: -8px;
+  bottom: -26px;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 2.5px solid #c8412d;
+  border-radius: 50%;
+  background: #f8f3ea;
+  box-shadow: inset 0 0 0 3px #f8f3ea, inset 0 0 0 4.5px #c8412d, 0 3px 0 #0b0f2a55;
+  color: #c8412d;
+  opacity: 0;
+  rotate: -14deg;
+  animation: ti-stamp 450ms cubic-bezier(0.2, 0.9, 0.3, 1.2) 3300ms forwards;
+}
+
+.ti-stamp span {
+  width: 2.2em;
+  font-family: 'Songti SC', serif;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.ti-sparkles {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  pointer-events: none;
+}
+
+.ti-sparkles i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px;
+  border-radius: 2px;
+  background: #f6c76b;
+  box-shadow: 0 0 8px #f6c76baa;
+  opacity: 0;
+  rotate: var(--ti-a);
+  animation: ti-burst 900ms ease-out 3400ms forwards;
+}
+
+.ti-sparkles i:nth-child(even) {
+  width: 6px;
+  height: 6px;
+  margin: -3px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.ti-caption {
+  margin-top: 26px;
+  color: #fff;
+  font-family: 'Songti SC', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 0 #0b0f2a;
+  opacity: 0;
+  animation: ti-caption 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 3400ms forwards;
+}
+
+.ti-skip {
+  position: absolute;
+  bottom: 40px;
+  color: #ffffff80;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes ti-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ti-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ti-slot-drop {
+  from {
+    opacity: 0;
+    translate: 0 -40px;
+  }
+}
+
+@keyframes ti-slot-leave {
+  to {
+    opacity: 0;
+    translate: 0 -26px;
+    scale: 0.94;
+  }
+}
+
+@keyframes ti-print {
+  0% {
+    translate: 0 -100%;
+  }
+  70% {
+    translate: 0 -12%;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+/* After printing, the ticket tips toward the viewer and springs flat: the 3D beat. */
+@keyframes ti-settle {
+  0% {
+    transform: perspective(700px) rotateX(-24deg) scale(0.98);
+  }
+  55% {
+    transform: perspective(700px) rotateX(8deg) scale(1.04);
+  }
+  100% {
+    transform: perspective(700px) rotateX(0) scale(1);
+  }
+}
+
+@keyframes ti-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.04, 0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ti-pop {
+  0% {
+    scale: 0;
+  }
+  70% {
+    scale: 1.3;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes ti-stamp {
+  0% {
+    opacity: 0;
+    scale: 2.4;
+  }
+  70% {
+    opacity: 0.95;
+    scale: 0.92;
+  }
+  100% {
+    opacity: 0.9;
+    scale: 1;
+  }
+}
+
+@keyframes ti-impact {
+  0%,
+  100% {
+    scale: 1;
+  }
+  40% {
+    scale: 0.97;
+  }
+  70% {
+    scale: 1.015;
+  }
+}
+
+@keyframes ti-burst {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-120px) scale(1);
+  }
+}
+
+@keyframes ti-caption {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ti-fly-away {
+  to {
+    opacity: 0;
+    transform: translateY(160px) scale(0.55);
+  }
+}

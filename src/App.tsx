@@ -323,14 +323,6 @@ export default function App() {
                   }
                   goToStage(11);
                 }}
-                onSkip={() => {
-                  if (version === 'v2') {
-                    goToStage(14);
-                    return;
-                  }
-                  goToStage(11);
-                  showToast('已跳过对话，先为你推荐几篇');
-                }}
               />
             )}
 
@@ -339,6 +331,7 @@ export default function App() {
               <StageRecommend
                 companion={currentCompanion}
                 selectedThemes={preferences.selectedThemes}
+                level={firstReadStartLevel}
                 onBack={() => goToStage(2, 13)}
                 onSelectArticle={(article) => {
                   setFirstReadArticleId(article.id);
