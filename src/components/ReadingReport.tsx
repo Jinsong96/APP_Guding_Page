@@ -49,8 +49,8 @@ const COUNT_UP_MS = 900;
 // Print-out length before the report appears (matches rj-print + rj-print-settle).
 const ISSUE_MS = 1500;
 // When the 已完成阅读 stamp lands: after the print-out, or after the arrival flip on a direct visit.
-const STAMP_AFTER_ISSUE_MS = 250;
-const STAMP_AFTER_ARRIVAL_MS = 1100;
+const STAMP_AFTER_ISSUE_MS = 550;
+const STAMP_AFTER_ARRIVAL_MS = 1500;
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

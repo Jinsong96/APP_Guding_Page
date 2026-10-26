@@ -1209,14 +1209,14 @@
   z-index: 4;
   display: grid;
   place-content: center;
-  width: 70px;
-  height: 70px;
-  border: 2.5px solid #b43b2d;
+  width: 88px;
+  height: 88px;
+  border: 3px solid #b43b2d;
   border-radius: 50%;
   box-shadow: inset 0 0 0 3px #f4f1ee, inset 0 0 0 4.5px #b43b2d;
   color: #b43b2d;
   font-family: 'Songti SC', serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: 1px;
@@ -1229,7 +1229,7 @@
 }
 
 .rj-done-stamp.is-stamped {
-  animation: rj-stamp 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+  animation: rj-stamp 720ms cubic-bezier(0.22, 0.85, 0.3, 1.08) forwards;
 }
 
 @keyframes rj-print {
@@ -1256,14 +1256,14 @@
 @keyframes rj-stamp {
   0% {
     opacity: 0;
-    scale: 2.2;
+    scale: 1.65;
   }
-  70% {
+  72% {
     opacity: 0.95;
-    scale: 0.92;
+    scale: 0.94;
   }
   100% {
-    opacity: 0.88;
+    opacity: 0.92;
     scale: 1;
   }
 }
@@ -1275,6 +1275,6 @@
   }
 
   .rj-done-stamp.is-stamped {
-    opacity: 0.88;
+    opacity: 0.92;
   }
 }
