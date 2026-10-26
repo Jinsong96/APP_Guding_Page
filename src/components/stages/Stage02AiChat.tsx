@@ -4,7 +4,6 @@ import { Companion, GoalTrackDetails } from '../../types';
 import { InterestThemePicker } from '../InterestThemePicker';
 import { CompanionScene } from '../CompanionScene';
 import { CompanionAvatar } from '../CompanionAvatar';
-import { ONBOARDING_PHASES, ONBOARDING_PHASES_V2, OnboardingProgress } from '../OnboardingProgress';
 import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
 
 // Pause after a tap so the selection registers visually before the screen advances.
@@ -169,10 +168,10 @@ const DIFFICULTY_QUESTION: SurveyQuestionDef = {
   title: '你想读什么难度的文章？',
   defaultPrompt: '选一个读起来舒服的难度，之后会跟着你慢慢调～',
   options: [
-    { label: '入门', subtitle: '认识常用词，能读懂简单短句', level: 'A1-', aiReasoning: '' },
-    { label: '基础', subtitle: '能读懂日常话题的短文和小故事', level: 'A2', aiReasoning: '' },
-    { label: '进阶', subtitle: '能读懂简单的英文新闻和科普', level: 'B1', aiReasoning: '' },
-    { label: '高阶', subtitle: '能读外刊级别的原版文章', level: 'B2+', aiReasoning: '' }
+    { label: '入门', subtitle: '常用词和简单短句', level: 'A1-', aiReasoning: '' },
+    { label: '基础', subtitle: '日常短文和小故事', level: 'A2', aiReasoning: '' },
+    { label: '进阶', subtitle: '英文新闻和科普', level: 'B1', aiReasoning: '' },
+    { label: '高阶', subtitle: '外刊原文', level: 'B2+', aiReasoning: '' }
   ]
 };
 
@@ -216,7 +215,6 @@ interface Stage02AiChatProps {
   onStepChange?: (step: number) => void;
   onBack: () => void;
   onComplete: (selectedInterests: string[], surveyAnswers?: SurveyAnswers) => void;
-  onSkip: () => void;
   version?: 'v1' | 'v2';
 }
 
@@ -226,12 +224,10 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
   onStepChange,
   onBack,
   onComplete,
-  onSkip,
   version = 'v1'
 }) => {
   const isV2 = version === 'v2';
   const firstQuestionStep = isV2 ? DIFFICULTY_QUESTION.step : 11;
-  const progressPhases = isV2 ? ONBOARDING_PHASES_V2 : ONBOARDING_PHASES;
   const questionsFor = (goalCat: GoalCategory) =>
     isV2 ? [DIFFICULTY_QUESTION] : getSurveyQuestions(companion.name, goalCat);
   // Navigation Steps:
@@ -493,20 +489,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             <h1 className="truncate text-center text-[17px] font-semibold text-[#172747]">
               和{companion.name}聊聊
             </h1>
-            <OnboardingProgress
-              phase={2}
-              phases={progressPhases}
-              phaseProgress={(currentQ?.number || 1) / (currentQ?.total || 3)}
-              className="mx-auto mt-1 w-[184px]"
-            />
           </div>
-          <button
-            type="button"
-            onClick={onSkip}
-            className="shrink-0 px-2 py-2 text-[13px] font-medium text-[#6F7E96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#BD4B35]"
-          >
-            跳过
-          </button>
+          <span className="h-10 w-10 shrink-0" aria-hidden="true" />
         </header>
       ) : null}
 
@@ -563,7 +547,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
             onToggleTag={handleToggleTag}
             onConfirm={handleConfirmAstrolabe}
             onBack={handlePrevStep}
-            onSkip={onSkip}
           />
         )}
 
@@ -589,21 +572,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
                   >
                     和{companion.name}聊聊
                   </h1>
-                  <OnboardingProgress
-                    phase={2}
-                    phases={progressPhases}
-                    phaseProgress={currentQ.number / currentQ.total}
-                    tone="dark"
-                    className="mt-1 w-[184px]"
-                  />
                 </div>
-                <button
-                  type="button"
-                  onClick={onSkip}
-                  className="mt-1 min-w-9 px-1 py-2 text-[14px] font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                >
-                  跳过
-                </button>
+                <span className="h-9 min-w-9" aria-hidden="true" />
               </header>
             </section>
 

@@ -116,7 +116,6 @@ export const BoardView: React.FC<BoardViewProps> = ({
                     companion={companion}
                     onBack={() => {}}
                     onComplete={() => {}}
-                    onSkip={() => {}}
                   />
                 )}
                 {stage.num === 11 && (

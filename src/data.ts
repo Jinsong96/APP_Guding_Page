@@ -179,7 +179,7 @@ export const COMPANIONS: Companion[] = [
     portraitUrl: publicAsset('/assets/companion-tuanzi-avatar.jpg'),
     sceneUrl: publicAsset('/assets/companion-tuanzi-scene.webp'),
     sceneMouth: { x: 0.4375, y: 0.445 },
-    intro: '我是团子…\n安静陪你读就好。',
+    intro: '我是团子，\n安静陪你读就好。',
     celebrateActionName: '元气活力跳跃',
     celebrateQuote: '“读累了就歇一会儿，我一直都在。”',
     accentColor: '#6C779B',

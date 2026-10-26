@@ -13,7 +13,6 @@ import type { Companion } from '../types';
 import { CompletionRipple } from './CompletionRipple';
 import { CompanionScene } from './CompanionScene';
 import { CompanionAvatar } from './CompanionAvatar';
-import { OnboardingProgress } from './OnboardingProgress';
 
 interface InterestThemePickerProps {
   companion: Companion;
@@ -24,7 +23,6 @@ interface InterestThemePickerProps {
   onToggleTag: (tag: string) => void;
   onConfirm: (tags: string[]) => void;
   onBack: () => void;
-  onSkip: () => void;
 }
 
 const INTERESTS = [
@@ -44,8 +42,7 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   isConfirming,
   onToggleTag,
   onConfirm,
-  onBack,
-  onSkip
+  onBack
 }) => {
   const selectedNames = selectedTags.filter((tag) => INTERESTS.some((interest) => interest.name === tag));
 
@@ -70,15 +67,8 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
             >
               和{companion.name}聊聊
             </h1>
-            <OnboardingProgress phase={1} tone="dark" className="mt-1 w-[184px]" />
           </div>
-          <button
-            type="button"
-            onClick={onSkip}
-            className="mt-1 min-w-9 px-1 py-2 text-[14px] font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          >
-            跳过
-          </button>
+          <span className="h-9 w-9" aria-hidden="true" />
         </header>
       </section>
 

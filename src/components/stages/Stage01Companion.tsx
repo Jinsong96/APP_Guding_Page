@@ -8,7 +8,6 @@ import { SceneSpeechBubble } from '../SceneSpeechBubble';
 // The selection hero spans the full 393pt screen at 2:1.
 const HERO_WIDTH = 393;
 const HERO_HEIGHT = HERO_WIDTH / 2;
-import { OnboardingProgress } from '../OnboardingProgress';
 
 interface Stage01CompanionProps {
   selectedCompanionId: CompanionId;
@@ -48,8 +47,6 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
         </span>
         <span className="h-9 w-9" aria-hidden="true" />
       </header>
-
-      <OnboardingProgress phase={0} className="shrink-0 px-1" />
 
       <section className="flex h-[67px] shrink-0 flex-col items-center justify-center text-center">
         <h1
