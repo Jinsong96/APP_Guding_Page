@@ -5,14 +5,31 @@ interface Stage00StartProps {
   onBrowse: () => void;
 }
 
+// The start scene is one flat illustration, so the train "pulls in" through layers on top of it
+// (start-arrival.css): the camera glides in and brakes, light from passing windows and rail glints
+// slow down, then the headlight flares and the engine lets off steam.
 export const Stage00Start: React.FC<Stage00StartProps> = ({ onStart, onBrowse }) => (
   <div className="relative h-full w-full overflow-hidden bg-[#101b35] text-white">
-    <img
-      src={`${import.meta.env.BASE_URL}assets/readpal-start-scene.png`}
-      alt=""
-      aria-hidden="true"
-      className="absolute inset-0 h-full w-full object-fill"
-    />
+    <div className="st-camera" aria-hidden="true">
+      <div className="st-brake">
+        <img
+          src={`${import.meta.env.BASE_URL}assets/readpal-start-scene.png`}
+          alt=""
+          className="absolute inset-0 h-full w-full object-fill"
+        />
+        <span className="st-window-sweep st-window-sweep-left" />
+        <span className="st-window-sweep st-window-sweep-right" />
+        <span className="st-rail-glint" />
+        <span className="st-headlight-beam" />
+        <span className="st-headlight" />
+        <span className="st-steam">
+          <i />
+          <i />
+          <i />
+        </span>
+      </div>
+    </div>
+    <div className="st-night-fade" aria-hidden="true" />
 
     <div className="sr-only">
       <h1>ReadPal</h1>

@@ -1,0 +1,254 @@
+/* 00 启动: the night train pulls into the station (Stage00Start).
+   Positions are % of readpal-start-scene.png, which fills the screen.
+   Timeline: night fades 0–900ms · camera glides in 0–4000 · window light and rail glints slow down
+   200–3600 · brake settle 3500 · headlight flare 3600 · steam 3700. */
+
+.st-camera {
+  position: absolute;
+  inset: 0;
+  transform-origin: 82% 55%;
+  animation: st-dolly 4000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.st-brake {
+  position: absolute;
+  /* A few px of overscan so the brake lurch never shows the edge. */
+  inset: -4px;
+  animation: st-brake 650ms ease-out 3500ms both;
+}
+
+.st-night-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: #070b1c;
+  pointer-events: none;
+  animation: st-fade 900ms ease-out forwards;
+}
+
+/* Warm light from the carriage windows sliding past, slowing to a stop.
+   Split in two so it skips the deer standing in front of the train. */
+.st-window-sweep {
+  position: absolute;
+  top: 43.5%;
+  height: 9.5%;
+  background-image: repeating-linear-gradient(
+    90deg,
+    #ffd58a00 0px,
+    #ffd58acc 18px,
+    #ffd58a00 40px,
+    #ffd58a00 110px
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation:
+    st-sweep-move 3400ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms both,
+    st-sweep-fade 3400ms linear 200ms both;
+}
+
+.st-window-sweep-left {
+  left: 0;
+  width: 11%;
+}
+
+.st-window-sweep-right {
+  left: 32%;
+  width: 44%;
+}
+
+/* Glints running along the rail lights in front of the engine. */
+.st-rail-glint {
+  position: absolute;
+  top: 60.2%;
+  left: 63%;
+  width: 35%;
+  height: 1.6%;
+  background-image: radial-gradient(circle at 50% 50%, #fff3c8 0 2px, #ffd58a66 3px, #0000 7px);
+  background-size: 34px 100%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation:
+    st-sweep-move 3400ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms both,
+    st-sweep-fade 3400ms linear 200ms both;
+}
+
+.st-headlight {
+  position: absolute;
+  top: 55.6%;
+  left: 88.8%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffbe8 0 18%, #ffd27a 32%, #ffb84d55 55%, #0000 72%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation:
+    st-flare 700ms cubic-bezier(0.2, 0.9, 0.3, 1.2) 3600ms forwards,
+    st-breathe 2600ms ease-in-out 4300ms infinite;
+}
+
+.st-headlight-beam {
+  position: absolute;
+  top: 51.5%;
+  left: 89%;
+  width: 14%;
+  height: 8%;
+  background: radial-gradient(ellipse at 0% 50%, #ffe2a0aa, #ffd27a33 45%, #0000 75%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform-origin: 0 50%;
+  animation: st-beam 900ms ease-out 3700ms forwards;
+}
+
+.st-steam {
+  position: absolute;
+  top: 45.2%;
+  left: 81.5%;
+}
+
+.st-steam i {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin: -11px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f4f2ffdd, #d9d6f0aa 45%, #0000 70%);
+  filter: blur(1.5px);
+  opacity: 0;
+  animation: st-puff 2600ms ease-out 3700ms 2 both;
+}
+
+.st-steam i:nth-child(2) {
+  animation-delay: 4000ms;
+}
+
+.st-steam i:nth-child(3) {
+  animation-delay: 4300ms;
+}
+
+@keyframes st-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Camera starts close on the arriving engine and eases back as the train slows. */
+@keyframes st-dolly {
+  from {
+    transform: translateX(-3%) scale(1.14);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* A small lurch forward and back when the brakes catch. */
+@keyframes st-brake {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateX(3px) rotate(0.15deg);
+  }
+  60% {
+    transform: translateX(-1.5px);
+  }
+  80% {
+    transform: translateX(0.5px);
+  }
+}
+
+@keyframes st-sweep-move {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 880px;
+  }
+}
+
+@keyframes st-sweep-fade {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  70% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes st-flare {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(2.4);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes st-breathe {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1.2);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+}
+
+@keyframes st-beam {
+  from {
+    opacity: 0;
+    transform: scaleX(0.3);
+  }
+  to {
+    opacity: 0.8;
+    transform: none;
+  }
+}
+
+@keyframes st-puff {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  15% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-14px, -70px) scale(2.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-camera,
+  .st-brake,
+  .st-night-fade,
+  .st-window-sweep,
+  .st-rail-glint,
+  .st-headlight,
+  .st-headlight-beam,
+  .st-steam i {
+    animation: none;
+  }
+
+  .st-night-fade {
+    opacity: 0;
+  }
+}
