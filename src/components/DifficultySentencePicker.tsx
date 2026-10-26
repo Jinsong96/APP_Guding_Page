@@ -6,7 +6,7 @@ interface DifficultySentencePickerProps {
   onConfirm: (level: CefrLevelKey) => void;
 }
 
-interface LevelSample {
+export interface LevelSample {
   level: CefrLevelKey;
   label: string;
   sentence: string;
@@ -17,7 +17,8 @@ interface LevelSample {
 }
 
 // The same idea written at four levels, so only the difficulty changes between stops.
-const LEVEL_SAMPLES: LevelSample[] = [
+// Also used by the example-list version of the question (DifficultyExampleList).
+export const LEVEL_SAMPLES: LevelSample[] = [
   {
     level: 'A1-',
     label: '入门',
