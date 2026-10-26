@@ -11,9 +11,9 @@ interface Stage01CompanionProps {
   onNext: () => void;
 }
 
-// Three traits per companion, from the IP sheet (signature behaviour + look).
+// Three traits per companion, from each character sheet.
 const COMPANION_TRAITS: Record<CompanionId, string[]> = {
-  wick: ['静默引路', '走三步回头', '角尖微光'],
+  wick: ['温柔', '好奇', '治愈'],
   pal: ['机灵探索', '收藏好句', '星图长尾'],
   tuanzi: ['安静在场', '偶尔眨眼', '书角尾巴']
 };

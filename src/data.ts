@@ -146,7 +146,7 @@ export const COMPANIONS: Companion[] = [
     celebrateQuote: '“太棒啦！准备好一起出发了吗？”',
     accentColor: '#B83C2A',
     bgGlow: 'rgba(184, 60, 42, 0.18)',
-    description: '在前面安静引路，走三步回一次头。'
+    description: '温柔而好奇，会为黑暗的地方点亮微光。'
   },
   {
     id: 'pal',
