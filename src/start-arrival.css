@@ -172,11 +172,11 @@
   outline-offset: 3px;
 }
 
-/* Engine headlight on the resting frame (start-train-arrival-poster.jpg: lamp at 600,753 of 720×1280). */
+/* Engine headlight on the resting frame (start-train-arrival-poster.jpg: lamp at 596,755 of 720×1280). */
 .st-headlight {
   position: absolute;
-  top: 58.8%;
-  left: 83.3%;
+  top: 59%;
+  left: 82.8%;
   width: 34px;
   height: 34px;
   margin: -17px 0 0 -17px;
@@ -188,8 +188,8 @@
 
 .st-headlight-beam {
   position: absolute;
-  top: 55.4%;
-  left: 83.5%;
+  top: 55.6%;
+  left: 83%;
   width: 16%;
   height: 7%;
   background: radial-gradient(ellipse at 0% 50%, #ffe2a0aa, #ffd27a33 45%, #0000 75%);
