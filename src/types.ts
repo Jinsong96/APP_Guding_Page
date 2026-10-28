@@ -20,11 +20,6 @@ export interface Companion {
   // Point beside the head to anchor bubbles instead of the mouth, for scenes where a bubble at the
   // mouth would cover the body.
   sceneBubbleAnchors?: { side?: { x: number; y: number } };
-  // One-line self-introduction shown in the companion selection hero.
-  intro: string;
-  celebrateAvatarUrl?: string;
-  celebrateActionName?: string;
-  celebrateQuote?: string;
   accentColor: string;
   bgGlow: string;
   description: string;

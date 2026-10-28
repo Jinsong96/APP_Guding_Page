@@ -13,7 +13,7 @@ export const INTEREST_STEP = 1;
 export const DIFFICULTY_STEP = 2;
 
 const BUBBLE_LINES: Record<number, string> = {
-  [INTEREST_STEP]: '这一程，你想先读点什么？',
+  [INTEREST_STEP]: '你平时喜欢读些什么呀？',
   // The line break keeps 「左右滑滑看～」 together on the second line.
   [DIFFICULTY_STEP]: '哪一句，你读着最舒服？\n左右滑滑看～'
 };

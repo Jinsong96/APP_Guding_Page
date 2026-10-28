@@ -105,7 +105,7 @@ const PICKING_CLIPS: Record<CompanionId, PickingClip> = {
 
 const PICKED_LINES: Record<CompanionId, string> = {
   wick: '车票盖好啦，我们从这一站出发吧。',
-  pal: '破案啦，就是这篇文章！',
+  pal: '我仔细比较过了，这篇最适合你！',
   tuanzi: '……给你留了个靠窗的位置。'
 };
 

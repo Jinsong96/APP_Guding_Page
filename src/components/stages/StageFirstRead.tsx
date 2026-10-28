@@ -39,7 +39,7 @@ type LineMoment = 'start' | 'checkpoint' | 'end';
 
 // IP rule: a companion speaks up at most three times per read, each in its own voice.
 // The first line always teaches tapping a word for help, the core "stuck? someone helps" moment.
-// Wick guides quietly and looks back now and then; Pal plays detective and collects; Tuanzi barely speaks.
+// Wick guides gently and looks back now and then; Pal is the bookish scholar; Tuanzi talks tough but cares.
 const COMPANION_LINES: Record<CompanionId, Partial<Record<LineMoment, string>>> = {
   wick: {
     start: '遇到不认识的词，点一下，我在旁边轻声告诉你。',
@@ -47,13 +47,14 @@ const COMPANION_LINES: Record<CompanionId, Partial<Record<LineMoment, string>>> 
     end: '最后一段了，我在前面等你到站。'
   },
   pal: {
-    start: '发现不认识的词？点它！我来帮你破案～',
-    checkpoint: '线索越来越多啦！查到的词可以加入词句本，我帮你收着。',
-    end: '最后一段，线索集齐就到站！'
+    start: '生词点一下，意思和来历我都知道！',
+    checkpoint: '好词记下来！词句本就是你的笔记。',
+    end: '最后一段，读完又多知道一点点！'
   },
   tuanzi: {
-    start: '（团子用尾巴轻轻点了点一个词：卡住了就点一下）',
-    end: '（团子慢慢眨了一下眼，陪你读完最后一段）'
+    start: '……别硬扛，不认识就点一下。',
+    checkpoint: '（打了个哈欠）读得还行嘛，继续。',
+    end: '最后一段了。慢慢读，我又不急。'
   }
 };
 

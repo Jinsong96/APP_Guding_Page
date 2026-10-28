@@ -13,9 +13,9 @@ interface Stage01CompanionProps {
 
 // Three traits per companion, from each character's positioning.
 const COMPANION_TRAITS: Record<CompanionId, string[]> = {
-  wick: ['温柔', '好奇', '治愈'],
-  pal: ['博学', '爱探索', '星图学者'],
-  tuanzi: ['嘴硬', '心软', '守护']
+  wick: ['温柔', '坚韧', '有担当'],
+  pal: ['博学', '认真', '有点书呆子'],
+  tuanzi: ['慵懒', '重感情', '心细']
 };
 
 // Card width plus the gap to the next card; the track moves by this per companion.
@@ -72,9 +72,8 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
       </header>
 
       <section className="cs-intro">
-        <h1>选择旅伴</h1>
-        <p>这一程，想和谁同行？</p>
-        <p>学习功能相同，陪伴方式由你选择。</p>
+        <h1>这一程，想和谁同行？</h1>
+        <p>跟着感觉选就好</p>
       </section>
 
       <div

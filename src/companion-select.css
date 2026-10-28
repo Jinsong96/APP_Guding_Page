@@ -37,9 +37,12 @@
 
 .cs-intro h1 {
   margin-bottom: 10px;
-  font-size: 32px;
+  /* Same serif as the companion names and the reading home's title. */
+  font-family: 'Songti SC', 'STSong', 'Noto Serif CJK SC', Georgia, serif;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .cs-intro p {
@@ -215,6 +218,12 @@
 .cs-clip.is-active.is-still:not(.has-motion) .cs-clip-still {
   transform-origin: 50% 90%;
   animation: cs-art-breathe 4.6s ease-in-out infinite;
+}
+
+/* A motion clip without an idle loop rests on its last frame and breathes from there. */
+.cs-clip.has-motion.is-active.is-still .cs-clip-still {
+  transform-origin: 50% 92%;
+  animation: cs-clip-breathe 4.2s ease-in-out infinite;
 }
 
 .cs-clip:focus-visible {
@@ -427,6 +436,16 @@
   }
   50% {
     transform: scale(1.045);
+  }
+}
+
+@keyframes cs-clip-breathe {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: scale(1.018);
   }
 }
 

@@ -12,6 +12,8 @@ interface ClipSet {
   signature?: string;
   // First frame of the signature move: the still shown on inactive cards and while loading.
   poster: string;
+  // Last frame of the signature, shown after it when there is no idle loop (defaults to the poster).
+  rest?: string;
   // Seamless idle loop (forward-then-back); without one the still poster breathes in CSS instead.
   idle?: string;
   // Where the idle loop starts so it picks up from the signature's last frame (seconds).
@@ -25,11 +27,12 @@ const clipUrl = (file: string) => `${import.meta.env.BASE_URL}assets/companions/
 // Designs follow the 2026-10-27 IP sheet (银河夜行专列 · IP 三视图). A companion without a clip can fall
 // back to a still cut from that sheet (*-card-v2.jpg); the older *-signature.mp4 / *-idle.mp4 show the previous designs.
 const CLIPS: Record<CompanionId, ClipSet> = {
+  // 凑近镜头: he runs up to the lens, leaves a glowing hoof print, hops back and waves.
+  // No idle clip: the old idle shows the previous model, so he rests on the last frame and breathes.
   wick: {
-    signature: clipUrl('wick-v2-signature.mp4'),
-    poster: clipUrl('wick-v2-signature.jpg'),
-    idle: clipUrl('wick-v2-idle.mp4'),
-    idleStart: 43 / 24,
+    signature: clipUrl('wick-v3-signature.mp4'),
+    poster: clipUrl('wick-v3-signature.jpg'),
+    rest: clipUrl('wick-v3-still.jpg'),
     sound: true
   },
   pal: {
@@ -51,12 +54,14 @@ const CLIPS: Record<CompanionId, ClipSet> = {
 type Phase = 'still' | 'signature' | 'idle';
 
 // V2 01 选伴: the companion's 3D motion clip (or a still in a rounded night-window frame when it has none).
-// On focus it plays its signature move once with sound (Wick lights up his antlers, Pal spins with a sparkle
+// On focus it plays its signature move once with sound (Wick runs up to the lens and leaves a hoof print, Pal spins with a sparkle
 // trail, Tuanzi's sunglasses slip and he pushes them back), then idles; tap to see the signature move again.
 // Styles: companion-select.css (.cs-clip).
 export const CompanionClip: React.FC<CompanionClipProps> = ({ companion, active }) => {
   const clips = CLIPS[companion.id];
   const [phase, setPhase] = useState<Phase>('still');
+  // The signature has just finished and there is no idle loop to take over.
+  const [resting, setResting] = useState(false);
   const signatureRef = useRef<HTMLVideoElement | null>(null);
   const idleRef = useRef<HTMLVideoElement | null>(null);
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -67,6 +72,7 @@ export const CompanionClip: React.FC<CompanionClipProps> = ({ companion, active 
     idleRef.current?.pause();
     video.currentTime = 0;
     video.muted = !clips.sound;
+    setResting(false);
     setPhase('signature');
     // Sound needs a user gesture: if the browser refuses, play muted; if that is refused too
     // (e.g. power saving), stay on the still.
@@ -80,6 +86,7 @@ export const CompanionClip: React.FC<CompanionClipProps> = ({ companion, active 
   const startIdle = () => {
     const idle = idleRef.current;
     if (!idle) {
+      setResting(true);
       setPhase('still');
       return;
     }
@@ -94,6 +101,7 @@ export const CompanionClip: React.FC<CompanionClipProps> = ({ companion, active 
     } else {
       signatureRef.current?.pause();
       idleRef.current?.pause();
+      setResting(false);
       setPhase('still');
     }
   }, [active]);
@@ -111,7 +119,7 @@ export const CompanionClip: React.FC<CompanionClipProps> = ({ companion, active 
         playSignature();
       }}
     >
-      <img className="cs-clip-still" src={clips.poster} alt="" draggable={false} />
+      <img className="cs-clip-still" src={resting && clips.rest ? clips.rest : clips.poster} alt="" draggable={false} />
       {clips.signature && (
         <video
           ref={signatureRef}
