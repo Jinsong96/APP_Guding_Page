@@ -1095,13 +1095,18 @@
   }
 }
 
-/* ---------- V2 为你出票 → 阅读报告 (ReadingReport issuing) ----------
-   On a dark screen the report ticket prints out of a slot (0.2–1.1s) and settles (to 1.5s); then the
-   dark layer and slot fade away and the report fades in around the same ticket. The 已完成阅读 stamp
-   lands right after (or ~1.1s after a direct visit). */
+/* ---------- 为你出票 → 阅读报告 (ReadingReport issuing) ----------
+   On a dark screen the companion's paws hand the report ticket down from above (0.2–1.1s), let go and
+   pull back while it settles; then one paw comes back and taps the ticket (1.35–2.45s). At 2.55s the dark layer fades and the report fades in around the same
+   ticket; the 已完成阅读 stamp lands right after (or ~1.1s after a direct visit). */
 
 .rj-report-scroll {
   position: relative;
+}
+
+/* Let the paws' arms reach up past the scroll area to the top of the screen. */
+.rj-page.is-issuing .rj-report-scroll {
+  overflow: visible;
 }
 
 .rj-issue-backdrop {
@@ -1126,60 +1131,75 @@
   opacity: 0;
 }
 
-.rj-issue-slot {
-  position: absolute;
-  top: -3px;
-  left: 50%;
-  z-index: 22;
-  width: 380px;
-  height: 22px;
-  border-radius: 11px;
-  background: linear-gradient(#3a46a0, #222b6e);
-  box-shadow: 0 5px 0 #10163a, 0 12px 24px #0006;
-  transform: translateX(-50%);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-}
-
-.rj-issue-slot span {
-  position: absolute;
-  top: 8px;
-  right: 14px;
-  left: 14px;
-  height: 6px;
-  border-radius: 3px;
-  background: #0b0f2a;
-  box-shadow: 0 1px 0 #ffffff26, inset 0 0 6px #f6c76b55;
-}
-
-.rj-page:not(.is-issuing) .rj-issue-slot {
-  opacity: 0;
-  transform: translate(-50%, -24px) scale(0.94);
-  pointer-events: none;
-}
-
 .rj-printed {
   position: relative;
   z-index: 21;
   perspective: 1200px;
 }
 
-/* Clip only the top edge so the ticket appears to come out of the slot. */
+/* The ticket and the paws holding it come down together from above the screen. */
 .rj-printed.is-printing {
-  clip-path: inset(0 -80px -400px -80px);
+  transform-origin: 50% 0;
+  animation: rj-deliver 900ms cubic-bezier(0.22, 0.9, 0.3, 1) 200ms both;
 }
 
 .rj-printed.is-printing .rj-ticket {
   transform-origin: 50% 0;
-  animation:
-    rj-print 900ms cubic-bezier(0.22, 0.9, 0.3, 1) 200ms both,
-    /* forwards only: filling backwards would override the print's translate before 1.1s. */
-    rj-print-settle 400ms cubic-bezier(0.34, 1.4, 0.64, 1) 1100ms forwards;
+  animation: rj-print-settle 400ms cubic-bezier(0.34, 1.4, 0.64, 1) 1100ms forwards;
 }
 
+/* Paw images (public/assets/paws): arms cut off at their top edge. Each grip paw is placed by
+   ReadingReport (pawStyle) so its keyed-out card corner lands on the ticket's top corner. */
+.rj-paws {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.rj-paw-grip {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  /* Soft contact shadow of the paws on the ticket. */
+  filter: drop-shadow(0 5px 5px #1a12304d);
+  animation: rj-paw-release 420ms cubic-bezier(0.5, 0, 0.75, 0) 1100ms forwards;
+}
+
+.rj-paw-gesture {
+  position: absolute;
+  bottom: calc(100% - var(--paw-gesture-grip, 22px));
+  left: 50%;
+  width: var(--paw-gesture-width, 66px);
+  height: auto;
+  filter: drop-shadow(0 6px 8px #0006);
+  opacity: 0;
+  translate: -50% 0;
+  animation: rj-paw-tap 1100ms ease-in-out 1350ms both;
+}
+
+/* Tap paws are sized so the paw matches the gripping paws (about 76–82px across the knuckles). */
+.rj-paws.is-wick {
+  --paw-gesture-width: 85px;
+  --paw-gesture-grip: 18px;
+}
+
+.rj-paws.is-pal {
+  --paw-gesture-width: 84px;
+  --paw-gesture-grip: 32px;
+}
+
+.rj-paws.is-tuanzi {
+  --paw-gesture-width: 115px;
+  --paw-gesture-grip: 20px;
+}
+
+/* The 已完成阅读 stamp sits at the ticket's bottom right like a real ink stamp: rings and lettering
+   only, no fill, multiplied onto the paper so the signature and engraving beneath show through. */
 .rj-done-stamp {
   position: absolute;
-  top: 8px;
-  left: 12px;
+  right: 16px;
+  bottom: 10px;
   z-index: 4;
   display: grid;
   place-content: center;
@@ -1187,7 +1207,8 @@
   height: 88px;
   border: 3px solid #b43b2d;
   border-radius: 50%;
-  box-shadow: inset 0 0 0 3px #f4f1ee, inset 0 0 0 4.5px #b43b2d;
+  outline: 1.5px solid #b43b2d;
+  outline-offset: -9px;
   color: #b43b2d;
   font-family: 'Songti SC', serif;
   font-size: 16px;
@@ -1195,8 +1216,7 @@
   line-height: 1.15;
   letter-spacing: 1px;
   text-align: center;
-  /* Paper fill so the lettering stays clear over the train engraving beneath it. */
-  background: #f4f1eef2;
+  mix-blend-mode: multiply;
   opacity: 0;
   rotate: -14deg;
   pointer-events: none;
@@ -1206,14 +1226,58 @@
   animation: rj-stamp 720ms cubic-bezier(0.22, 0.85, 0.3, 1.08) forwards;
 }
 
-@keyframes rj-print {
-  from {
-    transform: translateY(-100%);
+/* Carried down by the paws: a slight swing that settles as it arrives. */
+@keyframes rj-deliver {
+  0% {
+    transform: translateY(-720px) rotate(-2.5deg);
   }
-  to {
+  60% {
+    transform: translateY(-40px) rotate(1.5deg);
+  }
+  100% {
     transform: none;
   }
 }
+
+@keyframes rj-paw-release {
+  0% {
+    transform: none;
+  }
+  25% {
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-220px);
+  }
+}
+
+/* The gesture paw comes down, taps the ticket once and goes back up (same for every companion). */
+
+@keyframes rj-paw-tap {
+  0% {
+    opacity: 1;
+    transform: translateY(-260px);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+  42% {
+    transform: translateY(4px) scale(0.97);
+  }
+  54% {
+    transform: translateY(-6px);
+  }
+  72% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-260px);
+  }
+}
+
 
 @keyframes rj-print-settle {
   0% {

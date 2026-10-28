@@ -322,6 +322,7 @@ export default function App() {
               <ReadingReport
                 issuing={currentStage === 14}
                 onIssued={() => goToStage(8)}
+                companionId={currentCompanion.id}
                 ticket={homeStoryTicket}
                 summary={lastReadSummary}
                 quote={homeArticle.quote}

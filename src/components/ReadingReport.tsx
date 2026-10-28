@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { ReadSummary, RideTicket } from '../types';
+import { CompanionId, ReadSummary, RideTicket } from '../types';
 import { MiniProgramHeader } from './MiniProgramHeader';
 
 export interface ReportQuote {
@@ -32,10 +32,12 @@ interface ReadingReportProps {
   onBack: () => void;
   // 返回发现: back to the reading home.
   onHome: () => void;
-  // V2 为你出票: the ticket first prints out of a slot on a dark screen, then the report fades in
-  // around it without remounting. onIssued fires when the print-out ends.
+  // 为你出票: on a dark screen the companion's paws hand the ticket down, then the report fades in
+  // around it without remounting. onIssued fires when the hand-over ends.
   issuing?: boolean;
   onIssued?: () => void;
+  // Whose paws hand the ticket over.
+  companionId?: CompanionId;
 }
 
 // Past this many characters the quote would wrap at full size, so the ticket uses its compact rows.
@@ -46,11 +48,43 @@ const TOAST_MS = 2000;
 // station board while the metrics count up.
 const COUNT_UP_DELAY_MS = 400;
 const COUNT_UP_MS = 900;
-// Print-out length before the report appears (matches rj-print + rj-print-settle).
-const ISSUE_MS = 1500;
+// Hand-over length before the report appears (matches rj-deliver, rj-paw-release and rj-paw-gesture
+// in reading-journey.css).
+const ISSUE_MS = 2550;
 // When the 已完成阅读 stamp lands: after the print-out, or after the arrival flip on a direct visit.
 const STAMP_AFTER_ISSUE_MS = 550;
 const STAMP_AFTER_ARRIVAL_MS = 1500;
+
+const pawUrl = (companionId: CompanionId, part: 'left' | 'right' | 'tap') =>
+  `${import.meta.env.BASE_URL}assets/paws/${companionId}-${part}.png`;
+
+// Matches .rj-ticket's width.
+const TICKET_WIDTH = 357;
+
+// Each paw image (public/assets/paws/*-left|right.png) was cut from a picture of both paws holding a
+// chroma-green card that was keyed out, so the real ticket shows where the card was: thumb in front,
+// fingers behind its top edge. Per companion: the shown width of each paw image (px), its height /
+// width, and where the card's top corner sits in the left and right image (fractions of width/height).
+interface PawGrip {
+  width: number;
+  aspect: number;
+  left: { x: number; y: number };
+  right: { x: number; y: number };
+}
+
+const PAW_GRIPS: Record<CompanionId, PawGrip> = {
+  wick: { width: 210, aspect: 0.7008, left: { x: 0.2469, y: 0.6812 }, right: { x: 0.7523, y: 0.6812 } },
+  pal: { width: 262, aspect: 0.6923, left: { x: 0.5002, y: 0.7441 }, right: { x: 0.5006, y: 0.7441 } },
+  tuanzi: { width: 247, aspect: 0.67, left: { x: 0.393, y: 0.7318 }, right: { x: 0.6063, y: 0.7318 } }
+};
+
+// Places a paw image so its card corner lands on the ticket's matching top corner.
+const pawStyle = (companionId: CompanionId, side: 'left' | 'right'): React.CSSProperties => {
+  const grip = PAW_GRIPS[companionId];
+  const corner = grip[side];
+  const cornerX = side === 'left' ? 0 : TICKET_WIDTH;
+  return { width: grip.width, left: cornerX - corner.x * grip.width, top: -corner.y * grip.width * grip.aspect };
+};
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -132,7 +166,8 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
   onBack,
   onHome,
   issuing = false,
-  onIssued
+  onIssued,
+  companionId = 'wick'
 }) => {
   const [toast, setToast] = useState<string | null>(null);
   const [isPrinting, setIsPrinting] = useState(issuing);
@@ -184,11 +219,6 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
       <MiniProgramHeader title="阅读报告" onBack={onBack} onClose={onHome} onShare={() => setToast('车票链接已复制')} />
 
       <div className="rj-report-scroll">
-        {arrivedByPrint && (
-          <div className="rj-issue-slot" aria-hidden="true">
-            <span />
-          </div>
-        )}
         <div className={`rj-ticket-wrap ${arrivedByPrint ? 'rj-printed' : 'rj-celebrate'} ${isPrinting ? 'is-printing' : ''}`}>
           <article className={`rj-ticket ${isLongQuote ? 'is-long-quote' : ''}`} aria-label={`第 ${ticket.rideNumber} 站到站车票`}>
             <img className="rj-ticket-paper" src={`${import.meta.env.BASE_URL}assets/ticket-paper.jpg`} alt="" aria-hidden="true" />
@@ -278,6 +308,14 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
               <span>阅读</span>
             </div>
           </article>
+          {isPrinting && (
+            // Both paws grip the ticket's top corners, let go, then one paw taps it.
+            <div className={`rj-paws is-${companionId}`} aria-hidden="true">
+              <img className="rj-paw-grip" src={pawUrl(companionId, 'left')} style={pawStyle(companionId, 'left')} alt="" draggable={false} />
+              <img className="rj-paw-grip" src={pawUrl(companionId, 'right')} style={pawStyle(companionId, 'right')} alt="" draggable={false} />
+              <img className="rj-paw-gesture" src={pawUrl(companionId, 'tap')} alt="" draggable={false} />
+            </div>
+          )}
         </div>
 
         <div className="rj-report-tools" aria-label="报告操作">
