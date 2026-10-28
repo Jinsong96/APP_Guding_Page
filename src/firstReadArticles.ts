@@ -1,5 +1,4 @@
 import type { CefrLevelKey } from './components/stages/Stage02AiChat';
-import type { GoalTrackDetails } from './types';
 
 const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 
@@ -41,9 +40,6 @@ export const CEFR_TO_STARTING_LEVEL: Record<CefrLevelKey, string> = {
   'B1': 'L7',
   'B2+': 'L10'
 };
-
-// The first N paragraphs ask for a difficulty rating; the rest are read at the settled level.
-export const RATED_PARAGRAPH_COUNT = 4;
 
 export const FIRST_READ_ARTICLES: FirstReadArticle[] = [
   {
@@ -471,44 +467,6 @@ export const findParagraphVocab = (vocab: FirstReadVocab[], text: string, limit 
     .map((item) => item.entry);
 };
 
-// The goal/exam answer sets where the first read starts; the rated paragraphs refine it from there.
-const EXAM_START_LEVELS: Record<string, CefrLevelKey> = {
-  'KET/PET': 'A1-',
-  中考: 'A1-',
-  高考: 'A2',
-  四六级: 'A2',
-  考研: 'B1',
-  雅思或托福: 'B1'
-};
-
-export const startLevelForGoal = (goalTrack?: GoalTrackDetails): CefrLevelKey => {
-  if (goalTrack?.category === 'exam') return EXAM_START_LEVELS[goalTrack.targetFocus] || 'A2';
-  return 'A2';
-};
-
-// Words from the paragraphs the user needed help with come first, then words from the rest.
-export const collectLearnedWords = (
-  article: FirstReadArticle,
-  shownLevels: CefrLevelKey[],
-  helpedParagraphs: number[],
-  limit = 3
-): FirstReadVocab[] => {
-  const order = [
-    ...helpedParagraphs,
-    ...article.paragraphs.map((_, index) => index).filter((index) => !helpedParagraphs.includes(index))
-  ];
-  const words: FirstReadVocab[] = [];
-  for (const index of order) {
-    const level = shownLevels[index];
-    if (!level) continue;
-    for (const entry of findParagraphVocab(article.vocab, article.paragraphs[index].text[level], 10)) {
-      if (!words.some((word) => word.word === entry.word)) words.push(entry);
-      if (words.length >= limit) return words;
-    }
-  }
-  return words;
-};
-
 // Home-page story cards (data.ts WORLD_STORIES) open these articles in the same reader as the first read.
 export const HOME_STORY_ARTICLES: Record<string, FirstReadArticle> = {
   'world-1': FIRST_READ_ARTICLES.find((article) => article.id === 'children-world-game')!,
@@ -534,14 +492,4 @@ export const pickNextArticle = (interests: string[] = [], readIds: string[] = []
     return first === -1 ? interests.length : first;
   };
   return pool.sort((a, b) => rank(a) - rank(b))[0];
-};
-
-// Articles matching the user's interests come first, in the order the interests were picked.
-export const rankArticlesForInterests = (interests: string[] = []): FirstReadArticle[] => {
-  const rank = (article: FirstReadArticle) => {
-    const hits = interests.map((interest) => article.themes.indexOf(interest) !== -1);
-    const first = hits.indexOf(true);
-    return first === -1 ? interests.length : first;
-  };
-  return [...FIRST_READ_ARTICLES].sort((a, b) => rank(a) - rank(b));
 };

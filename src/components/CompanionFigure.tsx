@@ -11,9 +11,9 @@ interface CompanionFigureProps {
 
 // Figure height per companion so each sits at a similar visual size on the card.
 const FIGURE_HEIGHT: Record<CompanionId, number> = {
-  wick: 214,
-  pal: 172,
-  tuanzi: 168
+  wick: 204,
+  pal: 204,
+  tuanzi: 192
 };
 const CHEER_MS = 650;
 

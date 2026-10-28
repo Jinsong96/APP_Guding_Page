@@ -15,23 +15,14 @@ import { BookmarkedSentence, Companion, CompanionId, ReadSummary } from '../../t
 import { CompanionAvatar } from '../CompanionAvatar';
 import { MiniProgramHeader } from '../MiniProgramHeader';
 import { CefrLevelKey } from './Stage02AiChat';
-import {
-  FirstReadArticle,
-  FirstReadVocab,
-  RATED_PARAGRAPH_COUNT,
-  collectLearnedWords,
-  findParagraphVocab
-} from '../../firstReadArticles';
-import { COMPANION_TYPING_INTERVAL_MS, SPEECH_CONTENT_REVEAL_MS } from '../speechTiming';
+import { FirstReadArticle, findParagraphVocab } from '../../firstReadArticles';
+import { COMPANION_TYPING_INTERVAL_MS } from '../speechTiming';
 
 interface StageFirstReadProps {
   companion: Companion;
   article: FirstReadArticle;
-  startLevel?: CefrLevelKey;
-  // 'onboarding' shows the onboarding step bar; 'library' (reads opened from home) shows reading progress.
-  mode?: 'onboarding' | 'library';
-  // When false, no difficulty rating: every paragraph is read at startLevel with a plain "下一段".
-  rated?: boolean;
+  // Every paragraph is shown at this level (the difficulty picked on 03).
+  level?: CefrLevelKey;
   bookmarkedSentences?: BookmarkedSentence[];
   bookmarkedWords?: string[];
   onToggleWordBookmark?: (word: string) => void;
@@ -41,21 +32,8 @@ interface StageFirstReadProps {
   onToggleArticleLike?: () => void;
   onToggleArticleBookmark?: () => void;
   onBack: () => void;
-  onComplete: (finalLevel: CefrLevelKey, learnedWords: FirstReadVocab[], summary: ReadSummary) => void;
+  onComplete: (summary: ReadSummary) => void;
 }
-
-type Feeling = 'down' | 'keep' | 'up';
-
-const LEVEL_ORDER: CefrLevelKey[] = ['A1-', 'A2', 'B1', 'B2+'];
-// Pause after a rating so the choice registers visually before the next paragraph.
-const RATING_ADVANCE_DELAY_MS = 400;
-
-const getNextLevel = (current: CefrLevelKey, feeling: Feeling): CefrLevelKey => {
-  const index = LEVEL_ORDER.indexOf(current);
-  if (feeling === 'up') return LEVEL_ORDER[Math.min(index + 1, LEVEL_ORDER.length - 1)];
-  if (feeling === 'down') return LEVEL_ORDER[Math.max(index - 1, 0)];
-  return current;
-};
 
 type LineMoment = 'start' | 'checkpoint' | 'end';
 
@@ -86,14 +64,12 @@ const lineMomentFor = (paragraphIdx: number, total: number): LineMoment | null =
   return null;
 };
 
-// The user's first real read: the opening paragraphs double as the placement check, so there
-// is no separate test. Each rated paragraph sets the difficulty of the next one.
+// The reader for every article opened from the reading home: one paragraph per card at the chosen
+// level, tap a word to look it up, companion lines at the start, a checkpoint and the end.
 export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   companion,
   article,
-  startLevel = 'A2',
-  mode = 'onboarding',
-  rated = true,
+  level = 'A2',
   bookmarkedSentences = [],
   bookmarkedWords = [],
   onToggleWordBookmark,
@@ -107,12 +83,6 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
 }) => {
   const total = article.paragraphs.length;
   const [paragraphIdx, setParagraphIdx] = useState(0);
-  const [level, setLevel] = useState<CefrLevelKey>(startLevel);
-  // Level each paragraph was shown at, so going back restores what the user saw.
-  const [levelHistory, setLevelHistory] = useState<CefrLevelKey[]>([startLevel]);
-  // Paragraphs where the user opened the translation, flipped the card or rated it hard.
-  const helpedParagraphsRef = useRef<Set<number>>(new Set());
-  const [selectedFeeling, setSelectedFeeling] = useState<Feeling | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [playing, setPlaying] = useState<'card' | 'full' | null>(null);
@@ -121,14 +91,12 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   const [lookedUpWords, setLookedUpWords] = useState<string[]>([]);
   const [bubbleText, setBubbleText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startedAtRef = useRef(Date.now());
   // Horizontal swipe on the card turns pages, like the arrows.
   const swipeStartXRef = useRef<number | null>(null);
 
   const paragraph = article.paragraphs[paragraphIdx];
   const text = paragraph.text[level];
-  const isRated = rated && paragraphIdx < RATED_PARAGRAPH_COUNT;
   const isLast = paragraphIdx === total - 1;
   const bookmark = { sentence: text, translation: paragraph.translation };
   const isBookmarked = bookmarkedSentences.some((item) => item.sentence === text);
@@ -151,7 +119,7 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
       )?.trim() || text
     : '';
 
-  // Companion line types out when it has something to say, but never blocks reading or rating.
+  // Companion line types out when it has something to say, but never blocks reading.
   useEffect(() => {
     const line = companionLine;
     if (!line) {
@@ -179,7 +147,6 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
   }, [companionLine]);
 
   useEffect(() => {
-    setSelectedFeeling(null);
     setIsCardFlipped(false);
     setLookupWord(null);
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -188,79 +155,38 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
 
   useEffect(
     () => () => {
-      if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     },
     []
   );
 
-  const goToParagraph = (nextIdx: number, nextLevel: CefrLevelKey) => {
-    setLevel(nextLevel);
-    setLevelHistory((prev) => {
-      const next = prev.slice(0, nextIdx);
-      next[nextIdx] = nextLevel;
-      return next;
-    });
-    setParagraphIdx(nextIdx);
-  };
-
-  const markHelped = () => helpedParagraphsRef.current.add(paragraphIdx);
-
   const openLookup = (word: string) => {
-    markHelped();
     setLookupWord(word);
     setLookedUpWords((prev) => (prev.includes(word.toLowerCase()) ? prev : [...prev, word.toLowerCase()]));
   };
 
-  const handleRate = (feeling: Feeling) => {
-    setSelectedFeeling(feeling);
-    if (feeling === 'down') markHelped();
-    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
-    const currentIdx = paragraphIdx;
-    const nextLevel = getNextLevel(level, feeling);
-    advanceTimerRef.current = setTimeout(() => {
-      advanceTimerRef.current = null;
-      goToParagraph(currentIdx + 1, nextLevel);
-    }, RATING_ADVANCE_DELAY_MS);
-  };
-
   const handleNext = () => {
     if (isLast) {
-      const wordsRead = article.paragraphs.reduce((sum, part, index) => {
-        const shownLevel = levelHistory[index] || level;
-        return sum + (part.text[shownLevel].match(/[A-Za-z']+/g)?.length ?? 0);
-      }, 0);
-      onComplete(level, collectLearnedWords(article, levelHistory, [...helpedParagraphsRef.current]), {
+      const wordsRead = article.paragraphs.reduce(
+        (sum, part) => sum + (part.text[level].match(/[A-Za-z']+/g)?.length ?? 0),
+        0
+      );
+      onComplete({
         lookedUpWords: lookedUpWords.length,
         wordsRead,
         seconds: Math.round((Date.now() - startedAtRef.current) / 1000)
       });
       return;
     }
-    goToParagraph(paragraphIdx + 1, level);
+    setParagraphIdx(paragraphIdx + 1);
   };
 
   const handlePrev = () => {
-    if (advanceTimerRef.current) {
-      clearTimeout(advanceTimerRef.current);
-      advanceTimerRef.current = null;
-    }
     if (paragraphIdx === 0) {
       onBack();
       return;
     }
-    const prevIdx = paragraphIdx - 1;
-    setLevel(levelHistory[prevIdx] || startLevel);
-    setParagraphIdx(prevIdx);
-  };
-
-  // The next arrow (or a swipe) on a rated paragraph counts as "刚刚好".
-  const handleForward = () => {
-    if (!isRated) {
-      handleNext();
-      return;
-    }
-    if (selectedFeeling === null) handleRate('keep');
+    setParagraphIdx(paragraphIdx - 1);
   };
 
   const handlePlay = (kind: 'card' | 'full') => {
@@ -270,9 +196,7 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
       setPlaying(null);
       return;
     }
-    const spokenText = kind === 'card' ? text : article.paragraphs.map((part, index) =>
-      part.text[levelHistory[index] || level]
-    ).join(' ');
+    const spokenText = kind === 'card' ? text : article.paragraphs.map((part) => part.text[level]).join(' ');
     const utterance = new SpeechSynthesisUtterance(spokenText);
     utterance.lang = 'en-US';
     utterance.rate = 0.92;
@@ -304,7 +228,7 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
     swipeStartXRef.current = null;
     if (startX === null || isCardFlipped || lookupWord) return;
     const deltaX = clientX - startX;
-    if (deltaX < -50) handleForward();
+    if (deltaX < -50) handleNext();
     else if (deltaX > 50 && paragraphIdx > 0) handlePrev();
   };
 
@@ -415,10 +339,7 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      markHelped();
-                      setShowTranslation((visible) => !visible);
-                    }}
+                    onClick={() => setShowTranslation((visible) => !visible)}
                     aria-pressed={showTranslation}
                   >
                     <Languages size={18} strokeWidth={1.6} />
@@ -426,10 +347,7 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      markHelped();
-                      setIsCardFlipped(true);
-                    }}
+                    onClick={() => setIsCardFlipped(true)}
                   >
                     <RotateCcw size={18} strokeWidth={1.6} />
                     <span>解读</span>
@@ -477,36 +395,13 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
         )}
         <button
           type="button"
-          onClick={handleForward}
+          onClick={handleNext}
           aria-label={isLast ? '完成阅读' : '下一张'}
-          disabled={isRated && selectedFeeling !== null}
           className="rj-page-arrow is-next"
         >
           <ChevronRight size={18} />
         </button>
       </div>
-
-      {isRated && (
-        <div className="rj-ratings" role="group" aria-label="这一段的阅读难度">
-          {([
-            ['down', '偏难'],
-            ['keep', '刚刚好'],
-            ['up', '太简单']
-          ] as const).map(([feeling, label], index) => (
-            <button
-              key={`${paragraphIdx}-${feeling}`}
-              type="button"
-              onClick={() => handleRate(feeling)}
-              aria-pressed={selectedFeeling === feeling}
-              disabled={selectedFeeling !== null}
-              className="speech-option-enter"
-              style={{ animationDelay: `${SPEECH_CONTENT_REVEAL_MS + index * COMPANION_TYPING_INTERVAL_MS}ms` }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
 
       <button
         type="button"

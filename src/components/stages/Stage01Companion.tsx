@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { CompanionId } from '../../types';
 import { COMPANIONS } from '../../data';
-import { CompanionFigure } from '../CompanionFigure';
+import { CompanionClip } from '../CompanionClip';
 
 interface Stage01CompanionProps {
   selectedCompanionId: CompanionId;
@@ -11,11 +11,11 @@ interface Stage01CompanionProps {
   onNext: () => void;
 }
 
-// Three traits per companion, from each character sheet.
+// Three traits per companion, from each character's positioning.
 const COMPANION_TRAITS: Record<CompanionId, string[]> = {
   wick: ['温柔', '好奇', '治愈'],
-  pal: ['机灵探索', '收藏好句', '星图长尾'],
-  tuanzi: ['安静在场', '偶尔眨眼', '书角尾巴']
+  pal: ['博学', '爱探索', '星图学者'],
+  tuanzi: ['嘴硬', '心软', '守护']
 };
 
 // Card width plus the gap to the next card; the track moves by this per companion.
@@ -136,7 +136,7 @@ export const Stage01Companion: React.FC<Stage01CompanionProps> = ({
                 aria-hidden={!isActive}
                 onClick={() => !isActive && goTo(cardIndex)}
               >
-                <CompanionFigure companion={companion} active={isActive} />
+                <CompanionClip companion={companion} active={isActive} />
                 <h2>
                   {companion.name}
                   <span>{companion.nameEn}</span>

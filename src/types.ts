@@ -20,8 +20,6 @@ export interface Companion {
   // Point beside the head to anchor bubbles instead of the mouth, for scenes where a bubble at the
   // mouth would cover the body.
   sceneBubbleAnchors?: { side?: { x: number; y: number } };
-  // Selection hero only: shift the scene right (px) and put the bubble left of the mouth.
-  selectionSceneShift?: number;
   // One-line self-introduction shown in the companion selection hero.
   intro: string;
   celebrateAvatarUrl?: string;
@@ -51,15 +49,6 @@ export interface ReadSummary {
   wordsRead: number;
   // Time spent reading, for the report's 本次阅读时长.
   seconds: number;
-}
-
-// A real moment the user and companion shared, shown in the companion's 共同经历.
-export interface SharedEvent {
-  id: string;
-  kind: 'ride' | 'bookmark';
-  date: string;
-  title: string;
-  detail: string;
 }
 
 export interface VocabItem {
@@ -115,13 +104,6 @@ export interface Story {
   };
 }
 
-export interface GoalTrackDetails {
-  category: 'exam' | 'workplace' | 'original' | 'interest';
-  categoryLabel: string;
-  targetFocus: string;
-  targetHurdle: string;
-}
-
 export interface UserPreferences {
   companionId: CompanionId;
   interestTheme: string;
@@ -138,12 +120,6 @@ export interface UserPreferences {
     startingLevel: string;
     hintDensity: 'light' | 'detailed';
     sessionDuration: 5 | 10;
-    goal?: string;
-    challenge?: string;
-    durationPreference?: string;
-    readingState?: string;
-    companionStyle?: string;
-    goalTrack?: GoalTrackDetails;
   };
   bookmarkedWords: string[];
   bookmarkedSentences: BookmarkedSentence[];

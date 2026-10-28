@@ -1,4 +1,4 @@
-/* V2 04 为你挑选 (StagePicking). Same light palette as 01 选伴.
+/* 04 为你挑选 (StagePicking). Figure version: same light palette as 01 选伴.
    0–500ms covers pop in · from 700ms the companion looks at covers one by one (each lifts and glows,
    the pile reshuffles every two looks) · ~3.3s the pick glows and lands beside the companion, the
    others fade back · ~5.1s hand over to the reading home. */
@@ -159,6 +159,217 @@
   font-size: 12px;
 }
 
+/* ---------- Clip version (StagePicking PickingWithClip) ----------
+   The companion's video in the lower left, the C-01 carriage on the rails at the upper right. Positions
+   are px on the 393px-wide screen and match CLIP_SPOTS / HOLD_SPOT / WINDOW_SPOT in StagePicking. */
+
+/* The page follows the clips' cream (darker at their top edge, lighter at the bottom) so the video
+   blends in; its edges also fade out softly. */
+.pk-page.has-clip {
+  justify-content: flex-start;
+  background: linear-gradient(180deg, #efe1cd 0%, #ecddc8 36%, #f3e6d3 70%, #f6ecdc 100%);
+}
+
+.pk-clip-stage {
+  position: relative;
+  flex-shrink: 0;
+  width: 393px;
+  height: 560px;
+  margin-top: 56px;
+}
+
+.pk-rails {
+  position: absolute;
+  top: 236px;
+  right: 0;
+  left: 0;
+  height: 9px;
+  background:
+    linear-gradient(#8f7d66, #8f7d66) top / 100% 2px no-repeat,
+    linear-gradient(#8f7d66, #8f7d66) bottom / 100% 2px no-repeat,
+    repeating-linear-gradient(90deg, #c2ae93 0 7px, transparent 7px 24px);
+  opacity: 0.7;
+}
+
+/* The carriage rolls in from the right, waits, then pulls out with the pick in its window. */
+.pk-train {
+  position: absolute;
+  top: 70px;
+  left: 238px;
+  width: 280px;
+  height: 177px;
+  transition: transform 1s cubic-bezier(0.55, 0, 0.75, 0.3);
+  animation: pk-train-in 900ms cubic-bezier(0.2, 0.8, 0.25, 1) backwards;
+}
+
+.pk-train.is-departing {
+  transform: translateX(300px);
+}
+
+.pk-carriage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 8px 10px #4a3a2433);
+  pointer-events: none;
+}
+
+/* The carriage image has see-through windows: these sit behind it as the window interiors. */
+.pk-window {
+  position: absolute;
+  top: 28%;
+  left: 17.5%;
+  z-index: 1;
+  width: 16%;
+  height: 25%;
+  overflow: hidden;
+  background: #fbf0d9;
+  transition: background-color 0.4s;
+}
+
+.pk-window.is-right {
+  left: 43.5%;
+  width: 17.5%;
+}
+
+.pk-window.is-lit {
+  background: #ffe2a0;
+}
+
+.pk-window img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: pk-fade-in 200ms ease-out both;
+}
+
+.pk-plate {
+  position: absolute;
+  top: 66%;
+  left: 10%;
+  z-index: 3;
+  color: #e9cf95;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.pk-stop-tag {
+  position: absolute;
+  top: 9%;
+  left: 13%;
+  z-index: 3;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #e0a94a;
+  box-shadow: 0 0 14px #ffd98acc;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  animation: pk-caption-in 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.pk-clip-video {
+  position: absolute;
+  top: 250px;
+  left: -10px;
+  z-index: 1;
+  width: 290px;
+  height: 290px;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-mask-image:
+    linear-gradient(90deg, #0000, #000 18%, #000 82%, #0000), linear-gradient(180deg, #0000, #000 14%, #000 90%, #0000);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, #0000, #000 18%, #000 82%, #0000), linear-gradient(180deg, #0000, #000 14%, #000 90%, #0000);
+  mask-composite: intersect;
+}
+
+/* Covers sit on the stage at px spots (top-left origin). */
+.pk-cover.is-on-clip {
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 56px;
+  height: 76px;
+  animation-name: pk-pop-here;
+}
+
+.pk-cover.is-on-clip img {
+  border-width: 2px;
+  border-radius: 9px;
+}
+
+.pk-cover.is-on-clip.is-looking img {
+  box-shadow: 0 0 0 2px #fff6dc, 0 0 22px #ffe3a0e6, 0 12px 22px #6b5a3a2e;
+}
+
+.pk-clip-stage:has(.is-looking) .pk-cover:not(.is-looking) {
+  opacity: 0.8;
+}
+
+.pk-page.has-clip.is-picked .pk-cover.is-chosen {
+  z-index: 5;
+  transition:
+    transform 0.65s cubic-bezier(0.45, 0, 0.25, 1.1),
+    opacity 0.2s ease;
+  transform: translate(-50%, -50%) translate(var(--pk-x), var(--pk-y)) rotate(var(--pk-r)) scale(1.18);
+}
+
+/* In Wick's paws: smaller, like a ticket held up below his chin. */
+.pk-page.has-clip.is-picked .pk-cover.is-chosen.is-held {
+  transform: translate(-50%, -50%) translate(var(--pk-x), var(--pk-y)) rotate(var(--pk-r)) scale(0.7);
+}
+
+/* Off to the carriage: shrinks to the window's size on the way. */
+.pk-page.has-clip.is-picked .pk-cover.is-chosen.is-flying,
+.pk-page.has-clip.is-picked .pk-cover.is-chosen.is-in-window {
+  transform: translate(-50%, -50%) translate(var(--pk-x), var(--pk-y)) rotate(0deg) scale(0.74);
+}
+
+/* Arrived: the copy inside the window (which leaves with the carriage) takes over. */
+.pk-page.has-clip.is-picked .pk-cover.is-chosen.is-in-window {
+  opacity: 0;
+}
+
+.pk-page.has-clip.is-picked .pk-cover:not(.is-chosen) {
+  opacity: 0.3;
+}
+
+.pk-page.has-clip.is-picked:has(.is-flying, .is-in-window) .pk-cover:not(.is-chosen) {
+  opacity: 0;
+}
+
+/* Wick's 第1站 stamp on the ticket. */
+.pk-stamp {
+  position: absolute;
+  right: -10px;
+  bottom: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #b43a27;
+  border-radius: 50%;
+  background: #fff8ee;
+  color: #b43a27;
+  font-size: 9px;
+  font-weight: 800;
+  transform: rotate(-14deg);
+  animation: pk-stamp 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.pk-page.has-clip .pk-caption {
+  margin-top: 0;
+  padding: 0 24px;
+}
+
 /* ---------- Keyframes ---------- */
 
 @keyframes pk-fade-in {
@@ -174,6 +385,13 @@
   }
 }
 
+@keyframes pk-pop-here {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(var(--pk-x), var(--pk-y)) rotate(0) scale(0.5);
+  }
+}
+
 @keyframes pk-drift {
   0%,
   100% {
@@ -181,6 +399,19 @@
   }
   50% {
     transform: translateY(-7px) rotate(2deg);
+  }
+}
+
+@keyframes pk-train-in {
+  from {
+    transform: translateX(240px);
+  }
+}
+
+@keyframes pk-stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg) scale(2.2);
   }
 }
 
@@ -211,7 +442,10 @@
   .pk-cover,
   .pk-cover-float,
   .pk-caption,
-  .pk-page.is-picked .pk-caption {
+  .pk-page.is-picked .pk-caption,
+  .pk-train,
+  .pk-stamp,
+  .pk-stop-tag {
     transition: none;
     animation: none;
   }

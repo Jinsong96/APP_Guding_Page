@@ -139,8 +139,8 @@ export const COMPANIONS: Companion[] = [
     avatarUrl: publicAsset('/assets/companion-wick-card.png'),
     portraitUrl: publicAsset('/assets/companion-wick-portrait.png'),
     figureUrl: publicAsset('/assets/companion-wick-figure.png'),
-    sceneUrl: publicAsset('/assets/companion-wick-scene.webp'),
-    sceneMouth: { x: 0.425, y: 0.54 },
+    sceneUrl: publicAsset('/assets/companion-wick-scene.jpg'),
+    sceneMouth: { x: 0.35, y: 0.536 },
     intro: '我是灯芯，\n我在前面为你引路～',
     celebrateActionName: '喜悦欢呼跃动',
     celebrateQuote: '“太棒啦！准备好一起出发了吗？”',
@@ -158,17 +158,14 @@ export const COMPANIONS: Companion[] = [
     avatarUrl: publicAsset('/assets/companion-pal-card.png'),
     portraitUrl: publicAsset('/assets/companion-pal-portrait.png'),
     figureUrl: publicAsset('/assets/companion-pal-figure.png'),
-    sceneUrl: publicAsset('/assets/companion-pal-scene.webp'),
-    sceneMouth: { x: 0.265, y: 0.575 },
-    // Interim until Pal's scene is redrawn facing open space: keep bubbles off the body.
-    sceneBubbleAnchors: { side: { x: 0.31, y: 0.4 } },
-    selectionSceneShift: 82,
+    sceneUrl: publicAsset('/assets/companion-pal-scene.jpg'),
+    sceneMouth: { x: 0.358, y: 0.48 },
     intro: '我是帕利！\n好句子我帮你收藏～',
     celebrateActionName: '机智跃动致意',
     celebrateQuote: '“发现新线索了！继续往前看看吧。”',
     accentColor: '#C76B3F',
     bgGlow: 'rgba(199, 107, 63, 0.18)',
-    description: '陪你找线索，顺手帮你收藏好句子。'
+    description: '读过很多书，最爱带你去看没见过的星星。'
   },
   {
     id: 'tuanzi',
@@ -180,14 +177,14 @@ export const COMPANIONS: Companion[] = [
     avatarUrl: publicAsset('/assets/companion-tuanzi-card.png'),
     portraitUrl: publicAsset('/assets/companion-tuanzi-portrait.png'),
     figureUrl: publicAsset('/assets/companion-tuanzi-figure.png'),
-    sceneUrl: publicAsset('/assets/companion-tuanzi-scene.webp'),
-    sceneMouth: { x: 0.4375, y: 0.445 },
+    sceneUrl: publicAsset('/assets/companion-tuanzi-scene.jpg'),
+    sceneMouth: { x: 0.317, y: 0.458 },
     intro: '我是团子，\n安静陪你读就好。',
     celebrateActionName: '元气活力跳跃',
     celebrateQuote: '“读累了就歇一会儿，我一直都在。”',
     accentColor: '#6C779B',
     bgGlow: 'rgba(108, 119, 155, 0.18)',
-    description: '安静待在你身边，偶尔眨一眨眼。'
+    description: '看着不好惹，其实一直在默默护着你。'
   }
 ];
 

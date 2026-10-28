@@ -447,32 +447,6 @@
   right: 8px;
 }
 
-.rj-ratings {
-  display: grid;
-  flex-shrink: 0;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 0 24px;
-}
-
-.rj-ratings button {
-  min-height: 46px;
-  border: 1px solid #e6e0ee;
-  border-radius: 14px;
-  background: #fffdfa;
-  color: #403c5a;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 4px 15px #2b25400a;
-  transition: border-color 0.15s, background-color 0.15s;
-}
-
-.rj-ratings button[aria-pressed='true'] {
-  border-color: #d94a30;
-  background: #fbe8e3;
-  color: #9b3021;
-}
-
 .rj-listen {
   display: flex;
   flex-shrink: 0;

@@ -151,6 +151,77 @@
   background: radial-gradient(closest-side, #192b4d33, #192b4d00);
 }
 
+/* ---------- V2 companion art (CompanionClip) ----------
+   Square art on a night-sky backdrop, framed as a rounded train window inside the card. */
+
+.cs-clip {
+  position: relative;
+  flex-shrink: 0;
+  width: 236px;
+  height: 236px;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #1c2a4a;
+  box-shadow:
+    0 14px 26px #192b4d2e,
+    0 2px 6px #192b4d1a;
+  cursor: pointer;
+}
+
+/* Thin glass rim over the art. */
+.cs-clip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px #ffffff2e, inset 0 -24px 30px -18px #0b142866;
+  pointer-events: none;
+}
+
+.cs-clip-still,
+.cs-clip-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.cs-clip-video {
+  opacity: 0;
+}
+
+.cs-clip.is-signature .is-signature,
+.cs-clip.is-idle .is-idle {
+  opacity: 1;
+}
+
+/* Motion clips are filmed on a cream studio backdrop: no window frame, edges fade into the card. */
+.cs-clip.has-motion {
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  -webkit-mask-image: radial-gradient(closest-side, #000 74%, #0000 100%);
+  mask-image: radial-gradient(closest-side, #000 74%, #0000 100%);
+}
+
+.cs-clip.has-motion::after {
+  content: none;
+}
+
+/* A still with no clip breathes gently while its card is in focus. */
+.cs-clip.is-active.is-still:not(.has-motion) .cs-clip-still {
+  transform-origin: 50% 90%;
+  animation: cs-art-breathe 4.6s ease-in-out infinite;
+}
+
+.cs-clip:focus-visible {
+  outline: 2px solid #b83c2a;
+  outline-offset: 2px;
+}
+
 /* ---------- Idle motion, one per companion ---------- */
 
 /* Wick: slow breath, a faint sway, antlers glowing softly. */
@@ -349,6 +420,16 @@
   }
 }
 
+@keyframes cs-art-breathe {
+  0%,
+  100% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(1.045);
+  }
+}
+
 @keyframes cs-squish {
   0%,
   100% {
@@ -387,7 +468,8 @@
   .cs-figure.is-active .cs-figure-body,
   .cs-figure.is-active .cs-ground,
   .cs-figure.is-active .cs-antler-glow,
-  .cs-figure-cheer.is-cheering {
+  .cs-figure-cheer.is-cheering,
+  .cs-clip.is-active.is-still:not(.has-motion) .cs-clip-still {
     animation: none;
   }
 }

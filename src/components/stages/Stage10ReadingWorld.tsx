@@ -15,10 +15,9 @@ interface Stage10ReadingWorldProps {
   rideCount?: number;
   // Consecutive reading days, shown in the featured banner.
   streakDays?: number;
-  onOpenCompanion?: () => void;
   // Story shown as the large featured card (defaults to the first story).
   featuredStoryId?: string;
-  // V2 before the first read: mark the featured story as the user's first ride.
+  // Before the first read: mark the featured story as the user's first ride.
   showFirstRideHint?: boolean;
 }
 
@@ -31,7 +30,6 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
   onRestartOnboarding,
   rideCount = 0,
   streakDays = 0,
-  onOpenCompanion,
   featuredStoryId,
   showFirstRideHint = false
 }) => {
@@ -274,14 +272,9 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
         {activeTab === 'profile' && (
           <div>
             <div className="text-center py-4 mb-4 pb-4 border-b border-[#E7E1F0]">
-              <button
-                type="button"
-                onClick={onOpenCompanion}
-                aria-label={`查看我的旅伴${companion.name}`}
-                className="relative mx-auto mb-2 block h-20 w-20 rounded-[22px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8176A8]"
-              >
+              <div className="relative mx-auto mb-2 h-20 w-20">
                 <CompanionAvatar companion={companion} size={80} alt={companion.name} />
-              </button>
+              </div>
               <h2 className="text-base font-bold text-stone-900">
                 你的伴读者：{companion.name}
               </h2>
@@ -314,57 +307,6 @@ export const Stage10ReadingWorld: React.FC<Stage10ReadingWorldProps> = ({
                 <span className="text-stone-500">车票册</span>
                 <span className="text-emerald-700 font-semibold">已收集 {rideCount} 张车票</span>
               </div>
-
-              {preferences.profile.goalTrack?.targetFocus && (
-                <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-300/80 flex items-center justify-between shadow-xs">
-                  <span className="text-emerald-900 font-medium flex items-center gap-1.5">
-                    <span>{preferences.profile.goalTrack.category === 'exam' ? '🎯' :
-                           preferences.profile.goalTrack.category === 'workplace' ? '💼' :
-                           preferences.profile.goalTrack.category === 'original' ? '🌟' : '🌱'}</span>
-                    <span>细分目标专项</span>
-                  </span>
-                  <span className="font-bold text-emerald-900 truncate max-w-[170px]">
-                    {preferences.profile.goalTrack.targetFocus}
-                  </span>
-                </div>
-              )}
-
-              {preferences.profile.goalTrack?.targetHurdle && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
-                  <span className="text-stone-500">重点突破卡点</span>
-                  <span className="text-stone-800 font-medium truncate max-w-[170px]">
-                    {preferences.profile.goalTrack.targetHurdle}
-                  </span>
-                </div>
-              )}
-
-              {preferences.profile.goal && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
-                  <span className="text-stone-500">阅读目标</span>
-                  <span className="text-stone-800 font-medium truncate max-w-[170px]">{preferences.profile.goal}</span>
-                </div>
-              )}
-
-              {preferences.profile.challenge && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
-                  <span className="text-stone-500">主要攻克阻碍</span>
-                  <span className="text-stone-800 font-medium truncate max-w-[170px]">{preferences.profile.challenge}</span>
-                </div>
-              )}
-
-              {preferences.profile.durationPreference && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
-                  <span className="text-stone-500">专注习惯</span>
-                  <span className="text-stone-800 font-medium truncate max-w-[170px]">{preferences.profile.durationPreference}</span>
-                </div>
-              )}
-
-              {preferences.profile.companionStyle && (
-                <div className="p-3.5 rounded-2xl bg-[#FFFFFF] border border-[#E7E1F0] flex items-center justify-between shadow-xs">
-                  <span className="text-stone-500">伴读风格</span>
-                  <span className="text-stone-800 font-medium truncate max-w-[170px]">{preferences.profile.companionStyle}</span>
-                </div>
-              )}
             </div>
 
             <button

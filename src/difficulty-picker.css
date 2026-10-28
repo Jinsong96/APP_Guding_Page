@@ -1,5 +1,5 @@
 /* V2 03 阅读难度 (DifficultySentencePicker). The card itself reuses the reader's .rj-card, tools and
-   flip from reading-journey.css; this file adds the drag wrapper, underlay, stops and footer. */
+   flip from reading-journey.css; this file adds the drag wrapper, underlay, position dots and footer. */
 
 .dp-root {
   /* Reader colour tokens, normally provided by .rj-page. */
@@ -45,29 +45,40 @@
   position: absolute;
   inset: 0;
   /* `translate`/`rotate` follow the drag; easing back when released. */
-  transition: translate 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), rotate 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
-  animation: dp-card-in 420ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  transition: translate 0.45s cubic-bezier(0.34, 1.3, 0.64, 1), rotate 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
+  animation: dp-card-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .dp-card.is-dragging {
   transition: none;
 }
 
-/* Lean toward the direction of the change, then spring flat. */
-.dp-card.is-up {
+/* Flies off the way it was swiped, picking up from where the finger let go. */
+.dp-card.is-exiting {
+  transition: translate 220ms cubic-bezier(0.4, 0, 1, 1), rotate 220ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* Lean toward the direction of the change, then settle flat. A left swipe brings the harder
+   sentence in from the right; a right swipe brings the easier one in from the left. */
+.dp-card.is-harder {
   --dp-tilt: 10deg;
   --dp-from: 60px;
 }
 
-.dp-card.is-down {
+.dp-card.is-easier {
   --dp-tilt: -10deg;
   --dp-from: -60px;
+}
+
+/* One gentle sway after the opening line, to show the card can be swiped. */
+.dp-card.is-sway-hint {
+  animation: dp-sway-hint 1400ms ease-in-out both;
 }
 
 .dp-sentence span {
   display: inline-block;
   white-space: pre;
-  animation: dp-word-in 360ms ease-out both;
+  animation: dp-word-in 600ms ease-out both;
 }
 
 /* 解读 side: one line per key phrase, so the longest level fits without scrolling. */
@@ -88,50 +99,44 @@
   color: #5c5872;
 }
 
-/* ---------- Four stops ---------- */
+/* ---------- Position dots (no labels) ---------- */
 
-.dp-stops {
-  position: relative;
+.dp-dots {
+  display: flex;
+  justify-content: center;
+  /* Clears the tilted underlay below the card; the buttons' own padding adds the rest. */
+  margin: 2px 24px 8px;
+}
+
+/* Each dot sits in a 30×32 tap target; swiping stays the main way to switch. */
+.dp-dots button {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  height: 50px;
-  margin: 0 24px 16px;
-  padding: 4px;
-  border: 1.5px solid #e3dcea;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 3px 0 #e6dfee;
+  place-items: center;
+  width: 30px;
+  height: 32px;
+  border-radius: 999px;
 }
 
-.dp-thumb {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc((100% - 8px) / 4);
-  border-radius: 12px;
-  background: #d9473a;
-  box-shadow: 0 3px 0 #a8321f;
-  transition: transform 380ms cubic-bezier(0.34, 1.5, 0.64, 1);
-}
-
-.dp-stops button {
-  position: relative;
-  z-index: 1;
-  border-radius: 12px;
-  color: #5d5672;
-  font-size: 15px;
-  font-weight: 700;
-  transition: color 0.2s;
-}
-
-.dp-stops button.is-active {
-  color: #fff;
-}
-
-.dp-stops button:focus-visible {
+.dp-dots button:focus-visible {
   outline: 2px solid #8176a8;
-  outline-offset: 2px;
+  outline-offset: -2px;
+}
+
+.dp-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #cbc2da;
+  transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1), background-color 600ms ease;
+}
+
+.dp-dots button:hover span {
+  background: #b0a5c4;
+}
+
+.dp-dots button.is-active span {
+  width: 22px;
+  background: #d9473a;
 }
 
 /* Same as the 继续 button on the 02 interest step. */
@@ -153,6 +158,11 @@
   transition: background-color 0.15s;
 }
 
+/* Breathes twice when the companion invites the user to continue. */
+.dp-confirm.is-glow {
+  animation: dp-confirm-glow 1300ms ease-in-out 2;
+}
+
 .dp-confirm:hover {
   background: #c94032;
 }
@@ -172,6 +182,29 @@
   }
 }
 
+@keyframes dp-confirm-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(217, 76, 59, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(217, 76, 59, 0.22);
+  }
+}
+
+@keyframes dp-sway-hint {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translateX(-18px) rotate(-1.2deg);
+  }
+  60% {
+    transform: translateX(14px) rotate(1deg);
+  }
+}
+
 @keyframes dp-word-in {
   from {
     opacity: 0;
@@ -187,11 +220,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .dp-card,
-  .dp-sentence span {
+  .dp-sentence span,
+  .dp-confirm.is-glow {
     animation: none;
   }
 
-  .dp-thumb {
+  .dp-dots span,
+  .rj-page .dp-companion-row .rj-bubble {
     transition: none;
   }
 }
@@ -199,7 +234,8 @@
 /* V2 03 on the reader page layout (.rj-page): the card fills the space and the footer sits on the
    page background instead of the questionnaire's panel. */
 .rj-page .dp-root {
-  padding-top: 8px;
+  /* Breathing room between the companion's bubble and the card. */
+  padding-top: 28px;
 }
 
 .rj-page .dp-card-area {
@@ -214,6 +250,42 @@
   background: none;
 }
 
-.dp-companion-row {
-  margin-top: 4px;
+/* Companion row sized to the card: same side insets as .dp-card-area, so the avatar starts at the
+   card's left edge and the bubble ends at its right edge. The bubble is a fixed two-line box, so
+   lines of different length (and the typewriter) never move the card. */
+.rj-page .dp-companion-row {
+  /* Always as tall as a two-line bubble, so shorter or longer lines never move the card. */
+  height: 64px;
+  min-height: 0;
+  /* Clear space under the 选择阅读难度 header. */
+  margin-top: 16px;
+  padding: 0 36px;
+}
+
+/* The bubble hugs its line: Stage02AiChat sets its width from the full text before typing, and its
+   height is one or two lines, centred on the avatar. */
+.rj-page .dp-companion-row .rj-bubble {
+  max-width: 100%;
+  padding: 10px 16px;
+  transition: width 200ms ease;
+}
+
+.dp-bubble-slot {
+  position: relative;
+}
+
+.rj-page .dp-companion-row .dp-bubble-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Type stays the reader bubble's (same as 02 兴趣); only the line breaking changes. */
+.rj-page .dp-companion-row .rj-bubble p {
+  /* Lines carry their own break at the natural pause (\n); wrapping is only a fallback. */
+  white-space: pre-line;
+  text-wrap: pretty;
 }

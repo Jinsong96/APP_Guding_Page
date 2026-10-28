@@ -2,13 +2,6 @@ import React from 'react';
 import { RotateCcw, BookOpen } from 'lucide-react';
 import { Companion } from '../types';
 
-export type DemoVersion = 'v1' | 'v2';
-
-export const DEMO_VERSIONS: { id: DemoVersion; label: string }[] = [
-  { id: 'v1', label: 'V1 完整版' },
-  { id: 'v2', label: 'V2 简略版' }
-];
-
 export interface AppScreen {
   index: number;
   label: string;
@@ -16,45 +9,24 @@ export interface AppScreen {
   step?: number;
 }
 
-// Each version numbers its screens in its own flow order.
 export const screenCode = (screen: AppScreen) => String(screen.index).padStart(2, '0');
 
+// Interests → one difficulty question → the companion picks the featured story → reading home, where the
+// first article the user opens is their first read (no ratings, read at the chosen difficulty).
 export const APP_SCREENS: AppScreen[] = [
   { index: 0, label: '启动', stage: 0 },
   { index: 1, label: '选伴', stage: 1 },
   { index: 2, label: '兴趣', stage: 2, step: 1 },
-  { index: 3, label: '阅读目标', stage: 2, step: 11 },
-  { index: 4, label: '目标场景', stage: 2, step: 12 },
-  { index: 5, label: '专注时长', stage: 2, step: 13 },
-  { index: 6, label: '推荐文章', stage: 11 },
-  { index: 7, label: '首篇阅读', stage: 12 },
-  { index: 8, label: '阅读报告', stage: 8 },
-  { index: 9, label: '报告(首页)', stage: 7 },
-  { index: 10, label: '阅读首页', stage: 10 },
-  { index: 11, label: '我的旅伴', stage: 13 }
-];
-
-// V2 (简略版): interests → one difficulty question → the companion picks the featured story → reading home,
-// where the first article the user opens is their first read (no ratings, starts at the chosen difficulty).
-export const APP_SCREENS_V2: AppScreen[] = [
-  { index: 0, label: '启动', stage: 0 },
-  { index: 1, label: '选伴', stage: 1 },
-  { index: 2, label: '兴趣', stage: 2, step: 1 },
-  { index: 3, label: '阅读难度', stage: 2, step: 14 },
+  { index: 3, label: '阅读难度', stage: 2, step: 2 },
   { index: 4, label: '为你挑选', stage: 16 },
   { index: 5, label: '阅读首页', stage: 10 },
   // Every read prints its ticket here, then becomes 07 阅读报告 without a cut.
   { index: 6, label: '为你出票', stage: 14 },
-  { index: 7, label: '阅读报告', stage: 8 },
-  { index: 8, label: '我的旅伴', stage: 13 }
+  { index: 7, label: '阅读报告', stage: 8 }
 ];
-
-export const screensForVersion = (version: DemoVersion) => (version === 'v2' ? APP_SCREENS_V2 : APP_SCREENS);
 
 interface TopNavigationHeaderProps {
   currentScreen: number;
-  version: DemoVersion;
-  onSetVersion: (version: DemoVersion) => void;
   companion: Companion;
   onJumpToScreen: (screen: AppScreen) => void;
   onReset: () => void;
@@ -62,8 +34,6 @@ interface TopNavigationHeaderProps {
 
 export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
   currentScreen,
-  version,
-  onSetVersion,
   companion,
   onJumpToScreen,
   onReset
@@ -91,23 +61,6 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <div className="flex items-center rounded-xl border border-[#E7E1F0] bg-[#F0ECF8] p-0.5" role="group" aria-label="版本">
-            {DEMO_VERSIONS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onSetVersion(item.id)}
-                aria-pressed={version === item.id}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  version === item.id
-                    ? 'bg-[#23305E] text-white shadow-xs'
-                    : 'text-stone-500 hover:text-stone-800'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
           <button
             type="button"
             onClick={onReset}
@@ -124,7 +77,7 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
         aria-label="逐屏导航"
         className="no-scrollbar -mx-1 flex w-full items-stretch gap-1 overflow-x-auto px-1 py-0.5"
       >
-        {screensForVersion(version).map((screen) => {
+        {APP_SCREENS.map((screen) => {
           const isActive = currentScreen === screen.index;
           const number = screenCode(screen);
           return (
