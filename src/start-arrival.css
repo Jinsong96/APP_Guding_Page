@@ -1,20 +1,40 @@
 /* 00 启动: the night train pulls into the station (Stage00Start).
-   Positions are % of readpal-start-scene.png, which fills the screen.
-   Timeline: night fades 0–900ms · camera glides in 0–4000 · window light and rail glints slow down
-   200–3600 · brake settle 3500 · headlight flare 3600 · steam 3700. */
+   start-train-arrival.mp4 (≈6.6s) carries the motion: the train enters from the left, engine first,
+   and brakes at the platform; its last frame is the resting scene. .st-arrived is added when it ends: headlight flare · beam · steam.
+   Overlay positions are % of the 9:16 video frame (.st-stage), which covers the screen like
+   object-fit: cover with object-position 70% so the engine stays clear of the right edge, lifted 9% so
+   the platform and companions sit above the headline (the dark platform colour fills below). */
 
-.st-camera {
+.st-stage {
   position: absolute;
-  inset: 0;
-  transform-origin: 82% 55%;
-  animation: st-dolly 4000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  top: -9%;
+  left: 70%;
+  height: 100%;
+  aspect-ratio: 9 / 16;
+  transform: translateX(-70%);
 }
 
-.st-brake {
+.st-video {
   position: absolute;
-  /* A few px of overscan so the brake lurch never shows the edge. */
-  inset: -4px;
-  animation: st-brake 650ms ease-out 3500ms both;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Keeps the title and buttons readable over the sky and the platform. */
+.st-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #0b14304d 0%,
+    #0b143000 26%,
+    #0b143000 62%,
+    #0d1834b3 80%,
+    #0d1834f2 100%
+  );
 }
 
 .st-night-fade {
@@ -26,56 +46,137 @@
   animation: st-fade 900ms ease-out forwards;
 }
 
-/* Warm light from the carriage windows sliding past, slowing to a stop.
-   Split in two so it skips the deer standing in front of the train. */
-.st-window-sweep {
+.st-content {
   position: absolute;
-  top: 43.5%;
-  height: 9.5%;
-  background-image: repeating-linear-gradient(
-    90deg,
-    #ffd58a00 0px,
-    #ffd58acc 18px,
-    #ffd58a00 40px,
-    #ffd58a00 110px
-  );
-  mix-blend-mode: screen;
-  opacity: 0;
-  animation:
-    st-sweep-move 3400ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms both,
-    st-sweep-fade 3400ms linear 200ms both;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 7% 24px 4.5%;
+  text-align: center;
+  pointer-events: none;
 }
 
-.st-window-sweep-left {
-  left: 0;
-  width: 11%;
+.st-content button {
+  pointer-events: auto;
 }
 
-.st-window-sweep-right {
-  left: 32%;
-  width: 44%;
+.st-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: st-rise 1200ms ease-out 300ms both;
 }
 
-/* Glints running along the rail lights in front of the engine. */
-.st-rail-glint {
-  position: absolute;
-  top: 60.2%;
-  left: 63%;
-  width: 35%;
-  height: 1.6%;
-  background-image: radial-gradient(circle at 50% 50%, #fff3c8 0 2px, #ffd58a66 3px, #0000 7px);
-  background-size: 34px 100%;
-  mix-blend-mode: screen;
-  opacity: 0;
-  animation:
-    st-sweep-move 3400ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms both,
-    st-sweep-fade 3400ms linear 200ms both;
+.st-title-star {
+  font-size: 13px;
+  line-height: 1;
+  color: #f6dd9e;
+  text-shadow: 0 0 10px #f6dd9eaa;
 }
 
+.st-logo {
+  margin-top: 2px;
+  font-family: 'EB Garamond', 'Songti SC', serif;
+  font-size: 54px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  color: #fbf6ec;
+  text-shadow: 0 2px 18px #0b143099;
+}
+
+.st-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #ece7f4;
+}
+
+.st-tag::before,
+.st-tag::after {
+  content: '';
+  width: 20px;
+  height: 1px;
+  background: #ece7f499;
+}
+
+.st-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: auto;
+  animation: st-rise 1000ms ease-out 1400ms both;
+}
+
+.st-headline {
+  font-family: 'Songti SC', 'STSong', 'Noto Serif SC', serif;
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #fbf6ec;
+}
+
+.st-sub {
+  margin: 10px 0 26px;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #ebe7f2;
+}
+
+.st-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  height: 58px;
+  border-radius: 999px;
+  background: #fcf2e6;
+  box-shadow: 0 8px 26px #0b143066;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #1d2846;
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.st-primary:hover {
+  background: #fff8ee;
+}
+
+.st-primary:active {
+  transform: scale(0.98);
+}
+
+.st-primary span {
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.st-secondary {
+  margin-top: 14px;
+  padding: 6px 16px;
+  font-size: 14px;
+  color: #e8e3f0;
+}
+
+.st-primary:focus-visible,
+.st-secondary:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Engine headlight on the resting frame (start-train-arrival-poster.jpg: lamp at 600,753 of 720×1280). */
 .st-headlight {
   position: absolute;
-  top: 55.6%;
-  left: 88.8%;
+  top: 58.8%;
+  left: 83.3%;
   width: 34px;
   height: 34px;
   margin: -17px 0 0 -17px;
@@ -83,28 +184,25 @@
   background: radial-gradient(circle, #fffbe8 0 18%, #ffd27a 32%, #ffb84d55 55%, #0000 72%);
   mix-blend-mode: screen;
   opacity: 0;
-  animation:
-    st-flare 700ms cubic-bezier(0.2, 0.9, 0.3, 1.2) 3600ms forwards,
-    st-breathe 2600ms ease-in-out 4300ms infinite;
 }
 
 .st-headlight-beam {
   position: absolute;
-  top: 51.5%;
-  left: 89%;
-  width: 14%;
-  height: 8%;
+  top: 55.4%;
+  left: 83.5%;
+  width: 16%;
+  height: 7%;
   background: radial-gradient(ellipse at 0% 50%, #ffe2a0aa, #ffd27a33 45%, #0000 75%);
   mix-blend-mode: screen;
   opacity: 0;
   transform-origin: 0 50%;
-  animation: st-beam 900ms ease-out 3700ms forwards;
 }
 
+/* Chimney top on the resting frame. */
 .st-steam {
   position: absolute;
-  top: 45.2%;
-  left: 81.5%;
+  top: 56.8%;
+  left: 81.2%;
 }
 
 .st-steam i {
@@ -116,15 +214,28 @@
   background: radial-gradient(circle, #f4f2ffdd, #d9d6f0aa 45%, #0000 70%);
   filter: blur(1.5px);
   opacity: 0;
-  animation: st-puff 2600ms ease-out 3700ms 2 both;
 }
 
-.st-steam i:nth-child(2) {
-  animation-delay: 4000ms;
+.st-arrived .st-headlight {
+  animation:
+    st-flare 700ms cubic-bezier(0.2, 0.9, 0.3, 1.2) 150ms forwards,
+    st-breathe 2600ms ease-in-out 850ms infinite;
 }
 
-.st-steam i:nth-child(3) {
-  animation-delay: 4300ms;
+.st-arrived .st-headlight-beam {
+  animation: st-beam 900ms ease-out 250ms forwards;
+}
+
+.st-arrived .st-steam i {
+  animation: st-puff 2600ms ease-out 250ms 2 both;
+}
+
+.st-arrived .st-steam i:nth-child(2) {
+  animation-delay: 550ms;
+}
+
+.st-arrived .st-steam i:nth-child(3) {
+  animation-delay: 850ms;
 }
 
 @keyframes st-fade {
@@ -133,54 +244,14 @@
   }
 }
 
-/* Camera starts close on the arriving engine and eases back as the train slows. */
-@keyframes st-dolly {
+@keyframes st-rise {
   from {
-    transform: translateX(-3%) scale(1.14);
+    opacity: 0;
+    transform: translateY(12px);
   }
   to {
+    opacity: 1;
     transform: none;
-  }
-}
-
-/* A small lurch forward and back when the brakes catch. */
-@keyframes st-brake {
-  0%,
-  100% {
-    transform: none;
-  }
-  30% {
-    transform: translateX(3px) rotate(0.15deg);
-  }
-  60% {
-    transform: translateX(-1.5px);
-  }
-  80% {
-    transform: translateX(0.5px);
-  }
-}
-
-@keyframes st-sweep-move {
-  from {
-    background-position-x: 0;
-  }
-  to {
-    background-position-x: 880px;
-  }
-}
-
-@keyframes st-sweep-fade {
-  0% {
-    opacity: 0;
-  }
-  12% {
-    opacity: 0.75;
-  }
-  70% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
   }
 }
 
@@ -237,18 +308,25 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .st-camera,
-  .st-brake,
   .st-night-fade,
-  .st-window-sweep,
-  .st-rail-glint,
-  .st-headlight,
-  .st-headlight-beam,
-  .st-steam i {
+  .st-title,
+  .st-bottom,
+  .st-arrived .st-headlight,
+  .st-arrived .st-headlight-beam,
+  .st-arrived .st-steam i {
     animation: none;
   }
 
   .st-night-fade {
     opacity: 0;
+  }
+
+  .st-arrived .st-headlight {
+    opacity: 0.85;
+    transform: scale(1.2);
+  }
+
+  .st-arrived .st-headlight-beam {
+    opacity: 0.8;
   }
 }
