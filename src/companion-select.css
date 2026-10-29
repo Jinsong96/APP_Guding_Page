@@ -206,6 +206,11 @@
   opacity: 1;
 }
 
+/* Hard cut into the idle: a fade would flash the neutral still underneath before the smile. */
+.cs-clip.is-idle .cs-clip-video {
+  transition: none;
+}
+
 /* Motion clips are filmed on a cream studio backdrop: no window frame, edges fade into the card. */
 .cs-clip.has-motion {
   border-radius: 0;

@@ -18,6 +18,8 @@ interface ClipSet {
   idle?: string;
   // Where the idle loop starts so it picks up from the signature's last frame (seconds).
   idleStart?: number;
+  // The idle opens with a one-off lead-in and then loops only from here to its end (seconds); without it the whole clip loops.
+  idleLoopFrom?: number;
   // The signature clip has its own sound effect.
   sound?: boolean;
 }
@@ -28,11 +30,14 @@ const clipUrl = (file: string) => `${import.meta.env.BASE_URL}assets/companions/
 // back to a still cut from that sheet (*-card-v2.jpg); the older *-signature.mp4 / *-idle.mp4 show the previous designs.
 const CLIPS: Record<CompanionId, ClipSet> = {
   // 凑近镜头: he runs up to the lens, leaves a glowing hoof print, hops back and waves.
-  // No idle clip: the old idle shows the previous model, so he rests on the last frame and breathes.
+  // Idle (wick-v3-idle): cuts straight from the signature to a big smile as he tilts his head (lead-in, frames 0–46),
+  // then keeps smiling in a gentle forward-then-back sway (frame 47 to the end, which lands back on frame 46).
   wick: {
     signature: clipUrl('wick-v3-signature.mp4'),
     poster: clipUrl('wick-v3-signature.jpg'),
     rest: clipUrl('wick-v3-still.jpg'),
+    idle: clipUrl('wick-v3-idle.mp4'),
+    idleLoopFrom: 47 / 24,
     sound: true
   },
   pal: {
@@ -140,7 +145,12 @@ export const CompanionClip: React.FC<CompanionClipProps> = ({ companion, active 
           src={clips.idle}
           muted
           playsInline
-          loop
+          loop={clips.idleLoopFrom === undefined}
+          onEnded={(event) => {
+            const idle = event.currentTarget;
+            idle.currentTime = clips.idleLoopFrom ?? 0;
+            idle.play().catch(() => setPhase('still'));
+          }}
           preload={active ? 'auto' : 'none'}
           aria-hidden="true"
         />
