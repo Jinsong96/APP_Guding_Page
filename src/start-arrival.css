@@ -29,6 +29,31 @@
   object-fit: cover;
 }
 
+.st-sound {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #ffffff66;
+  border-radius: 50%;
+  background: #0b143080;
+  color: #fff;
+  transition: background-color 150ms ease;
+}
+
+.st-sound:hover {
+  background: #0b1430b3;
+}
+
+.st-sound:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 /* Keeps the title and buttons readable over the sky and the platform. */
 .st-scrim {
   position: absolute;
@@ -317,6 +342,16 @@
 /* ---- Day ---- */
 
 /* Bright sky and stone platform: dark ink on top, a cream wash over the floor for the buttons. */
+.st-day .st-sound {
+  border-color: #1d284633;
+  background: #fffaf0cc;
+  color: #1d2846;
+}
+
+.st-day .st-sound:hover {
+  background: #fffaf0;
+}
+
 .st-day {
   background: #f3ece1;
   color: #1d2846;

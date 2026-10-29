@@ -32,7 +32,7 @@ interface ReadingReportProps {
   onBack: () => void;
   // 返回发现: back to the reading home.
   onHome: () => void;
-  // 为你出票: on a dark screen the companion's paws hand the ticket down, then the report fades in
+  // 为你出票: on a lavender screen the companion's paws hand the ticket down, then the report fades in
   // around it without remounting. onIssued fires when the hand-over ends.
   issuing?: boolean;
   onIssued?: () => void;

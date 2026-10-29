@@ -1134,8 +1134,8 @@
 }
 
 /* ---------- 为你出票 → 阅读报告 (ReadingReport issuing) ----------
-   On a dark screen the companion's paws hand the report ticket down from above (0.2–1.1s), let go and
-   pull back while it settles; then one paw comes back and taps the ticket (1.35–2.45s). At 2.55s the dark layer fades and the report fades in around the same
+   On a lavender screen the companion's paws hand the report ticket down from above (0.2–1.1s), let go and
+   pull back while it settles; then one paw comes back and taps the ticket (1.35–2.45s). At 2.55s the lavender layer fades and the report fades in around the same
    ticket; the 已完成阅读 stamp lands after the handover celebration has resolved. */
 
 .rj-report-scroll {
@@ -1151,7 +1151,9 @@
   position: absolute;
   inset: 0;
   z-index: 20;
-  background: radial-gradient(120% 80% at 50% 38%, #2a3479e6, #141a3df2);
+  background:
+    radial-gradient(65% 38% at 50% 14%, #d94c3b26, #d94c3b00 90%),
+    radial-gradient(100% 85% at 50% 35%, #e8dff0f2, #b9a9cbf5 72%, #8f7b9ef7);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s ease;
@@ -1173,6 +1175,10 @@
   position: relative;
   z-index: 21;
   perspective: 1200px;
+}
+
+.rj-page.is-issuing .rj-printed {
+  filter: drop-shadow(0 16px 25px #4e355044);
 }
 
 /* The ticket and the paws holding it come down together from above the screen. */

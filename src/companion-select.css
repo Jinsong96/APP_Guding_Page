@@ -1,5 +1,5 @@
 /* 01 选伴 (Stage01Companion): soft, raised cards in a horizontal carousel with the next card
-   peeking in. Colours stay the onboarding's navy #192b4d / brick red #b43a27 on near-white. */
+   peeking in. Actions share the later stages' lavender and vermilion palette. */
 
 .cs-page {
   display: flex;
@@ -27,7 +27,12 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  color: #172747;
+  color: #756889;
+  transition: background-color 0.15s;
+}
+
+.cs-header button:hover {
+  background: #eee8f4;
 }
 
 .cs-intro {
@@ -318,18 +323,22 @@
   height: 48px;
   margin-top: auto;
   border-radius: 999px;
-  background: linear-gradient(180deg, #2a3f6b 0%, #192b4d 100%);
+  background: #d94c3b;
   color: #fff;
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 1px;
-  box-shadow: 0 10px 20px #192b4d33, 0 3px 0 #0f1b33, inset 0 1px 0 #ffffff33;
-  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 6px 16px #d94c3b38;
+  transition: background-color 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+
+.cs-choose:hover {
+  background: #c94032;
 }
 
 .cs-choose:active {
   transform: translateY(2px);
-  box-shadow: 0 6px 12px #192b4d33, 0 1px 0 #0f1b33, inset 0 1px 0 #ffffff33;
+  box-shadow: 0 3px 8px #d94c3b38;
 }
 
 .cs-choose:focus-visible,
@@ -353,15 +362,15 @@
   width: 11px;
   height: 11px;
   border-radius: 999px;
-  background: #e1e5ee;
-  box-shadow: inset 0 1px 2px #192b4d14;
+  background: #ddd4e8;
+  box-shadow: inset 0 1px 2px #37305914;
   transition: width 0.3s, background-color 0.3s;
 }
 
 .cs-dots button.is-active {
   width: 22px;
-  background: #b43a27;
-  box-shadow: 0 2px 0 #8f2d1f;
+  background: #d94c3b;
+  box-shadow: 0 2px 0 #b43b2d;
 }
 
 @keyframes cs-breathe {
