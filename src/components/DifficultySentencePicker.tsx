@@ -29,7 +29,7 @@ const LEVEL_SAMPLES: LevelSample[] = [
     translation: '我的猫在阳光下睡觉。',
     note: '一个主语加一个动词的简单句：My cat 是主语，sleeps 是动作。',
     phrases: [{ phrase: 'in the sun', meaning: '在阳光下' }],
-    companionLine: '这是「入门」难度，\n像跟朋友聊天那么轻松。'
+    companionLine: '「入门」，像聊天一样轻松'
   },
   {
     level: 'A2',
@@ -41,7 +41,7 @@ const LEVEL_SAMPLES: LevelSample[] = [
       { phrase: 'wait for', meaning: '等待某人' },
       { phrase: 'by the door', meaning: '在门边' }
     ],
-    companionLine: '「基础」难度，\n日常小故事大多是这个样子。'
+    companionLine: '「基础」，日常小故事这样写'
   },
   {
     level: 'B1',
@@ -53,7 +53,7 @@ const LEVEL_SAMPLES: LevelSample[] = [
       { phrase: 'recognise', meaning: '认出（美式拼写 recognize）' },
       { phrase: "owners' voices", meaning: '主人们的声音' }
     ],
-    companionLine: '「进阶」了，\n新闻和科普常是这种句子。'
+    companionLine: '「进阶」，新闻科普常这样写'
   },
   {
     level: 'B2+',
@@ -65,20 +65,20 @@ const LEVEL_SAMPLES: LevelSample[] = [
       { phrase: 'aloof', meaning: '冷淡的，疏远的' },
       { phrase: 'form a bond with', meaning: '与……建立感情' }
     ],
-    companionLine: '「高阶」！\n原版文章的味道出来了。'
+    companionLine: '「高阶」！原版文章的味道'
   }
 ];
 
 // Proactive nudges; each fires at most once per visit. Two invite a switch; the continue nudges
 // share one slot, so a visit hears at most three proactive lines (the IP's per-session cap).
-// Companion lines break at their natural pause with \n, so the bubble never splits a phrase.
+// Every line fits the bubble on one row.
 const NUDGES = {
-  idle: '读着有点费劲？\n往右滑，换句简单的试试。',
-  tooEasy: '这句是不是太轻松了？\n往左滑，挑战一下？',
+  idle: '有点费劲？往右滑换简单的',
+  tooEasy: '太轻松了？往左滑挑战下',
   // Continue nudges: the 继续 button glows along with them.
-  settled: (label: string) => `就读「${label}」这样的？\n点继续，我照这个难度挑文章～`,
-  ready: '读着刚好的话，\n点继续就行～',
-  topLevel: '哇，这句你也能读？\n那就高阶吧，点继续出发！'
+  settled: (label: string) => `就读「${label}」？点继续吧～`,
+  ready: '读着刚好，就点继续～',
+  topLevel: '这句也能读？点继续出发！'
 } as const;
 type NudgeKey = keyof typeof NUDGES;
 const CONTINUE_NUDGES: NudgeKey[] = ['settled', 'ready', 'topLevel'];
@@ -395,7 +395,9 @@ export const DifficultySentencePicker: React.FC<DifficultySentencePickerProps> =
           }
         }}
       >
-        <div aria-hidden="true" className="dp-underlay" />
+        {/* Two paper cards behind the sentence: the levels read as a deck to swipe through. */}
+        <div aria-hidden="true" className="dp-deck dp-deck-back" />
+        <div aria-hidden="true" className="dp-deck" />
         <div
           key={sample.level}
           className={`dp-card ${direction ? `is-${direction}` : ''} ${isDragging ? 'is-dragging' : ''} ${exitX !== null ? 'is-exiting' : ''} ${isSwayHint ? 'is-sway-hint' : ''}`}
@@ -406,7 +408,7 @@ export const DifficultySentencePicker: React.FC<DifficultySentencePickerProps> =
         >
           <div className="rj-flip">
             <div className={`rj-flip-inner ${isFlipped ? 'is-flipped' : ''}`}>
-              <article className="rj-card" aria-hidden={isFlipped} aria-live="polite">
+              <article className="rj-card" aria-hidden={isFlipped}>
                 <div className="rj-reading-area">
                   <div className="rj-prose">
                     <p className="rj-english dp-sentence" lang="en">
@@ -469,8 +471,9 @@ export const DifficultySentencePicker: React.FC<DifficultySentencePickerProps> =
         </div>
       </div>
 
-      {/* No visible labels: 入门 on the left through 高阶 on the right. Tapping one jumps to it. */}
+      {/* 入门 on the left through 高阶 on the right, between 易 and 难 ends. Tapping a dot jumps to it. */}
       <div className="dp-dots" role="group" aria-label="切换阅读难度">
+        <span className="dp-dots-end" aria-hidden="true">易</span>
         {LEVEL_SAMPLES.map((item, itemIndex) => (
           <button
             key={item.level}
@@ -483,6 +486,7 @@ export const DifficultySentencePicker: React.FC<DifficultySentencePickerProps> =
             <span aria-hidden="true" />
           </button>
         ))}
+        <span className="dp-dots-end" aria-hidden="true">难</span>
       </div>
 
       <div className="dp-footer">

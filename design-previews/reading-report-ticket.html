@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>阅读报告车票</title>
+<style>
+  :root {
+    --navy: #1B2150;
+    --navy-2: #2A3479;
+    --ink: #1B2150;
+    --ink-2: #5B5F7E;
+    --ink-3: #9A95AE;
+    --paper: #FFFDF6;
+    --paper-2: #F3F0FB;
+    --rule: #E3DCCB;
+    --red: #E2482D;       /* 朱红 */
+    --red-soft: #FBE3DC;
+    --lav: #E6E1F6;       /* 淡紫 */
+    --lav-2: #CDC4EC;
+    --lav-ink: #6C5FAE;
+    --bg: #E9E7F4;
+    --mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --serif: "Iowan Old Style", "Songti SC", Georgia, serif;
+    --sans: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: linear-gradient(180deg, #E9E7F4 0%, #DCD9EE 60%, #C9C6E3 100%);
+    min-height: 100vh;
+  }
+  .page { max-width: 390px; margin: 0 auto; padding: 12px 16px 40px; }
+
+  .nav { display: flex; align-items: center; gap: 10px; height: 44px; font-size: 17px; font-weight: 600; }
+  .nav svg { width: 22px; height: 22px; }
+
+  /* ---------- Ticket ---------- */
+  .ticket {
+    position: relative;
+    margin-top: 8px;
+    background: var(--paper);
+    border-radius: 14px;
+    box-shadow: 0 14px 30px rgba(35, 48, 94, .16), 0 1px 0 rgba(255,255,255,.6) inset;
+    overflow: hidden;
+  }
+  .ticket::after { /* subtle paper grain */
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .35;
+    background-image: radial-gradient(rgba(120,100,60,.08) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
+
+  .t-head {
+    background: var(--lav);
+    color: var(--ink);
+    padding: 12px 16px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: baseline; gap: 6px; }
+  .brand b { font-family: var(--serif); font-size: 20px; font-weight: 700; letter-spacing: .3px; }
+  .brand span { font-size: 11px; color: var(--lav-ink); }
+  .t-kind { text-align: right; font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em; line-height: 1.35; opacity: .9; }
+  .t-kind strong { display: block; font-size: 12px; letter-spacing: .12em; color: var(--red); }
+  .stripe { height: 6px; background: linear-gradient(180deg, var(--red) 0 50%, var(--lav-2) 50% 100%); }
+
+  .t-meta {
+    display: flex; justify-content: space-between;
+    padding: 9px 16px 0;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em; color: var(--ink-3);
+  }
+
+  /* Route: FROM → TO */
+  .route { display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 8px; padding: 14px 16px 4px; }
+  .stop small { display: block; font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em; color: var(--ink-3); }
+  .stop .code { font-family: var(--mono); font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+  .stop.from .code { color: #B8B3C8; }
+  .stop .cn { font-size: 12px; color: var(--ink-2); margin-top: 3px; }
+  .stop.to { text-align: right; }
+  .track { position: relative; height: 44px; display: flex; align-items: center; }
+  .track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dotted #C9C3D8; }
+  .track .dot { position: absolute; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: #C9C3D8; }
+  .track .dot.l { left: -2px; } .track .dot.r { right: -2px; background: var(--red); }
+  .track svg { position: relative; margin: 0 auto; width: 26px; height: 26px; background: var(--paper); padding: 0 3px; color: var(--lav-ink); }
+
+  .title { padding: 10px 16px 12px; border-bottom: 1px solid var(--rule); }
+  .title .en { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink-2); }
+  .title .zh { font-size: 20px; font-weight: 700; margin-top: 2px; }
+
+  /* Field grid like an Amtrak ticket */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--rule); }
+  .cell { padding: 10px 16px 12px; border-right: 1px solid var(--rule); min-width: 0; }
+  .cell:last-child { border-right: 0; }
+  .cell small { display: block; font-family: var(--mono); font-size: 8.5px; letter-spacing: .14em; color: var(--ink-3); white-space: nowrap; }
+  .cell b { display: block; margin-top: 3px; font-family: var(--mono); font-size: 20px; font-weight: 700; white-space: nowrap; }
+  .cell b i { font-style: normal; font-family: var(--sans); font-size: 10px; font-weight: 500; color: var(--ink-2); margin-left: 1px; }
+  
+  /* Perforation */
+  .perf { position: relative; height: 22px; display: flex; align-items: center; }
+  .perf::before { content: ""; position: absolute; left: 14px; right: 14px; top: 50%; border-top: 2px dashed #D9D1BE; }
+  .perf .notch { position: absolute; top: 50%; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; background: var(--bg); box-shadow: inset 0 2px 3px rgba(35,48,94,.12); z-index: 1; }
+  .perf .notch.l { left: -11px; } .perf .notch.r { right: -11px; }
+  .perf span { position: relative; margin: 0 auto; background: var(--paper); padding: 0 8px; font-family: var(--mono); font-size: 9px; letter-spacing: .2em; color: var(--ink-3); }
+
+  /* Quote */
+  .quote { padding: 6px 16px 14px; }
+  .quote .lbl { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em; color: var(--ink-3); }
+  .quote .lbl svg { width: 16px; height: 16px; color: var(--ink-2); }
+  .quote p.en { margin-top: 8px; font-family: var(--serif); font-size: 24px; line-height: 1.2; }
+  .quote p.zh { margin-top: 4px; font-size: 13px; color: var(--ink-2); }
+
+  /* Barcode */
+  .code-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 12px 16px 14px; border-top: 1px solid var(--rule); }
+  .barcode { display: flex; align-items: stretch; height: 40px; gap: 0; }
+  .barcode i { display: block; background: var(--ink); }
+  .ticket-no { font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; color: var(--ink-2); margin-top: 4px; }
+  .fine { text-align: right; font-size: 10px; line-height: 1.5; color: var(--ink-3); }
+
+  /* Arrival stamp */
+  .stamp {
+    position: absolute; right: 18px; top: 150px; z-index: 2;
+    width: 74px; height: 74px; border-radius: 50%;
+    border: 2px solid var(--red); color: var(--red);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transform: rotate(-14deg); opacity: .78;
+    font-family: var(--mono); text-align: center; mix-blend-mode: multiply;
+  }
+  .stamp::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; border: 1px dashed var(--red); }
+  .stamp b { font-size: 15px; letter-spacing: .1em; }
+  .stamp small { font-size: 8px; letter-spacing: .14em; }
+
+  /* ---------- Companion stub ---------- */
+  .stub {
+    position: relative;
+    margin-top: 46px;
+    background: var(--paper);
+    border-radius: 14px;
+    padding: 46px 16px 16px;
+    box-shadow: 0 10px 24px rgba(35, 48, 94, .12);
+  }
+  .stub::before { /* tear edge between ticket and stub */
+    content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 6px;
+    background: radial-gradient(circle at 5px -1px, var(--bg) 4px, transparent 4.5px) 0 0 / 10px 6px repeat-x;
+  }
+  .pet {
+    position: absolute; left: 50%; top: -42px; transform: translateX(-50%);
+    width: 84px; height: 84px; border-radius: 50%; padding: 3px; background: var(--paper);
+    box-shadow: 0 6px 14px rgba(35,48,94,.18);
+    animation: bob 3.2s ease-in-out infinite;
+  }
+  .pet img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+  .pet .seat { position: absolute; right: -6px; bottom: 2px; background: var(--red); color: #fff; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; padding: 2px 6px; border-radius: 6px; }
+  @keyframes bob { 50% { transform: translateX(-50%) translateY(-3px); } }
+  @media (prefers-reduced-motion: reduce) { .pet { animation: none; } }
+
+  .stub-head { text-align: center; }
+  .stub-head small { font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em; color: var(--ink-3); }
+  .stub-head h3 { font-size: 16px; margin-top: 2px; }
+  .stub-head .trait { font-size: 11.5px; color: var(--ink-3); margin-top: 1px; }
+
+  .bubble {
+    position: relative; margin: 12px 4px 0; padding: 11px 14px;
+    background: var(--lav); border-radius: 14px; font-size: 14px; line-height: 1.55; color: var(--navy-2);
+  }
+  .bubble::before { content: ""; position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; margin-left: -6px; background: var(--lav); transform: rotate(45deg); border-radius: 2px; }
+
+  .stub-row { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--rule); font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--ink-3); }
+  .stub-row b { color: var(--ink); font-weight: 700; }
+
+  .actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 16px; }
+  .btn { height: 46px; border-radius: 23px; border: 0; font: 600 15px var(--sans); cursor: pointer; }
+  .btn.ghost { background: rgba(255,255,255,.75); color: var(--lav-ink); }
+  .btn.primary { background: var(--red); color: #fff; box-shadow: 0 8px 18px rgba(226,72,45,.28); }
+  .btn:focus-visible { outline: 2px solid var(--lav-ink); outline-offset: 2px; }
+
+  /* Demo switcher (not part of the design) */
+  .switch { margin-top: 22px; text-align: center; font-size: 11px; color: var(--ink-3); }
+  .switch div { display: inline-flex; gap: 6px; margin-top: 6px; }
+  .switch button { border: 1px solid #CFCBE3; background: rgba(255,255,255,.6); border-radius: 14px; padding: 4px 12px; font: 12px var(--sans); color: var(--ink-2); cursor: pointer; }
+  .switch button[aria-pressed="true"] { background: var(--lav-ink); color: #fff; border-color: var(--lav-ink); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="nav">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>
+    阅读报告
+  </div>
+
+  <article class="ticket" aria-label="到站车票">
+    <header class="t-head">
+      <div class="brand"><b>ReadPal</b><span>一鹿知</span></div>
+      <div class="t-kind"><strong>BOARDING PASS</strong>到站车票 · 单程</div>
+    </header>
+    <div class="stripe"></div>
+
+    <div class="route">
+      <div class="stop from">
+        <small>FROM 出发</small>
+        <div class="code">02</div>
+        <div class="cn">第 2 站</div>
+      </div>
+      <div class="track" aria-hidden="true">
+        <span class="dot l"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M9 14h.01M15 14h.01M8 21l2-4M16 21l-2-4"/></svg>
+        <span class="dot r"></span>
+      </div>
+      <div class="stop to">
+        <small>TO 到达</small>
+        <div class="code">03</div>
+        <div class="cn">第 3 站</div>
+      </div>
+    </div>
+
+    <div class="stamp" aria-hidden="true"><small>COMPLETED</small><b>已完成</b><small>10·23·26</small></div>
+
+    <div class="title">
+      <p class="en">The Four-Year-Old Boss</p>
+      <p class="zh">小小老板，大大笑容</p>
+    </div>
+
+    <div class="grid">
+      <div class="cell"><small>WORDS 本篇词汇</small><b>288<i>词</i></b></div>
+      <div class="cell"><small>TIME 阅读时长</small><b>0:13</b></div>
+      <div class="cell"><small>DATE 日期</small><b>10/23</b></div>
+    </div>
+
+    <div class="perf"><span class="notch l"></span><span>这一站的收获</span><span class="notch r"></span></div>
+
+    <section class="quote">
+      <div class="lbl"><span>TODAY'S LINE 今日好句</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+      </div>
+      <p class="en">“Anything you want!”</p>
+      <p class="zh">你想吃什么都行！</p>
+    </section>
+
+    <div class="code-row">
+      <div>
+        <div class="barcode" id="barcode" aria-hidden="true"></div>
+        <div class="ticket-no">NO. RP-261023-0003</div>
+      </div>
+      <div class="fine">已收入车票册<br>可随时回看</div>
+    </div>
+  </article>
+
+  <section class="stub" aria-label="旅伴存根">
+    <div class="pet"><img id="petImg" src="../public/assets/companion-wick-avatar.jpg" alt="" /></div>
+    <div class="stub-head">
+      <small>COMPANION STUB 旅伴存根</small>
+      <h3 id="petName">灯芯 Wick 同行</h3>
+      <p class="trait" id="petTrait">静默引路 · 走三步回一次头</p>
+    </div>
+    <p class="bubble" id="petLine">慢一点也没关系，重点都还在文章里。我在下一站等你。</p>
+  </section>
+
+  <div class="actions">
+    <button class="btn ghost" type="button">分享车票</button>
+    <button class="btn primary" type="button">继续下一站</button>
+  </div>
+
+  <div class="switch">预览旅伴（仅演示）
+    <div>
+      <button type="button" data-pet="wick" aria-pressed="true">灯芯</button>
+      <button type="button" data-pet="pal" aria-pressed="false">帕利</button>
+      <button type="button" data-pet="tuanzi" aria-pressed="false">团子</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Deterministic barcode from the ticket number.
+  (function () {
+    const el = document.getElementById('barcode');
+    let seed = 261023;
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    let html = '';
+    for (let i = 0; i < 46; i++) {
+      const w = [1, 1, 2, 3][Math.floor(rnd() * 4)];
+      const gap = [1, 2, 2, 3][Math.floor(rnd() * 4)];
+      html += `<i style="width:${w}px;margin-right:${gap}px"></i>`;
+    }
+    el.innerHTML = html;
+  })();
+
+  const pets = {
+    wick:   { img: 'companion-wick-avatar.jpg',   name: '灯芯 Wick 同行', trait: '静默引路 · 走三步回一次头',
+              line: '慢一点也没关系，重点都还在文章里。我在下一站等你。' },
+    pal:    { img: 'companion-pal-avatar.jpg',    name: '帕利 Pal 同行',  trait: '机灵探索 · 收藏句子',       seat: 'C-02·3C',
+              line: '“Anything you want!” 这句我收进星图尾巴里啦，下一站见～' },
+    tuanzi: { img: 'companion-tuanzi-avatar.jpg', name: '团子 Mochi 同行', trait: '安静在场 · 书角尾巴',       seat: 'C-02·3D',
+              line: '（团子在书角上眨了眨眼）……今天也一起读完了。' }
+  };
+  document.querySelectorAll('[data-pet]').forEach(btn => btn.addEventListener('click', () => {
+    const p = pets[btn.dataset.pet];
+    document.getElementById('petImg').src = '../public/assets/' + p.img;
+    document.getElementById('petName').textContent = p.name;
+    document.getElementById('petTrait').textContent = p.trait;
+    document.getElementById('petLine').textContent = p.line;
+    document.querySelectorAll('[data-pet]').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+  }));
+</script>
+</body>
+</html>

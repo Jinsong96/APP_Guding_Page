@@ -1,5 +1,5 @@
 /* V2 03 阅读难度 (DifficultySentencePicker). The card itself reuses the reader's .rj-card, tools and
-   flip from reading-journey.css; this file adds the drag wrapper, underlay, position dots and footer. */
+   flip from reading-journey.css; this file adds the drag wrapper, deck, position dots and footer. */
 
 .dp-root {
   /* Reader colour tokens, normally provided by .rj-page. */
@@ -29,17 +29,21 @@
   cursor: grabbing;
 }
 
-.dp-underlay {
+.dp-deck {
   position: absolute;
-  right: 0.7%;
-  bottom: -16px;
-  left: 1.3%;
-  height: 40%;
-  border-radius: 25px;
-  background: linear-gradient(120deg, #ce6b63, #b43b2d);
-  opacity: 0.85;
-  transform: rotate(-3deg);
+  inset: 0;
+  border-radius: 24px;
+  background: #eee8f4;
+  box-shadow: 0 4px 12px #37305914;
+  transform: translateY(10px) scale(0.94);
+  transform-origin: bottom center;
 }
+
+.dp-deck-back {
+  background: #ddd4e8;
+  transform: translateY(20px) scale(0.88);
+}
+
 
 .dp-card {
   position: absolute;
@@ -75,6 +79,10 @@
   animation: dp-sway-hint 1400ms ease-in-out both;
 }
 
+.rj-english.dp-sentence {
+  line-height: 1.72;
+}
+
 .dp-sentence span {
   display: inline-block;
   white-space: pre;
@@ -103,9 +111,22 @@
 
 .dp-dots {
   display: flex;
+  align-self: center;
+  align-items: center;
   justify-content: center;
-  /* Clears the tilted underlay below the card; the buttons' own padding adds the rest. */
+  /* Clears the deck below the card; the buttons' own padding adds the rest. */
   margin: 2px 24px 8px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #fffefdd9;
+  box-shadow: 0 2px 8px #37305912;
+}
+
+.dp-dots-end {
+  padding: 0 6px;
+  color: #9a92ab;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* Each dot sits in a 30×32 tap target; swiping stays the main way to switch. */
@@ -122,7 +143,7 @@
   outline-offset: -2px;
 }
 
-.dp-dots span {
+.dp-dots button span {
   width: 7px;
   height: 7px;
   border-radius: 999px;
@@ -155,6 +176,7 @@
   color: #fff;
   font-size: 16px;
   font-weight: 700;
+  box-shadow: 0 6px 16px #d94c3b38;
   transition: background-color 0.15s;
 }
 
@@ -225,8 +247,7 @@
     animation: none;
   }
 
-  .dp-dots span,
-  .rj-page .dp-companion-row .rj-bubble {
+  .dp-dots button span {
     transition: none;
   }
 }
@@ -235,57 +256,34 @@
    page background instead of the questionnaire's panel. */
 .rj-page .dp-root {
   /* Breathing room between the companion's bubble and the card. */
-  padding-top: 28px;
+  padding-top: 22px;
 }
 
+/* One sentence doesn't need the whole page: the card stops at a reading height and the scenery
+   shows below it, with the scale and button kept together at the bottom. */
 .rj-page .dp-card-area {
+  flex: 0 1 475px;
   max-height: none;
-  margin: 0 36px 28px;
+  margin: 0 36px 30px;
 }
 
 .rj-page .dp-footer {
-  margin: 0;
+  margin: auto 0 0;
   padding: 4px 16px 14px;
   border-top: 0;
   background: none;
 }
 
-/* Companion row sized to the card: same side insets as .dp-card-area, so the avatar starts at the
-   card's left edge and the bubble ends at its right edge. The bubble is a fixed two-line box, so
-   lines of different length (and the typewriter) never move the card. */
+/* Companion row over the card: same side insets as .dp-card-area, so the avatar starts at the card's
+   left edge and the bubble ends at its right edge. Every line fits on one row, so the card never moves. */
 .rj-page .dp-companion-row {
-  /* Always as tall as a two-line bubble, so shorter or longer lines never move the card. */
-  height: 64px;
-  min-height: 0;
+  min-height: 64px;
   /* Clear space under the 选择阅读难度 header. */
   margin-top: 16px;
   padding: 0 36px;
 }
 
-/* The bubble hugs its line: Stage02AiChat sets its width from the full text before typing, and its
-   height is one or two lines, centred on the avatar. */
-.rj-page .dp-companion-row .rj-bubble {
-  max-width: 100%;
-  padding: 10px 16px;
-  transition: width 200ms ease;
-}
-
-.dp-bubble-slot {
-  position: relative;
-}
-
-.rj-page .dp-companion-row .dp-bubble-measure {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-/* Type stays the reader bubble's (same as 02 兴趣); only the line breaking changes. */
+/* Larger bubble text than the reader's: here the companion's line is the page's prompt. */
 .rj-page .dp-companion-row .rj-bubble p {
-  /* Lines carry their own break at the natural pause (\n); wrapping is only a fallback. */
-  white-space: pre-line;
-  text-wrap: pretty;
+  font-size: 16px;
 }

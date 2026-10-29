@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { BookmarkedSentence, Companion, CompanionId, ReadSummary } from '../../types';
 import { CompanionAvatar } from '../CompanionAvatar';
+import { TypedLine } from '../TypedLine';
 import { MiniProgramHeader } from '../MiniProgramHeader';
 import { CefrLevelKey } from './Stage02AiChat';
 import { FirstReadArticle, findParagraphVocab } from '../../firstReadArticles';
@@ -40,21 +41,22 @@ type LineMoment = 'start' | 'checkpoint' | 'end';
 // IP rule: a companion speaks up at most three times per read, each in its own voice.
 // The first line always teaches tapping a word for help, the core "stuck? someone helps" moment.
 // Wick guides gently and looks back now and then; Pal is the bookish scholar; Tuanzi talks tough but cares.
+// \n marks where a line may wrap in the bubble, so it never breaks mid-phrase.
 const COMPANION_LINES: Record<CompanionId, Partial<Record<LineMoment, string>>> = {
   wick: {
-    start: '遇到不认识的词，点一下，我在旁边轻声告诉你。',
-    checkpoint: '（灯芯回头看了看你）走得很稳，我们继续。',
-    end: '最后一段了，我在前面等你到站。'
+    start: '遇到不认识的词，点一下，\n我在旁边轻声告诉你。',
+    checkpoint: '（灯芯回头看了看你）\n走得很稳，我们继续。',
+    end: '最后一段了，\n我在前面等你到站。'
   },
   pal: {
-    start: '生词点一下，意思和来历我都知道！',
-    checkpoint: '好词记下来！词句本就是你的笔记。',
-    end: '最后一段，读完又多知道一点点！'
+    start: '生词点一下，\n意思和来历我都知道！',
+    checkpoint: '好词记下来！\n词句本就是你的笔记。',
+    end: '最后一段，\n读完又多知道一点点！'
   },
   tuanzi: {
-    start: '……别硬扛，不认识就点一下。',
-    checkpoint: '（打了个哈欠）读得还行嘛，继续。',
-    end: '最后一段了。慢慢读，我又不急。'
+    start: '……别硬扛，\n不认识就点一下。',
+    checkpoint: '（打了个哈欠）\n读得还行嘛，继续。',
+    end: '最后一段了。\n慢慢读，我又不急。'
   }
 };
 
@@ -283,17 +285,12 @@ export const StageFirstRead: React.FC<StageFirstReadProps> = ({
         </div>
       </div>
 
-      <div className="rj-companion-row">
-        <CompanionAvatar companion={companion} size={52} alt={companion.name} className="shadow-sm" />
-        <div className="min-w-0 flex-1" role="status" aria-live="polite">
+      <div className="rj-companion-row is-over-cards">
+        <CompanionAvatar companion={companion} size={44} alt={companion.name} frameless className="rj-avatar" />
+        <div className="min-w-0 flex-1" role="status" aria-atomic="true">
           {companionLine && (
             <div className="rj-bubble">
-              <p>
-                {bubbleText}
-                {isTyping && (
-                  <span aria-hidden="true" className="ml-1 inline-block h-3.5 w-[2px] translate-y-[2px] animate-pulse bg-[#C83E26] motion-reduce:animate-none" />
-                )}
-              </p>
+              <TypedLine text={companionLine} typed={bubbleText} isTyping={isTyping} />
             </div>
           )}
         </div>

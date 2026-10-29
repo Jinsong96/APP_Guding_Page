@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>02-05 选项布局方案对比</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --page: #efedf4;
+        --surface: #f8f5fa;
+        --ink: #302a3b;
+        --muted: #82788a;
+        --line: #dccfe8;
+        --accent: #d94c3b;
+        --selected: #fff0ec;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      .board {
+        width: min(1440px, calc(100% - 64px));
+        margin: 0 auto;
+        padding: 44px 0 52px;
+      }
+
+      .board-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 32px;
+        margin-bottom: 30px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 650;
+        letter-spacing: 0.08em;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.25;
+        font-weight: 700;
+      }
+
+      .board-heading p:last-child {
+        max-width: 430px;
+        margin: 0;
+        color: #696374;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .proposals {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: start;
+        gap: 28px;
+      }
+
+      .proposal {
+        min-width: 0;
+      }
+
+      .proposal-heading {
+        min-height: 68px;
+        margin-bottom: 12px;
+      }
+
+      .proposal-heading .name {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+      }
+
+      .proposal-heading .letter {
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .proposal-heading p {
+        margin: 5px 0 0 28px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .phone {
+        width: 100%;
+        max-width: 360px;
+        aspect-ratio: 427 / 852;
+        margin: 0 auto;
+        padding: 8px;
+        overflow: hidden;
+        border: 1px solid #292a31;
+        border-radius: 31px;
+        background: #171820;
+        box-shadow: 0 14px 34px rgba(34, 28, 50, 0.16);
+      }
+
+      .screen {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 23px;
+        background: var(--surface);
+      }
+
+      .scene {
+        position: relative;
+        height: 22%;
+        flex: 0 0 22%;
+        overflow: hidden;
+        background: #26213d url("/assets/companion-wick-scene.webp") center 43% / cover no-repeat;
+      }
+
+      .scene::after {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(22, 20, 39, 0.46), rgba(29, 24, 45, 0.05) 55%, rgba(26, 20, 38, 0.4));
+        content: "";
+      }
+
+      .topbar {
+        position: absolute;
+        z-index: 1;
+        inset: 11px 13px auto;
+        display: grid;
+        grid-template-columns: 32px 1fr 32px;
+        align-items: start;
+        color: white;
+        text-align: center;
+      }
+
+      .back {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.17);
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .top-title {
+        padding-top: 0;
+        font-family: "Songti SC", "STSong", Georgia, serif;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.35;
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+      }
+
+      .progress-label {
+        margin-top: 4px;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+        font-size: 9px;
+        font-weight: 500;
+      }
+
+      .progress {
+        display: flex;
+        gap: 3px;
+        margin-top: 5px;
+      }
+
+      .progress i {
+        height: 3px;
+        flex: 1;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.32);
+      }
+
+      .progress i:first-child,
+      .progress i:nth-child(2) {
+        background: white;
+      }
+
+      .skip {
+        padding-top: 7px;
+        font-size: 10px;
+        font-weight: 650;
+      }
+
+      .content {
+        display: flex;
+        min-height: 0;
+        flex: 1;
+        flex-direction: column;
+        padding-top: 13px;
+      }
+
+      .bubble-row {
+        display: flex;
+        min-height: 51px;
+        align-items: center;
+        gap: 8px;
+        padding: 0 14px;
+      }
+
+      .avatar {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        border: 1px solid white;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 1px 4px rgba(44, 34, 58, 0.12);
+      }
+
+      .bubble {
+        max-width: calc(100% - 42px);
+        padding: 9px 11px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: white;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+
+      .options {
+        display: grid;
+        min-height: 0;
+        flex: 1;
+        align-content: start;
+      }
+
+      .option {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 9px;
+        color: var(--ink);
+        text-align: left;
+      }
+
+      .option.selected {
+        border-color: var(--accent);
+        background: var(--selected);
+      }
+
+      .glyph {
+        display: grid;
+        width: 27px;
+        height: 27px;
+        flex: 0 0 27px;
+        place-items: center;
+        color: #897d91;
+        font-size: 17px;
+        line-height: 1;
+      }
+
+      .selected .glyph {
+        color: var(--accent);
+      }
+
+      .copy {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.35;
+      }
+
+      .subtitle {
+        display: block;
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.3;
+      }
+
+      .check {
+        width: 17px;
+        height: 17px;
+        flex: 0 0 17px;
+        border: 1px solid #CBBED5;
+        border-radius: 5px;
+      }
+
+      .selected .check {
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .footer {
+        flex: 0 0 auto;
+        padding: 9px 14px 8px;
+        border-top: 1px solid #e7dded;
+        background: var(--surface);
+      }
+
+      .continue {
+        display: grid;
+        height: 40px;
+        place-items: center;
+        border-radius: 24px;
+        background: var(--accent);
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .hint {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 9px;
+        line-height: 1.2;
+        text-align: center;
+      }
+
+      /* A: all options share a narrower centered column. */
+      .layout-a {
+        width: 82%;
+        margin: 12px auto 8px;
+        gap: 6px;
+      }
+
+      .layout-a .option {
+        min-height: 47px;
+        padding: 5px 8px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: white;
+      }
+
+      .layout-a .option.selected {
+        border-width: 1.5px;
+      }
+
+      /* B: interests use a two-column grid; question pages use the A column. */
+      .layout-b {
+        width: 90%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: center;
+        gap: 9px;
+        margin: 2px auto 8px;
+      }
+
+      .layout-b .option {
+        min-height: 82px;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 4px;
+        padding: 8px 9px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: white;
+      }
+
+      .layout-b .option.selected {
+        border-width: 1.5px;
+      }
+
+      .layout-b .glyph {
+        display: none;
+      }
+
+      .layout-b .check {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        align-self: flex-end;
+        margin-top: -53px;
+        margin-right: -1px;
+      }
+
+      /* C: a Swiss editorial list with one shared text edge and quiet dividers. */
+      .layout-c {
+        width: 82%;
+        margin: 12px auto 8px;
+        gap: 0;
+      }
+
+      .layout-c .option {
+        min-height: 47px;
+        padding: 5px 4px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+      }
+
+      .layout-c .option:last-child {
+        border-bottom: 0;
+      }
+
+      .layout-c .glyph {
+        width: 22px;
+        flex-basis: 22px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .layout-c .selected {
+        border-radius: 7px;
+        background: var(--selected);
+      }
+
+      .layout-c .check {
+        width: 15px;
+        height: 15px;
+        flex-basis: 15px;
+        border-radius: 50%;
+      }
+
+      .proposal-note {
+        max-width: 360px;
+        min-height: 54px;
+        margin: 12px auto 0;
+        color: #696374;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .proposal-note strong {
+        color: #393444;
+      }
+
+      @media (max-width: 1050px) {
+        .board {
+          width: min(720px, calc(100% - 36px));
+        }
+
+        .board-heading {
+          align-items: start;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .proposals {
+          grid-template-columns: 1fr;
+          max-width: 430px;
+          margin: 0 auto;
+        }
+
+        .phone {
+          max-width: 340px;
+        }
+
+        .proposal-heading {
+          min-height: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="board">
+      <header class="board-heading">
+        <div>
+          <p class="eyebrow">02–05 · 选项布局提案</p>
+          <h1>把选项从屏幕边缘收回来</h1>
+        </div>
+        <p>以 02 兴趣页做对比。车厢背景、宠物提问、颜色和底部操作保持一致，仅调整选项区的宽度与排列。</p>
+      </header>
+
+      <section class="proposals" aria-label="三种选项布局">
+        <article class="proposal">
+          <header class="proposal-heading">
+            <h2 class="name"><span class="letter">A</span> 居中窄列</h2>
+            <p>所有页面统一窄列；保留现有卡片。</p>
+          </header>
+          <div class="phone">
+            <div class="screen">
+              <div class="scene">
+                <div class="topbar">
+                  <span class="back">‹</span>
+                  <div>
+                    <div class="top-title">和灯芯聊聊</div>
+                    <div class="progress-label">阅读兴趣　　2/4 步</div>
+                    <div class="progress"><i></i><i></i><i></i><i></i></div>
+                  </div>
+                  <span class="skip">跳过</span>
+                </div>
+              </div>
+              <div class="content">
+                <div class="bubble-row">
+                  <img class="avatar" src="/assets/companion-wick-avatar.jpg" alt="" />
+                  <div class="bubble">这一程，你想先读点什么？</div>
+                </div>
+                <div class="options layout-a">
+                  <div class="option"><span class="glyph">◎</span><span class="copy"><span class="label">世界热点</span><span class="subtitle">看见更大的世界</span></span><span class="check"></span></div>
+                  <div class="option selected"><span class="glyph">✦</span><span class="copy"><span class="label">科学探索</span><span class="subtitle">探索奇妙的世界</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">◈</span><span class="copy"><span class="label">文化故事</span><span class="subtitle">从故事看世界</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">⌂</span><span class="copy"><span class="label">商业观察</span><span class="subtitle">了解商业与社会</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">↗</span><span class="copy"><span class="label">自我成长</span><span class="subtitle">遇见更好的自己</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">▤</span><span class="copy"><span class="label">趣味故事</span><span class="subtitle">轻松有趣的阅读</span></span><span class="check"></span></div>
+                </div>
+              </div>
+              <footer class="footer"><div class="continue">继续　→</div><p class="hint">偏好只影响推荐顺序</p></footer>
+            </div>
+          </div>
+          <p class="proposal-note"><strong>特点：</strong>只增加左右留白，02–05 都用同一条居中对齐轴，视觉最统一。</p>
+        </article>
+
+        <article class="proposal">
+          <header class="proposal-heading">
+            <h2 class="name"><span class="letter">B</span> 兴趣双列</h2>
+            <p>02 用 2×3；03–05 回到居中纵列。</p>
+          </header>
+          <div class="phone">
+            <div class="screen">
+              <div class="scene">
+                <div class="topbar">
+                  <span class="back">‹</span>
+                  <div>
+                    <div class="top-title">和灯芯聊聊</div>
+                    <div class="progress-label">阅读兴趣　　2/4 步</div>
+                    <div class="progress"><i></i><i></i><i></i><i></i></div>
+                  </div>
+                  <span class="skip">跳过</span>
+                </div>
+              </div>
+              <div class="content">
+                <div class="bubble-row">
+                  <img class="avatar" src="/assets/companion-wick-avatar.jpg" alt="" />
+                  <div class="bubble">这一程，你想先读点什么？</div>
+                </div>
+                <div class="options layout-b">
+                  <div class="option"><span class="glyph">◎</span><span class="copy"><span class="label">世界热点</span><span class="subtitle">看见更大的世界</span></span><span class="check"></span></div>
+                  <div class="option selected"><span class="glyph">✦</span><span class="copy"><span class="label">科学探索</span><span class="subtitle">探索奇妙的世界</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">◈</span><span class="copy"><span class="label">文化故事</span><span class="subtitle">从故事看世界</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">⌂</span><span class="copy"><span class="label">商业观察</span><span class="subtitle">了解商业与社会</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">↗</span><span class="copy"><span class="label">自我成长</span><span class="subtitle">遇见更好的自己</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">▤</span><span class="copy"><span class="label">趣味故事</span><span class="subtitle">轻松有趣的阅读</span></span><span class="check"></span></div>
+                </div>
+              </div>
+              <footer class="footer"><div class="continue">继续　→</div><p class="hint">偏好只影响推荐顺序</p></footer>
+            </div>
+          </div>
+          <p class="proposal-note"><strong>特点：</strong>兴趣一屏扫读、横向留白明显；问题选项继续纵向，避免长文案挤进窄格。</p>
+        </article>
+
+        <article class="proposal">
+          <header class="proposal-heading">
+            <h2 class="name"><span class="letter">C</span> 瑞士式列表</h2>
+            <p>窄列、统一左边缘，以分隔线替代卡片框。</p>
+          </header>
+          <div class="phone">
+            <div class="screen">
+              <div class="scene">
+                <div class="topbar">
+                  <span class="back">‹</span>
+                  <div>
+                    <div class="top-title">和灯芯聊聊</div>
+                    <div class="progress-label">阅读兴趣　　2/4 步</div>
+                    <div class="progress"><i></i><i></i><i></i><i></i></div>
+                  </div>
+                  <span class="skip">跳过</span>
+                </div>
+              </div>
+              <div class="content">
+                <div class="bubble-row">
+                  <img class="avatar" src="/assets/companion-wick-avatar.jpg" alt="" />
+                  <div class="bubble">这一程，你想先读点什么？</div>
+                </div>
+                <div class="options layout-c">
+                  <div class="option"><span class="glyph">01</span><span class="copy"><span class="label">世界热点</span><span class="subtitle">看见更大的世界</span></span><span class="check"></span></div>
+                  <div class="option selected"><span class="glyph">02</span><span class="copy"><span class="label">科学探索</span><span class="subtitle">探索奇妙的世界</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">03</span><span class="copy"><span class="label">文化故事</span><span class="subtitle">从故事看世界</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">04</span><span class="copy"><span class="label">商业观察</span><span class="subtitle">了解商业与社会</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">05</span><span class="copy"><span class="label">自我成长</span><span class="subtitle">遇见更好的自己</span></span><span class="check"></span></div>
+                  <div class="option"><span class="glyph">06</span><span class="copy"><span class="label">趣味故事</span><span class="subtitle">轻松有趣的阅读</span></span><span class="check"></span></div>
+                </div>
+              </div>
+              <footer class="footer"><div class="continue">继续　→</div><p class="hint">偏好只影响推荐顺序</p></footer>
+            </div>
+          </div>
+          <p class="proposal-note"><strong>特点：</strong>选项视觉重量最轻，适合 03–05 的问题列表；选中项仍保留原强调色。</p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

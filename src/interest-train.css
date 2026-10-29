@@ -1,0 +1,184 @@
+/* 02 interest stations: a train route with one ticked stop per theme, in the existing paper-and-ink palette. */
+.it-layout {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  /* Starts lower so the companion and list sit closer to the thumb. */
+  padding: 22px 18px 0;
+}
+
+.it-companion-row {
+  flex: none;
+  margin: 0 -18px;
+}
+/* Larger bubble text than the reader's: here the companion's line is the page's prompt. */
+.rj-page .it-companion-row .rj-bubble p { font-size: 16px; }
+
+.it-station-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 4px 14px;
+}
+
+.it-station-heading h2 {
+  margin: 0;
+  color: #302a3b;
+  font-size: 18px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.it-station-count {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #fffefdd9;
+  box-shadow: 0 1px 3px #37305912;
+  color: #6f6580;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  transition: color 160ms ease, background 160ms ease;
+}
+/* One pip per pickable theme, filled as themes are chosen. */
+.it-count-pips { display: inline-flex; gap: 3px; }
+.it-count-pips > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d9d1e2;
+  transition: background 160ms ease;
+}
+.it-count-pips > span.is-on { background: #d94c3b; }
+/* Tapping a fourth theme turns the counter into the explanation. */
+.it-station-count.is-limit { background: #fde9e5; color: #c13f30; }
+
+.it-route-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+}
+.it-route-viewport::-webkit-scrollbar { display: none; }
+
+/* The route line runs down the left; each station's dot sits on it. */
+.it-route {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 4px 20px 34px;
+}
+.it-route::before {
+  content: '';
+  position: absolute;
+  top: 34px;
+  bottom: 48px;
+  left: 15px;
+  width: 4px;
+  border-radius: 4px;
+  background: #2b3a5c;
+}
+
+.it-stop {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 56px;
+  flex: none;
+  align-items: center;
+  padding: 0 14px 0 18px;
+  border-radius: 16px;
+  background: #fffefd;
+  box-shadow: 0 2px 8px #37305910;
+  color: #302a3b;
+  text-align: left;
+  transition: background 160ms ease, color 160ms ease, opacity 160ms ease, transform 160ms ease;
+  animation: it-stop-in 520ms cubic-bezier(.19,.82,.25,1) both;
+  animation-delay: calc(var(--it-i) * 60ms);
+  -webkit-tap-highlight-color: transparent;
+}
+.it-stop::before {
+  content: '';
+  position: absolute;
+  top: calc(50% - 7px);
+  left: -26px;
+  width: 14px;
+  height: 14px;
+  border: 3px solid #2b3a5c;
+  border-radius: 50%;
+  background: #fffefd;
+  transition: all 160ms ease;
+}
+.it-stop:active:not(:disabled) { transform: scale(.985); }
+.it-stop:focus-visible { outline: 2px solid #d94c3b; outline-offset: 2px; }
+.it-stop-name { flex: 1; min-width: 0; font-size: 16px; font-weight: 700; }
+.it-stop-check {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  place-items: center;
+  border: 1.5px solid #cfc6d9;
+  border-radius: 7px;
+  background: #fffefd;
+  color: #fff;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.it-stop-selected { background: #fde9e5; color: #b43b2d; }
+.it-stop-selected::before {
+  top: calc(50% - 9px);
+  left: -28px;
+  width: 18px;
+  height: 18px;
+  border-color: #d94c3b;
+  background: #d94c3b;
+  box-shadow: 0 0 0 4px #d94c3b33;
+}
+.it-stop-selected .it-stop-check { border-color: #d94c3b; background: #d94c3b; animation: it-check-pop 260ms cubic-bezier(.34,1.56,.64,1); }
+.it-stop-blocked { opacity: .5; }
+
+.it-footer { flex: none; padding: 12px 16px 14px; }
+.it-continue {
+  display: flex;
+  width: 100%;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: #d94c3b;
+  color: white;
+  font-size: 16px;
+  font-weight: 750;
+  box-shadow: 0 6px 16px #d94c3b38;
+  transition: background 160ms ease, box-shadow 160ms ease;
+}
+.it-continue:hover:not(:disabled) { background: #c94032; }
+.it-continue:disabled { cursor: not-allowed; background: #c9c3d0; box-shadow: none; }
+.it-continue:focus-visible { outline: 2px solid #d94c3b; outline-offset: 3px; }
+
+@keyframes it-stop-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes it-check-pop {
+  from { transform: scale(.4); }
+  to { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .it-stop { animation: none; }
+  .it-stop, .it-stop::before, .it-stop-check, .it-continue { transition: none; }
+  .it-stop-selected .it-stop-check { animation: none; }
+}

@@ -51,9 +51,20 @@ const COUNT_UP_MS = 900;
 // Hand-over length before the report appears (matches rj-deliver, rj-paw-release and rj-paw-gesture
 // in reading-journey.css).
 const ISSUE_MS = 2550;
-// When the 已完成阅读 stamp lands: after the print-out, or after the arrival flip on a direct visit.
+// Let the 1s companion cue finish before the report stamp lands.
+// The stamp sound begins with its 720ms visual animation; its impact is ~500ms later.
 const STAMP_AFTER_ISSUE_MS = 550;
 const STAMP_AFTER_ARRIVAL_MS = 1500;
+// One shared arrival celebration for every companion: stamp hit followed by the selected train bell.
+const STAMP_SOUND_URL = `${import.meta.env.BASE_URL}assets/reading-completion-arrival-bell.wav`;
+type TicketSoundCue = 'deliver' | 'release' | 'approach' | 'contact' | 'retreat';
+const ticketSoundUrl = (cue: TicketSoundCue, companionId: CompanionId) =>
+  `${import.meta.env.BASE_URL}assets/${cue === 'contact' ? `ticket-handover-${companionId}` : {
+    deliver: 'ticket-paws-deliver',
+    release: 'ticket-paws-release',
+    approach: 'ticket-paw-approach',
+    retreat: 'ticket-paw-retreat'
+  }[cue]}.wav?v=paw-cues-6`;
 
 const pawUrl = (companionId: CompanionId, part: 'left' | 'right' | 'tap') =>
   `${import.meta.env.BASE_URL}assets/paws/${companionId}-${part}.png`;
@@ -174,12 +185,65 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
   const [isStamped, setIsStamped] = useState(false);
   // Whether this report arrived by a print-out (the arrival rise is skipped then).
   const [arrivedByPrint, setArrivedByPrint] = useState(issuing);
+  const stampSoundRef = useRef<HTMLAudioElement | null>(null);
+  const ticketSoundsRef = useRef<Partial<Record<TicketSoundCue, HTMLAudioElement>>>({});
+
+  useEffect(() => {
+    const sound = new Audio(STAMP_SOUND_URL);
+    sound.preload = 'auto';
+    sound.volume = 0.70;
+    stampSoundRef.current = sound;
+    return () => {
+      sound.pause();
+      stampSoundRef.current = null;
+    };
+  }, []);
+
+  // The sound starts with the visual stamp, including on a direct visit to 07.
+  useEffect(() => {
+    if (!isStamped) return;
+    const sound = stampSoundRef.current;
+    if (!sound) return;
+    sound.currentTime = 0;
+    // Autoplay can be refused when the report was opened without a user gesture.
+    sound.play().catch(() => {});
+  }, [isStamped]);
+
+  useEffect(() => () => {
+    Object.values(ticketSoundsRef.current).forEach((sound) => sound.pause());
+    ticketSoundsRef.current = {};
+  }, []);
+
+  // Prepare all cues before their CSS animations begin. Keep their tails playing
+  // through the transition from 出票 to 阅读报告; only navigation stops them.
+  useEffect(() => {
+    if (!issuing || prefersReducedMotion()) return;
+    Object.values(ticketSoundsRef.current).forEach((sound) => sound.pause());
+    for (const cue of ['deliver', 'release', 'approach', 'contact', 'retreat'] as const) {
+      const sound = new Audio(ticketSoundUrl(cue, companionId));
+      sound.preload = 'auto';
+      sound.volume = cue === 'contact' ? 0.44 : 0.28; // The completion motif lifts above the paw movements.
+      ticketSoundsRef.current[cue] = sound;
+    }
+  }, [issuing, companionId]);
+
+  // These events are emitted by the browser's animation timeline, not by a
+  // separate JS timeout that can drift from the paw position.
+  const playTicketCue = (cue: TicketSoundCue) => {
+    if (!issuing || prefersReducedMotion()) return;
+    const sound = ticketSoundsRef.current[cue];
+    if (!sound) return;
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+  };
 
   // Print the ticket whenever issuing turns on (including a repeat visit to 为你出票).
   useEffect(() => {
     if (!issuing) return;
     setArrivedByPrint(true);
     setIsStamped(false);
+    // A repeat visit should not overlap the previous report celebration.
+    stampSoundRef.current?.pause();
     if (prefersReducedMotion()) {
       setIsPrinting(false);
       setIsStamped(true);
@@ -219,7 +283,12 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
       <MiniProgramHeader title="阅读报告" onBack={onBack} onClose={onHome} onShare={() => setToast('车票链接已复制')} />
 
       <div className="rj-report-scroll">
-        <div className={`rj-ticket-wrap ${arrivedByPrint ? 'rj-printed' : 'rj-celebrate'} ${isPrinting ? 'is-printing' : ''}`}>
+        <div
+          className={`rj-ticket-wrap ${arrivedByPrint ? 'rj-printed' : 'rj-celebrate'} ${isPrinting ? 'is-printing' : ''}`}
+          onAnimationStart={(event) => {
+            if (event.target === event.currentTarget && event.animationName === 'rj-deliver') playTicketCue('deliver');
+          }}
+        >
           <article className={`rj-ticket ${isLongQuote ? 'is-long-quote' : ''}`} aria-label={`第 ${ticket.rideNumber} 站到站车票`}>
             <img className="rj-ticket-paper" src={`${import.meta.env.BASE_URL}assets/ticket-paper.jpg`} alt="" aria-hidden="true" />
             <TicketEtching />
@@ -311,9 +380,19 @@ export const ReadingReport: React.FC<ReadingReportProps> = ({
           {isPrinting && (
             // Both paws grip the ticket's top corners, let go, then one paw taps it.
             <div className={`rj-paws is-${companionId}`} aria-hidden="true">
-              <img className="rj-paw-grip" src={pawUrl(companionId, 'left')} style={pawStyle(companionId, 'left')} alt="" draggable={false} />
+              <img className="rj-paw-grip" src={pawUrl(companionId, 'left')} style={pawStyle(companionId, 'left')} alt="" draggable={false} onAnimationStart={(event) => {
+                if (event.animationName === 'rj-paw-release') playTicketCue('release');
+              }} />
               <img className="rj-paw-grip" src={pawUrl(companionId, 'right')} style={pawStyle(companionId, 'right')} alt="" draggable={false} />
-              <img className="rj-paw-gesture" src={pawUrl(companionId, 'tap')} alt="" draggable={false} />
+              <img className="rj-paw-gesture" src={pawUrl(companionId, 'tap')} alt="" draggable={false} onAnimationStart={(event) => {
+                if (event.animationName === 'rj-paw-tap') playTicketCue('approach');
+              }} />
+              <span className="rj-paw-contact-cue" onAnimationStart={(event) => {
+                if (event.animationName === 'rj-paw-contact') playTicketCue('contact');
+              }} />
+              <span className="rj-paw-retreat-cue" onAnimationStart={(event) => {
+                if (event.animationName === 'rj-paw-retreat') playTicketCue('retreat');
+              }} />
             </div>
           )}
         </div>

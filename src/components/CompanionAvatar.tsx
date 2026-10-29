@@ -8,6 +8,8 @@ interface CompanionAvatarProps {
   imgClassName?: string;
   alt?: string;
   onClick?: () => void;
+  // Drops the white mat and border; the caller gives it depth instead (companion rows use .rj-avatar).
+  frameless?: boolean;
   // Overlays such as a completion ripple render inside the frame.
   children?: React.ReactNode;
 }
@@ -20,14 +22,15 @@ export const CompanionAvatar: React.FC<CompanionAvatarProps> = ({
   imgClassName = '',
   alt = '',
   onClick,
+  frameless = false,
   children
 }) => {
   const radius = Math.round(size * 0.28);
-  const inset = size >= 64 ? 3 : 2;
+  const inset = frameless ? 0 : size >= 64 ? 3 : 2;
 
   return (
     <div
-      className={`relative shrink-0 overflow-hidden border border-[#DCCFE8] bg-white ${className}`}
+      className={`relative shrink-0 overflow-hidden bg-white ${frameless ? '' : 'border border-[#DCCFE8]'} ${className}`}
       style={{ width: size, height: size, borderRadius: radius, padding: inset }}
       onClick={onClick}
     >

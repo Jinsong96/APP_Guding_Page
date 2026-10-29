@@ -4,6 +4,7 @@ import { InterestThemePicker, MAX_INTERESTS } from '../InterestThemePicker';
 import { CompanionAvatar } from '../CompanionAvatar';
 import { DifficultySentencePicker } from '../DifficultySentencePicker';
 import { MiniProgramHeader } from '../MiniProgramHeader';
+import { TypedLine } from '../TypedLine';
 import { COMPANION_TYPING_INTERVAL_MS } from '../speechTiming';
 
 export type CefrLevelKey = 'A1-' | 'A2' | 'B1' | 'B2+';
@@ -14,14 +15,11 @@ export const DIFFICULTY_STEP = 2;
 
 const BUBBLE_LINES: Record<number, string> = {
   [INTEREST_STEP]: '你平时喜欢读些什么呀？',
-  // The line break keeps 「左右滑滑看～」 together on the second line.
-  [DIFFICULTY_STEP]: '哪一句，你读着最舒服？\n左右滑滑看～'
+  [DIFFICULTY_STEP]: '左右滑滑，挑句读着舒服的'
 };
 
 // 03 types its lines slower than 02, so each one can be read before the card changes again.
 const DIFFICULTY_TYPING_INTERVAL_MS = COMPANION_TYPING_INTERVAL_MS * 2.5;
-// Room for the typing caret (2px bar + 4px margin) so it never wraps onto its own line.
-const BUBBLE_CARET_ALLOWANCE_PX = 6;
 
 // Pause after confirming interests so the ripple on the avatar registers before the next screen.
 const INTEREST_CONFIRM_MS = 640;
@@ -47,11 +45,8 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
 
   // Companion Dynamic Speech State
   const [companionBubbleText, setCompanionBubbleText] = useState<string>('');
-  // The whole line being typed, so 03 can size its bubble before the first character appears.
+  // The whole line being typed, laid out in full from the first character.
   const [bubbleFullText, setBubbleFullText] = useState<string>('');
-  const [difficultyBubbleWidth, setDifficultyBubbleWidth] = useState<number | null>(null);
-  const bubbleSlotRef = useRef<HTMLDivElement>(null);
-  const bubbleMeasureRef = useRef<HTMLParagraphElement>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isConfirmingInterest, setIsConfirmingInterest] = useState(false);
 
@@ -113,38 +108,6 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
     );
   }, [step, companion.name]);
 
-  // 03: size the bubble to the widest line of the full text (laid out in a hidden copy of the
-  // bubble at the largest width it may take), so it hugs the words and doesn't grow while typing.
-  useLayoutEffect(() => {
-    if (step !== DIFFICULTY_STEP) return;
-    const slot = bubbleSlotRef.current;
-    const measure = bubbleMeasureRef.current;
-    if (!slot || !measure) return;
-    const fit = () => {
-      const range = document.createRange();
-      range.selectNodeContents(measure);
-      const rects = Array.from(range.getClientRects());
-      if (rects.length === 0) {
-        setDifficultyBubbleWidth(null);
-        return;
-      }
-      // Client rects are in screen pixels; the demo's phone frame may be scaled, so convert back.
-      const scale = measure.getBoundingClientRect().width / measure.offsetWidth || 1;
-      const textWidth =
-        (Math.max(...rects.map((rect) => rect.right)) - Math.min(...rects.map((rect) => rect.left))) / scale;
-      const bubbleStyle = getComputedStyle(measure.parentElement!);
-      const chrome = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'].reduce(
-        (sum, key) => sum + parseFloat(bubbleStyle[key as 'paddingLeft']),
-        0
-      );
-      setDifficultyBubbleWidth(Math.min(slot.clientWidth, Math.ceil(textWidth + chrome + BUBBLE_CARET_ALLOWANCE_PX)));
-    };
-    fit();
-    const observer = new ResizeObserver(fit);
-    observer.observe(slot);
-    return () => observer.disconnect();
-  }, [step, bubbleFullText]);
-
   // Interest selection supports adding and removing themes before the pause completes.
   const handleToggleTag = (tag: string) => {
     setSelectedTags((prev) => {
@@ -191,20 +154,9 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
       >
         <MiniProgramHeader title="选择阅读难度" onBack={handlePrevStep} />
         <div className="rj-companion-row dp-companion-row">
-          <CompanionAvatar companion={companion} size={52} alt={companion.name} />
-          <div ref={bubbleSlotRef} className="dp-bubble-slot min-w-0 flex-1" role="status" aria-live="polite">
-            <div className="rj-bubble" style={difficultyBubbleWidth ? { width: difficultyBubbleWidth } : undefined}>
-              <p>
-                {companionBubbleText}
-                {isTyping && (
-                  <span aria-hidden="true" className="ml-1 inline-block h-3.5 w-[2px] translate-y-[2px] animate-pulse bg-[#C83E26] motion-reduce:animate-none" />
-                )}
-              </p>
-            </div>
-            {/* Invisible full line at the widest the bubble may be, for measuring only. */}
-            <div aria-hidden="true" className="rj-bubble dp-bubble-measure">
-              <p ref={bubbleMeasureRef}>{bubbleFullText}</p>
-            </div>
+          <CompanionAvatar companion={companion} size={44} alt={companion.name} frameless className="rj-avatar" />
+          <div className="rj-bubble" role="status" aria-atomic="true">
+            <TypedLine text={bubbleFullText} typed={companionBubbleText} isTyping={isTyping} />
           </div>
         </div>
         <DifficultySentencePicker
@@ -221,6 +173,7 @@ export const Stage02AiChat: React.FC<Stage02AiChatProps> = ({
         <InterestThemePicker
           companion={companion}
           bubbleText={companionBubbleText}
+          bubbleFullText={bubbleFullText}
           bubbleIsTyping={isTyping}
           selectedTags={selectedTags}
           isConfirming={isConfirmingInterest}

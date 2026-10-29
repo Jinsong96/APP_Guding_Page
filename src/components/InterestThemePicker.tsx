@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import {
-  BookOpen,
-  BriefcaseBusiness,
-  Check,
-  Globe2,
-  Landmark,
-  Orbit,
-  Sprout
-} from 'lucide-react';
+import { Check } from 'lucide-react';
 import type { Companion } from '../types';
 import { CompletionRipple } from './CompletionRipple';
 import { CompanionAvatar } from './CompanionAvatar';
+import { TypedLine } from './TypedLine';
 import { MiniProgramHeader } from './MiniProgramHeader';
+import '../interest-train.css';
 
 interface InterestThemePickerProps {
   companion: Companion;
   bubbleText: string;
+  // The whole line being typed.
+  bubbleFullText: string;
   bubbleIsTyping: boolean;
   selectedTags: string[];
   isConfirming: boolean;
@@ -29,17 +25,18 @@ export const MAX_INTERESTS = 3;
 const LIMIT_HINT_MS = 1800;
 
 const INTERESTS = [
-  { name: '世界热点', subtitle: '看见更大的世界', reply: '好，我们一起看看更大的世界。', icon: Globe2 },
-  { name: '科学探索', subtitle: '探索奇妙的世界', reply: '好，我们先从科学出发。', icon: Orbit },
-  { name: '文化故事', subtitle: '从故事看世界', reply: '好，我们从文化故事出发。', icon: Landmark },
-  { name: '商业观察', subtitle: '了解商业与社会', reply: '好，我们从商业观察出发。', icon: BriefcaseBusiness },
-  { name: '自我成长', subtitle: '遇见更好的自己', reply: '好，我们从自我成长出发。', icon: Sprout },
-  { name: '趣味故事', subtitle: '轻松有趣的阅读', reply: '好，我们先读一个有趣的故事。', icon: BookOpen }
+  { name: '世界热点', reply: '好，我们一起看看更大的世界。' },
+  { name: '科学探索', reply: '好，我们先从科学出发。' },
+  { name: '文化故事', reply: '好，我们从文化故事出发。' },
+  { name: '商业观察', reply: '好，我们从商业观察出发。' },
+  { name: '自我成长', reply: '好，我们从自我成长出发。' },
+  { name: '趣味故事', reply: '好，我们先读一个有趣的故事。' }
 ] as const;
 
 export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
   companion,
   bubbleText,
+  bubbleFullText,
   bubbleIsTyping,
   selectedTags,
   isConfirming,
@@ -66,96 +63,72 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
     >
       <MiniProgramHeader title="选择阅读兴趣" onBack={onBack} />
 
-      <div className="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto px-2.5 pb-4 pt-1">
-        {/* Same companion row and bubble as the reader. */}
-        <div className="rj-companion-row" style={{ margin: '0 -10px' }}>
-          <CompanionAvatar companion={companion} size={52} alt={companion.name}>
+      <div className="it-layout">
+        <div className="rj-companion-row it-companion-row">
+          <CompanionAvatar companion={companion} size={44} alt={companion.name} frameless className="rj-avatar">
             <CompletionRipple active={isConfirming} />
           </CompanionAvatar>
-          <div className="min-w-0 flex-1" aria-live="polite">
-            <div className="rj-bubble">
-              <p>
-                {bubbleText}
-                {bubbleIsTyping && (
-                  <span className="ml-1 inline-block h-3.5 w-[2px] translate-y-[2px] animate-pulse bg-[#C83E26] motion-reduce:animate-none" />
-                )}
-              </p>
-            </div>
+          <div className="rj-bubble" role="status" aria-atomic="true">
+            <TypedLine text={bubbleFullText} typed={bubbleText} isTyping={bubbleIsTyping} />
           </div>
         </div>
 
-        <div
-          className="speech-content-enter mx-2 mt-4 grid shrink-0 grid-cols-1 gap-2"
-          role="group"
-          aria-label="选择阅读兴趣"
-          style={{ animationDuration: '240ms' }}
-        >
-          {INTERESTS.map(({ name, subtitle, icon: Icon }) => {
-            const isSelected = selectedTags.includes(name);
-            const isBlocked = atLimit && !isSelected;
-            return (
-              <button
-                key={name}
-                type="button"
-                aria-pressed={isSelected}
-                aria-disabled={isBlocked}
-                aria-label={`${name}，${subtitle}`}
-                onClick={() => (isBlocked ? setLimitHint(true) : onToggleTag(name))}
-                disabled={isConfirming}
-                className={`flex min-h-[76px] min-w-0 items-center gap-3 rounded-[11px] border bg-white px-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94C3B] disabled:cursor-wait ${
-                  isSelected
-                    ? 'border-[1.5px] border-[#E64E3D] bg-[#FFF0EC]'
-                    : isBlocked
-                      ? 'border-[#DCCFE8] opacity-50'
-                      : 'border-[#DCCFE8] hover:border-[#BCA9CE]'
-                }`}
-              >
-                <span className={`flex h-10 w-10 shrink-0 items-center justify-center ${
-                  isSelected ? 'text-[#D94C3B]' : 'text-[#897D91]'
-                }`}>
-                  <Icon size={27} strokeWidth={1.9} />
+        <div className="it-station-heading">
+          <h2>选 1–3 个喜欢的主题</h2>
+          <span className={`it-station-count ${limitHint ? 'is-limit' : ''}`} aria-live="polite">
+            {limitHint ? (
+              `最多 ${MAX_INTERESTS} 个，先取消一个`
+            ) : (
+              <>
+                <span className="it-count-pips" aria-hidden="true">
+                  {Array.from({ length: MAX_INTERESTS }, (_, pip) => (
+                    <span key={pip} className={pip < selectedNames.length ? 'is-on' : undefined} />
+                  ))}
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block break-words text-[17px] font-bold leading-5 text-[#302A3B]">
-                    {name}
-                  </span>
-                  <span className="mt-1 block break-words text-[12px] leading-4 text-[#82788A]">
-                    {subtitle}
-                  </span>
-                </span>
-                <span
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-[7px] border ${
-                    isSelected
-                      ? 'border-[#D94C3B] bg-[#D94C3B] text-white'
-                      : 'border-[#CBBED5]'
-                  }`}
-                  aria-hidden="true"
+                已选 {selectedNames.length}/{MAX_INTERESTS}
+              </>
+            )}
+          </span>
+        </div>
+
+        {/* A train route: each theme is a station, and ticking one makes it a stop. */}
+        <div className="it-route-viewport">
+          <div className="it-route" role="group" aria-label="阅读兴趣站点">
+            {INTERESTS.map(({ name }, stopIndex) => {
+              const isSelected = selectedTags.includes(name);
+              const isBlocked = atLimit && !isSelected;
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  role="checkbox"
+                  aria-checked={isSelected}
+                  aria-disabled={isBlocked}
+                  onClick={() => (isBlocked ? setLimitHint(true) : onToggleTag(name))}
+                  disabled={isConfirming}
+                  style={{ '--it-i': stopIndex } as React.CSSProperties}
+                  className={`it-stop ${isSelected ? 'it-stop-selected' : ''} ${isBlocked ? 'it-stop-blocked' : ''}`}
                 >
-                  {isSelected && <Check size={14} strokeWidth={3} />}
-                </span>
-              </button>
-            );
-          })}
+                  <span className="it-stop-name">{name}</span>
+                  <span className="it-stop-check" aria-hidden="true">
+                    {isSelected && <Check size={15} strokeWidth={3} />}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      <footer className="shrink-0 px-4 pb-3.5 pt-1">
+      <footer className="it-footer">
         <button
           type="button"
           onClick={() => onConfirm(selectedTags)}
           disabled={!selectedNames.length || isConfirming}
-          className="flex h-[50px] w-full items-center justify-center gap-2 rounded-full bg-[#D94C3B] px-4 text-[16px] font-bold text-white transition-colors hover:bg-[#C94032] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94C3B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#C9C3D0]"
+          className="it-continue"
         >
           <span>继续</span>
         </button>
-        <p
-          className={`mt-1 text-center text-[13px] leading-4 transition-colors ${limitHint ? 'text-[#D94C3B]' : 'text-[#82788A]'}`}
-          aria-live="polite"
-        >
-          {limitHint
-            ? `最多选 ${MAX_INTERESTS} 个，先取消一个再换`
-            : `最多选 ${MAX_INTERESTS} 个 · 已选 ${selectedNames.length}/${MAX_INTERESTS}`}
-        </p>
       </footer>
     </div>
   );

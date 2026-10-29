@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>02 兴趣页 列车方案对比</title>
+    <style>
+      :root {
+        --page: #efedf4;
+        --screen: #f4f1fa;
+        --ink: #302a3b;
+        --muted: #82788a;
+        --navy: #2b3a5c;
+        --navy-soft: #e9eef6;
+        --paper: #fffdf8;
+        --accent: #d94c3b;
+        --accent-deep: #b43b2d;
+        --accent-soft: #fde9e5;
+        --line: #ddd5e6;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+      button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+      .board { width: min(1480px, calc(100% - 32px)); margin: 0 auto; padding: 36px 0 48px; }
+      .board h1 { margin: 0 0 6px; font-size: 24px; }
+      .board > p { margin: 0 0 28px; color: var(--muted); font-size: 14px; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 28px 20px; }
+      .option h2 { margin: 0 0 4px; font-size: 17px; }
+      .option h2 small { margin-left: 6px; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent-deep); font-size: 12px; font-weight: 600; vertical-align: 2px; }
+      .option .tag { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+
+      /* Phone */
+      .phone {
+        display: flex; flex-direction: column;
+        width: 330px; height: 640px; margin: 0 auto;
+        overflow: hidden; border: 8px solid #1d1f29; border-radius: 42px;
+        background: var(--screen);
+      }
+      .phone-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 16px 16px 8px; }
+      .pal { width: 38px; height: 38px; flex: none; border-radius: 12px; background: #e8dccc; display: grid; place-items: center; font-size: 20px; }
+      .bubble { padding: 9px 13px; border-radius: 14px; background: #fff; font-size: 13px; box-shadow: 0 4px 12px #37305910; }
+      .heading { flex: none; display: flex; justify-content: space-between; align-items: center; padding: 8px 18px 8px; }
+      .heading b { font-size: 16px; }
+      .count { padding: 3px 10px; border-radius: 99px; background: #fff; color: var(--muted); font-size: 12px; font-weight: 600; }
+      .scroll { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; padding: 4px 16px 18px; mask-image: linear-gradient(#000 calc(100% - 26px), transparent); }
+      .scroll::-webkit-scrollbar { display: none; }
+      .cta { flex: none; margin: 8px 16px 18px; height: 46px; border-radius: 99px; background: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 6px 16px #d94c3b38; }
+      .more { margin-top: 10px; color: #a79fb2; font-size: 11px; text-align: center; }
+
+      .pros { margin: 14px 4px 0; padding: 0; list-style: none; font-size: 13px; line-height: 1.6; }
+      .pros li { padding-left: 18px; position: relative; }
+      .pros li::before { position: absolute; left: 0; }
+      .pros .p::before { content: "＋"; color: #2f8a5b; }
+      .pros .c::before { content: "－"; color: var(--accent-deep); }
+
+      /* ---------- A 车厢串（俯视） ---------- */
+      .a-train { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+      .a-train::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: repeating-linear-gradient(#cfc6d9 0 6px, transparent 6px 12px); }
+      .a-engine { position: relative; width: 76%; height: 34px; border-radius: 30px 30px 8px 8px; background: var(--navy); color: #f3dfb6; display: grid; place-items: center; font: 600 15px Georgia, serif; }
+      .a-car { position: relative; width: 86%; margin-top: 10px; height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1.5px solid var(--navy); border-radius: 12px; background: var(--paper); font-size: 15px; font-weight: 700; }
+      .a-car::before { content: ""; position: absolute; top: -11px; left: calc(50% - 6px); width: 12px; height: 9px; border-left: 2px solid #a99fb4; border-right: 2px solid #a99fb4; }
+      .a-car .no { color: #a79fb2; font-size: 11px; font-weight: 600; width: 22px; }
+      .a-car .ck { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #cfc6d9; }
+      .a-car.on { border-color: var(--accent-deep); background: var(--accent-soft); color: var(--accent-deep); }
+      .a-car.on .ck { border-color: var(--accent); background: var(--accent); }
+
+      /* ---------- B 车窗 ---------- */
+      .b-car { margin-bottom: 14px; padding: 10px 10px 14px; border-radius: 18px 18px 10px 10px; background: var(--navy); position: relative; }
+      .b-car::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: -10px; height: 6px; background: radial-gradient(circle at 5px 3px, #6c7795 3px, transparent 3.5px) left / 18px 6px repeat-x; }
+      .b-label { margin: 0 4px 8px; color: #c9d1e3; font-size: 11px; letter-spacing: 1px; }
+      .b-windows { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .b-win { height: 62px; border-radius: 12px; background: linear-gradient(180deg, #dfe9f6, #f6f1e8); color: var(--navy); font-size: 14px; font-weight: 700; display: flex; align-items: flex-end; padding: 0 10px 9px; position: relative; transition: background .2s; }
+      .b-win::before { content: ""; position: absolute; top: 8px; left: 10px; right: 10px; height: 2px; border-radius: 2px; background: #ffffffaa; }
+      .b-win.on { background: linear-gradient(180deg, #ffd9a8, #ffe9d6); color: var(--accent-deep); box-shadow: 0 0 0 2px #f6c37b, 0 0 16px #f6c37b88; }
+      .b-win.on::after { content: "✓"; position: absolute; top: 8px; right: 9px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; display: grid; place-items: center; }
+
+      /* ---------- C 选座 ---------- */
+      .c-coach { position: relative; margin-bottom: 18px; padding: 12px 12px 14px; border: 1.5px solid #cfc6d9; border-radius: 26px 26px 14px 14px; background: #fbf9fc; }
+      .c-coach + .c-coach::before { content: ""; position: absolute; top: -19px; left: calc(50% - 16px); width: 32px; height: 17px; border-left: 1.5px solid #cfc6d9; border-right: 1.5px solid #cfc6d9; background: repeating-linear-gradient(#e7e1ee 0 3px, transparent 3px 6px); }
+      .c-head { display: flex; justify-content: space-between; margin: 0 4px 10px; font-size: 12px; color: var(--muted); }
+      .c-head b { color: var(--ink); font-size: 13px; }
+      .c-coach { padding-left: 8px; padding-right: 8px; }
+      .c-row { display: grid; grid-template-columns: 1fr 1fr 12px 1fr 1fr; gap: 5px; margin-bottom: 8px; }
+      .c-seat { position: relative; height: 50px; padding-top: 9px; border-radius: 10px 10px 8px 8px; background: #fff; border: 1.5px solid #ddd5e6; font-size: 12px; font-weight: 700; letter-spacing: -0.3px; white-space: nowrap; display: grid; place-items: center; }
+      .c-seat::before { content: ""; position: absolute; top: 4px; left: 6px; right: 6px; height: 5px; border-radius: 4px; background: #e7e1ee; }
+      .c-seat.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .c-seat.on::before { background: #ffffff66; }
+      .c-seat .id { position: absolute; bottom: 2px; right: 5px; font-size: 9px; font-weight: 600; color: #b4abbf; }
+      .c-seat.on .id { color: #ffffffb0; }
+
+      /* ---------- D 站点线路 ---------- */
+      .d-line { position: relative; padding-left: 30px; }
+      .d-line::before { content: ""; position: absolute; top: 14px; bottom: 14px; left: 13px; width: 4px; border-radius: 4px; background: var(--navy); }
+      .d-group { margin: 6px 0 6px -30px; padding-left: 30px; color: var(--muted); font-size: 11px; letter-spacing: 1px; }
+      .d-stop { position: relative; display: flex; width: 100%; align-items: center; height: 46px; padding: 0 14px; margin-bottom: 6px; border-radius: 14px; background: #fff; font-size: 15px; font-weight: 700; text-align: left; }
+      .d-stop::before { content: ""; position: absolute; left: -24px; top: calc(50% - 7px); width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid var(--navy); box-sizing: border-box; }
+      .d-stop.on { background: var(--accent-soft); color: var(--accent-deep); }
+      .d-stop.on::before { left: -26px; top: calc(50% - 9px); width: 18px; height: 18px; border-color: var(--accent); background: var(--accent); box-shadow: 0 0 0 4px #d94c3b33; }
+      .d-stop span { margin-left: auto; color: #b4abbf; font-size: 11px; font-weight: 600; }
+      .d-stop.on span { color: var(--accent-deep); }
+    </style>
+  </head>
+  <body>
+    <main class="board">
+      <h1>02 兴趣页：可扩展主题的列车方案</h1>
+      <p>四个方案都放了 14 个主题，可以上下滑动、点选（最多 3 个）。配色沿用现有的纸色、藏青和红。</p>
+      <div class="grid">
+        <section class="option">
+          <h2>A · 车厢串</h2>
+          <p class="tag">回到俯视的一列火车，每节车厢一个主题，往上滑火车变长</p>
+          <div class="phone" data-opt="a">
+            <div class="phone-top"><div class="pal">🐑</div><div class="bubble">你平时喜欢读些什么呀？</div></div>
+            <div class="heading"><b>选 1–3 个喜欢的主题</b><span class="count">已选 0/3</span></div>
+            <div class="scroll"><div class="a-train" data-list></div></div>
+            <button class="cta">继续</button>
+          </div>
+          <ul class="pros">
+            <li class="p">最直观，延续之前的设计，“火车越来越长”的感觉强</li>
+            <li class="p">一行一个，点击区域大，不容易点错</li>
+            <li class="c">一屏只能放 7 个左右，主题多了要滑很久</li>
+            <li class="c">没法分类，长了以后像一张普通列表</li>
+          </ul>
+        </section>
+
+        <section class="option">
+          <h2>B · 车窗</h2>
+          <p class="tag">每节车厢有一排窗户，每扇窗就是一个主题，选中时窗户亮灯</p>
+          <div class="phone" data-opt="b">
+            <div class="phone-top"><div class="pal">🐑</div><div class="bubble">你平时喜欢读些什么呀？</div></div>
+            <div class="heading"><b>选 1–3 个喜欢的主题</b><span class="count">已选 0/3</span></div>
+            <div class="scroll" data-list></div>
+            <button class="cta">继续</button>
+          </div>
+          <ul class="pros">
+            <li class="p">一行两个，一屏大约 8 个，密度适中</li>
+            <li class="p">“窗户亮灯”的选中效果很有氛围，也最轻</li>
+            <li class="p">每节车厢可以是一个分类，扩展自然</li>
+            <li class="c">窗户里只放文字的话比较空；如果要放小插画，就得画素材</li>
+          </ul>
+        </section>
+
+        <section class="option">
+          <h2>C · 选座<small>推荐</small></h2>
+          <p class="tag">走进车厢俯视座位，主题就是座位，选主题就是选座</p>
+          <div class="phone" data-opt="c">
+            <div class="phone-top"><div class="pal">🐑</div><div class="bubble">你平时喜欢读些什么呀？</div></div>
+            <div class="heading"><b>选 1–3 个喜欢的主题</b><span class="count">已选 0/3</span></div>
+            <div class="scroll" data-list></div>
+            <button class="cta">继续</button>
+          </div>
+          <ul class="pros">
+            <li class="p">密度最高，一屏放得下 12 个以上，主题再多也不怕</li>
+            <li class="p">跟买火车票时的选座一模一样，不用教就会用</li>
+            <li class="p">座位号可以印到 06 为你出票的车票上，和后面的流程连起来</li>
+            <li class="c">座位小，主题名最多 4 个字</li>
+            <li class="c">格子多，看起来比 B 稍微密一些</li>
+          </ul>
+        </section>
+
+        <section class="option">
+          <h2>D · 站点线路</h2>
+          <p class="tag">不画车厢，画一条列车线路，每个主题是一个站，选中就是“停靠”</p>
+          <div class="phone" data-opt="d">
+            <div class="phone-top"><div class="pal">🐑</div><div class="bubble">你平时喜欢读些什么呀？</div></div>
+            <div class="heading"><b>选 1–3 个喜欢的主题</b><span class="count">已选 0/3</span></div>
+            <div class="scroll"><div class="d-line" data-list></div></div>
+            <button class="cta">继续</button>
+          </div>
+          <ul class="pros">
+            <li class="p">元素最少、最简洁，主题名多长都放得下</li>
+            <li class="p">“选几站停靠”贴合“阅读旅程”的叙事</li>
+            <li class="c">不是车厢，跟你想要的“列车里”的感觉差得最远</li>
+            <li class="c">一行一个，密度跟 A 差不多</li>
+          </ul>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const GROUPS = [
+        { name: '看世界', items: ['世界热点', '科学探索', '科技前沿', '历史人物', '自然动物', '太空宇宙'] },
+        { name: '懂生活', items: ['自我成长', '商业观察', '心理情绪', '美食旅行'] },
+        { name: '找乐子', items: ['趣味故事', '文化故事', '电影音乐', '体育运动'] }
+      ];
+      const MAX = 3;
+      const SEATS = ['A', 'B', 'C', 'D'];
+
+      const render = {
+        a: (list) => {
+          list.innerHTML = '<div class="a-engine">ReadPal ✦</div>';
+          let n = 0;
+          GROUPS.forEach((g) => g.items.forEach((t) => {
+            n += 1;
+            list.insertAdjacentHTML('beforeend', `<button class="a-car" data-t="${t}"><span class="no">${String(n).padStart(2, '0')}</span>${t}<span class="ck"></span></button>`);
+          }));
+          list.insertAdjacentHTML('beforeend', '<p class="more">往上滑，后面还有车厢</p>');
+        },
+        b: (list) => {
+          list.innerHTML = GROUPS.map((g, i) => `
+            <div class="b-car"><p class="b-label">${i + 1} 号车厢 · ${g.name}</p>
+              <div class="b-windows">${g.items.map((t) => `<button class="b-win" data-t="${t}">${t}</button>`).join('')}</div>
+            </div>`).join('') + '<p class="more">往上滑，后面还有车厢</p>';
+        },
+        c: (list) => {
+          list.innerHTML = GROUPS.map((g, i) => {
+            const rows = [];
+            for (let r = 0; r < g.items.length; r += 4) {
+              const seat = (k) => {
+                const t = g.items[r + k];
+                return t ? `<button class="c-seat" data-t="${t}">${t}<span class="id">${r / 4 + 1}${SEATS[k]}</span></button>` : '<span></span>';
+              };
+              rows.push(`<div class="c-row">${seat(0)}${seat(1)}<span class="c-aisle"></span>${seat(2)}${seat(3)}</div>`);
+            }
+            return `<div class="c-coach"><div class="c-head"><b>${i + 1} 车 · ${g.name}</b><span>${g.items.length} 座</span></div>${rows.join('')}</div>`;
+          }).join('') + '<p class="more">往上滑，后面还有车厢</p>';
+        },
+        d: (list) => {
+          list.innerHTML = GROUPS.map((g) => `<p class="d-group">${g.name}</p>` +
+            g.items.map((t) => `<button class="d-stop" data-t="${t}">${t}<span>停靠</span></button>`).join('')).join('');
+        }
+      };
+
+      document.querySelectorAll('.phone').forEach((phone) => {
+        const list = phone.querySelector('[data-list]');
+        const count = phone.querySelector('.count');
+        render[phone.dataset.opt](list);
+        const picked = new Set();
+        list.addEventListener('click', (e) => {
+          const el = e.target.closest('[data-t]');
+          if (!el) return;
+          const t = el.dataset.t;
+          if (picked.has(t)) picked.delete(t);
+          else if (picked.size < MAX) picked.add(t);
+          list.querySelectorAll('[data-t]').forEach((x) => x.classList.toggle('on', picked.has(x.dataset.t)));
+          count.textContent = `已选 ${picked.size}/${MAX}`;
+        });
+      });
+    </script>
+  </body>
+</html>

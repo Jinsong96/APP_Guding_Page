@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>伙伴欢呼 · 音效试听</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background: #f8f3e9; color: #41382f; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 85% 0%, #f0dfc7, transparent 34rem), #f8f3e9; }
+    main { width: min(860px, calc(100% - 36px)); margin: 0 auto; padding: 44px 0 72px; }
+    .eyebrow { margin: 0 0 12px; color: #9d754e; font-size: 12px; font-weight: 700; letter-spacing: .22em; }
+    h1 { font-family: Georgia, "Songti SC", serif; font-weight: 600; font-size: clamp(28px, 5vw, 40px); margin: 0 0 10px; }
+    .lead { margin: 0; color: #796d60; line-height: 1.8; font-size: 14px; }
+    .tabs { display: flex; gap: 12px; margin: 30px 0 20px; }
+    .tab { display: flex; align-items: center; gap: 10px; flex: 1; text-align: left; padding: 12px 14px; border: 1px solid #e3d6c7; border-radius: 16px; background: #fffaf2; color: #6c6055; cursor: pointer; transition: transform .15s, border-color .15s, background .15s; }
+    .tab:hover { transform: translateY(-2px); }
+    .tab[aria-selected="true"] { border-color: #b77b4b; background: #f5e7d6; box-shadow: 0 5px 18px #9f755316; color: #503d31; }
+    .tab img { width: 42px; height: 42px; object-fit: cover; border-radius: 50%; background: #eee1d0; }
+    .tab strong { display: block; font-size: 15px; }
+    .tab small { display: block; margin-top: 3px; color: #8d7c6c; font-size: 11px; }
+    .sheet { background: #fffdf8; border: 1px solid #e8ddcf; border-radius: 22px; overflow: hidden; box-shadow: 0 18px 48px #6c4e2812; }
+    .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 19px 24px; border-bottom: 1px solid #eee5da; }
+    .sheet-head h2 { font-family: Georgia, "Songti SC", serif; font-size: 19px; margin: 0 0 4px; }
+    .sheet-head p { font-size: 12px; color: #8f8173; margin: 0; line-height: 1.5; }
+    .head-actions { flex: none; display: flex; align-items: center; gap: 12px; }
+    .duration { color: #ac8666; font-size: 12px; }
+    .compare { border: 1px solid #dac3ac; border-radius: 999px; padding: 7px 11px; background: #fffaf2; color: #92674d; font-size: 12px; cursor: pointer; }
+    .compare:hover { background: #f6e9d8; }
+    .compare:focus-visible { outline: 3px solid #d5a66b; outline-offset: 2px; }
+    .row { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 13px 24px; border-bottom: 1px solid #f1ebe3; }
+    .row:last-child { border: 0; }
+    .row:hover { background: #fcf8f1; }
+    .play { width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #a9583b; color: white; cursor: pointer; font-size: 13px; padding: 0; transition: transform .15s, background .15s; }
+    .play:hover { transform: scale(1.06); background: #8f482e; }
+    .play:focus-visible, .tab:focus-visible { outline: 3px solid #d5a66b; outline-offset: 3px; }
+    .play.is-playing { background: #6c779b; }
+    .phrase { font-family: Georgia, serif; font-size: 19px; color: #463b33; }
+    .sub { color: #948477; font-size: 12px; }
+    .note { margin: 17px 3px 0; color: #998978; font-size: 12px; line-height: 1.7; }
+    @media(max-width: 600px) { .head-actions { align-items: flex-end; flex-direction: column; gap: 4px; } main { padding-top: 28px; } .tabs { gap: 7px; } .tab { padding: 9px 7px; gap: 5px; flex-direction: column; text-align: center; } .tab img { width: 37px; height: 37px; } .tab strong { font-size: 13px; } .tab small { font-size: 10px; } .sheet-head, .row { padding-left: 17px; padding-right: 17px; } .row { grid-template-columns: 38px 1fr auto; gap: 11px; } .phrase { font-size: 17px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">到站 · 伙伴的欢呼</p>
+    <h1>读完这一站，他们会怎么庆祝？</h1>
+    <p class="lead">最终庆祝音已统一选用「到站铃」。下面的伙伴欢呼保留为早期方案的试听对比，不会在正式流程中播放。</p>
+    <div class="tabs" role="tablist" aria-label="选择伙伴">
+      <button class="tab" role="tab" aria-selected="true" data-companion="wick" type="button"><img src="../../../public/assets/companion-wick-card.png" alt="" /><span><strong>灯芯</strong><small>温柔地为你开心</small></span></button>
+      <button class="tab" role="tab" aria-selected="false" data-companion="pal" type="button"><img src="../../../public/assets/companion-pal-card.png" alt="" /><span><strong>帕利</strong><small>兴奋得想分享</small></span></button>
+      <button class="tab" role="tab" aria-selected="false" data-companion="tuanzi" type="button"><img src="../../../public/assets/companion-tuanzi-card.png" alt="" /><span><strong>团子</strong><small>克制不住的高兴</small></span></button>
+    </div>
+    <section class="sheet" aria-label="欢呼词试听列表">
+      <div class="sheet-head"><div><h2 id="companion-title">灯芯 · 温柔地为你开心</h2><p>八句全部提供，先听声音，再决定哪句最像这位伙伴。</p></div><div class="head-actions"><button id="compare" class="compare" type="button">对比短尾音版</button><span class="duration">每段 2 秒</span></div></div>
+      <div id="list"></div>
+    </section>
+    <p class="note">已选定统一使用「到站铃」作为最终庆祝音；本页的宠物欢呼是未采用的台词／节奏方向稿，仅供对比。</p>
+  </main>
+  <script>
+    const options = [
+      ['woo-hoo', 'Woo-hoo!'], ['woo', 'Woo!'], ['hooray', 'Hooray!'], ['hurrah', 'Hurrah!'],
+      ['yippee', 'Yippee!'], ['woot-woot', 'Woot! Woot!'], ['yahoo', 'Yahoo!'], ['bravo', 'Bravo!']
+    ];
+    const labels = { wick: '灯芯 · 温柔地为你开心', pal: '帕利 · 兴奋得想分享', tuanzi: '团子 · 克制不住的高兴' };
+    let current = 'wick', held = true, activeAudio = null, activeButton = null;
+    const list = document.getElementById('list');
+    function stopAudio() {
+      if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; activeAudio = null; }
+      if (activeButton) { activeButton.textContent = '▶'; activeButton.classList.remove('is-playing'); activeButton.setAttribute('aria-label', '播放 ' + activeButton.dataset.label); activeButton = null; }
+    }
+    function render() {
+      stopAudio();
+      document.getElementById('companion-title').textContent = labels[current];
+      list.replaceChildren();
+      options.forEach(([slug, text]) => {
+        const row = document.createElement('div'); row.className = 'row';
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'play'; button.textContent = '▶';
+        button.dataset.label = text; button.setAttribute('aria-label', '播放 ' + text);
+        const phrase = document.createElement('span'); phrase.className = 'phrase'; phrase.textContent = text;
+        const hint = document.createElement('span'); hint.className = 'sub'; hint.textContent = '点击试听';
+        button.addEventListener('click', () => {
+          if (activeButton === button) { stopAudio(); return; }
+          stopAudio();
+          activeButton = button; button.textContent = 'Ⅱ'; button.classList.add('is-playing'); button.setAttribute('aria-label', '停止 ' + text);
+          activeAudio = new Audio(`${held ? "animated-held/" : "animated/"}${current}/${slug}.wav`);
+          activeAudio.addEventListener('ended', stopAudio, { once: true });
+          activeAudio.play().catch(stopAudio);
+        });
+        row.append(button, phrase, hint); list.append(row);
+      });
+    }
+    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
+      current = tab.dataset.companion;
+      document.querySelectorAll('.tab').forEach(item => item.setAttribute('aria-selected', String(item === tab)));
+      render();
+    }));
+    document.getElementById('compare').addEventListener('click', (event) => {
+      held = !held;
+      event.currentTarget.textContent = held ? '对比短尾音版' : '返回长尾音版';
+      document.querySelector('.sheet-head p').textContent = held
+        ? '长尾音版：把庆祝的赞叹再多留一会儿。'
+        : '短尾音版：上一版的轻快收尾，供对比。';
+      stopAudio();
+    });
+    document.querySelector('.sheet-head p').textContent = '长尾音版：把庆祝的赞叹再多留一会儿。';
+    render();
+  </script>
+</body>
+</html>
