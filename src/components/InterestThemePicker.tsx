@@ -75,19 +75,9 @@ export const InterestThemePicker: React.FC<InterestThemePickerProps> = ({
 
         <div className="it-station-heading">
           <h2>选 1–3 个喜欢的主题</h2>
-          <span className={`it-station-count ${limitHint ? 'is-limit' : ''}`} aria-live="polite">
-            {limitHint ? (
-              `最多 ${MAX_INTERESTS} 个，先取消一个`
-            ) : (
-              <>
-                <span className="it-count-pips" aria-hidden="true">
-                  {Array.from({ length: MAX_INTERESTS }, (_, pip) => (
-                    <span key={pip} className={pip < selectedNames.length ? 'is-on' : undefined} />
-                  ))}
-                </span>
-                已选 {selectedNames.length}/{MAX_INTERESTS}
-              </>
-            )}
+          {/* Only shows when a fourth theme is tapped, to explain why nothing happened. */}
+          <span className="it-limit-hint" aria-live="polite">
+            {limitHint ? `最多 ${MAX_INTERESTS} 个，先取消一个` : ''}
           </span>
         </div>
 

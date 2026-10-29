@@ -31,34 +31,13 @@
   line-height: 1.25;
 }
 
-.it-station-count {
-  display: inline-flex;
+.it-limit-hint {
   flex: none;
-  align-items: center;
-  gap: 7px;
-  height: 24px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: #fffefdd9;
-  box-shadow: 0 1px 3px #37305912;
-  color: #6f6580;
+  color: #c13f30;
   white-space: nowrap;
   font-size: 12px;
   font-weight: 600;
-  transition: color 160ms ease, background 160ms ease;
 }
-/* One pip per pickable theme, filled as themes are chosen. */
-.it-count-pips { display: inline-flex; gap: 3px; }
-.it-count-pips > span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #d9d1e2;
-  transition: background 160ms ease;
-}
-.it-count-pips > span.is-on { background: #d94c3b; }
-/* Tapping a fourth theme turns the counter into the explanation. */
-.it-station-count.is-limit { background: #fde9e5; color: #c13f30; }
 
 .it-route-viewport {
   flex: 1;
