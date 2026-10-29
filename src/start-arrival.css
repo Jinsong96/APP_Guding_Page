@@ -1,9 +1,16 @@
-/* 00 启动: the night train pulls into the station (Stage00Start).
-   start-train-arrival.mp4 (≈6.6s) carries the motion: the train enters from the left, engine first,
-   and brakes at the platform; its last frame is the resting scene. .st-arrived is added when it ends: headlight flare · beam · steam.
+/* 00 启动: the train pulls into the station (Stage00Start), as the night train (.st-night) or by day
+   (.st-day, overrides at the end of this file).
+   start-train-arrival.mp4 (≈6.6s, night) and start-train-arrival-day.mp4 (≈3.3s) carry the motion: the
+   train enters from the left, engine first, and brakes at the platform; the last frame is the resting
+   scene. .st-arrived is added when it ends: night headlight flare · beam · steam; day sun glint · steam.
    Overlay positions are % of the 9:16 video frame (.st-stage), which covers the screen like
    object-fit: cover with object-position 70% so the engine stays clear of the right edge, lifted 9% so
    the platform and companions sit above the headline (the dark platform colour fills below). */
+
+.st-root {
+  background: #121a38;
+  color: #fff;
+}
 
 .st-stage {
   position: absolute;
@@ -307,6 +314,120 @@
   }
 }
 
+/* ---- Day ---- */
+
+/* Bright sky and stone platform: dark ink on top, a cream wash over the floor for the buttons. */
+.st-day {
+  background: #f3ece1;
+  color: #1d2846;
+}
+
+.st-day .st-scrim {
+  background: linear-gradient(
+    180deg,
+    #fbf7f033 0%,
+    #fbf7f000 24%,
+    #f3ece100 60%,
+    #f3ece1c7 76%,
+    #f3ece1f7 90%,
+    #f3ece1 100%
+  );
+}
+
+.st-day .st-night-fade {
+  background: #fbf7f0;
+}
+
+.st-day .st-title-star {
+  color: #d39a3a;
+  text-shadow: 0 0 10px #fff3d6;
+}
+
+.st-day .st-logo {
+  color: #1d2846;
+  text-shadow: 0 1px 14px #ffffffcc;
+}
+
+.st-day .st-tag {
+  color: #34406a;
+  text-shadow: 0 0 10px #ffffffcc;
+}
+
+.st-day .st-tag::before,
+.st-day .st-tag::after {
+  background: #34406a80;
+}
+
+.st-day .st-headline {
+  color: #1d2846;
+}
+
+.st-day .st-sub {
+  color: #4a5478;
+}
+
+.st-day .st-primary {
+  background: #1d2846;
+  box-shadow: 0 8px 24px #1d284640;
+  color: #fcf2e6;
+}
+
+.st-day .st-primary:hover {
+  background: #27345a;
+}
+
+.st-day .st-secondary {
+  color: #5a6384;
+}
+
+.st-day .st-primary:focus-visible,
+.st-day .st-secondary:focus-visible {
+  outline-color: #1d2846;
+}
+
+/* Sun catching the front of the boiler (start-train-arrival-day-poster.jpg: 630,757 of 720×1280). */
+.st-day .st-headlight {
+  top: 59.1%;
+  left: 87.5%;
+  background: radial-gradient(circle, #ffffff 0 14%, #fff4d6 30%, #ffe7a855 52%, #0000 70%);
+}
+
+.st-day .st-headlight-beam {
+  display: none;
+}
+
+/* Chimney top on the day resting frame (597,705). */
+.st-day .st-steam {
+  top: 55.1%;
+  left: 82.9%;
+}
+
+.st-day .st-steam i {
+  width: 30px;
+  height: 30px;
+  margin: -15px;
+  background: radial-gradient(circle, #ffffffee, #f4f1ebbb 45%, #0000 70%);
+}
+
+.st-day.st-arrived .st-headlight {
+  animation: st-glint 1400ms ease-out 150ms forwards;
+}
+
+@keyframes st-glint {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(2) rotate(20deg);
+  }
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9) rotate(30deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .st-night-fade,
   .st-title,
@@ -328,5 +449,11 @@
 
   .st-arrived .st-headlight-beam {
     opacity: 0.8;
+  }
+
+  .st-day.st-arrived .st-headlight {
+    animation: none;
+    opacity: 0.35;
+    transform: none;
   }
 }

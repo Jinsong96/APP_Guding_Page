@@ -1,6 +1,7 @@
 import React from 'react';
-import { RotateCcw, BookOpen } from 'lucide-react';
+import { RotateCcw, BookOpen, Sun, Moon } from 'lucide-react';
 import { Companion } from '../types';
+import { LaunchMode } from './stages/Stage00Start';
 
 export interface AppScreen {
   index: number;
@@ -30,13 +31,17 @@ interface TopNavigationHeaderProps {
   companion: Companion;
   onJumpToScreen: (screen: AppScreen) => void;
   onReset: () => void;
+  launchMode: LaunchMode;
+  onToggleLaunchMode: () => void;
 }
 
 export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
   currentScreen,
   companion,
   onJumpToScreen,
-  onReset
+  onReset,
+  launchMode,
+  onToggleLaunchMode
 }) => (
   <header className="sticky top-0 z-50 border-b border-[#E7E1F0] bg-[#F4F1FA]/95 px-3 py-2 text-stone-800 backdrop-blur-md sm:px-6">
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-2">
@@ -61,6 +66,16 @@ export const TopNavigationHeader: React.FC<TopNavigationHeaderProps> = ({
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={onToggleLaunchMode}
+            aria-label={launchMode === 'day' ? '启动页切换为夜晚' : '启动页切换为白天'}
+            title={launchMode === 'day' ? '启动页：白天（点击切换为夜晚）' : '启动页：夜晚（点击切换为白天）'}
+            className="flex h-8 items-center gap-1.5 rounded-xl border border-[#E7E1F0] bg-[#F0ECF8] px-2.5 text-[11px] font-medium text-stone-600 transition-colors hover:bg-[#EAE5F4] hover:text-stone-900"
+          >
+            {launchMode === 'day' ? <Sun size={14} /> : <Moon size={14} />}
+            {launchMode === 'day' ? '白天' : '夜晚'}
+          </button>
           <button
             type="button"
             onClick={onReset}

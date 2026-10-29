@@ -11,7 +11,7 @@ import { PhoneSimulator } from './components/PhoneSimulator';
 import { Stage01Companion } from './components/stages/Stage01Companion';
 import { CefrLevelKey, INTEREST_STEP, Stage02AiChat } from './components/stages/Stage02AiChat';
 import { Stage10ReadingWorld } from './components/stages/Stage10ReadingWorld';
-import { Stage00Start } from './components/stages/Stage00Start';
+import { LaunchMode, Stage00Start, launchModeForNow } from './components/stages/Stage00Start';
 import { StageFirstRead } from './components/stages/StageFirstRead';
 import { StagePicking } from './components/stages/StagePicking';
 import { ReadingReport, ReportNextArticle, ReportTotals } from './components/ReadingReport';
@@ -48,6 +48,8 @@ export default function App() {
   const [totalWordsRead, setTotalWordsRead] = useState(0);
   // One ticket per finished read.
   const [tickets, setTickets] = useState<RideTicket[]>([]);
+  // Day or night train on the start screen; follows the clock, the header toggle overrides it for demos.
+  const [launchMode, setLaunchMode] = useState<LaunchMode>(() => launchModeForNow());
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -193,14 +195,21 @@ export default function App() {
         companion={currentCompanion}
         onJumpToScreen={handleJumpToScreen}
         onReset={handleReset}
+        launchMode={launchMode}
+        onToggleLaunchMode={() => {
+          setLaunchMode((mode) => (mode === 'day' ? 'night' : 'day'));
+          goToStage(0);
+        }}
       />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col justify-center items-center overflow-x-hidden">
         <div className="w-full py-1 sm:py-2.5 flex flex-col items-center justify-center">
-          <PhoneSimulator darkChrome={entryScreen === 'start'}>
+          <PhoneSimulator darkChrome={entryScreen === 'start' && launchMode === 'night'}>
             {entryScreen === 'start' && (
               <Stage00Start
+                key={launchMode}
+                mode={launchMode}
                 onStart={() => {
                   setCurrentStage(1);
                   setCurrentScreen(1);
