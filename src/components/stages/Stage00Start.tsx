@@ -34,6 +34,63 @@ const ARRIVAL: Record<LaunchMode, { video: string; poster: string; sound: string
 // brakes at the platform). Once the video ends on the resting frame, the night engine's headlight flares
 // and lets off steam; by day the sun glints off the engine instead (start-arrival.css). Reduced motion
 // or a video that can't play skips straight to that resting frame.
+const TAGLINE = ['读过的每一天', '都会把你带向更远的地方'];
+const TAGLINE_LENGTH = TAGLINE.join('').length;
+// The tagline starts typing as the meteor (night) or plane (day) passes overhead: see .st-meteor and
+// .st-plane in start-arrival.css, whose delays and durations these follow.
+const TYPE_START_MS: Record<LaunchMode, number> = { night: 1500, day: 2100 };
+const TYPE_STEP_MS = 115;
+
+// Handwritten two-line tagline, typed out one character at a time. The whole text is laid out from
+// the start with untyped characters invisible, so nothing shifts while it types. Screen readers get it
+// once.
+const StartTagline: React.FC<{ mode: LaunchMode }> = ({ mode }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCount(TAGLINE_LENGTH);
+      return;
+    }
+    let interval = 0;
+    const start = window.setTimeout(() => {
+      interval = window.setInterval(() => {
+        setCount((n) => {
+          if (n + 1 >= TAGLINE_LENGTH) window.clearInterval(interval);
+          return Math.min(n + 1, TAGLINE_LENGTH);
+        });
+      }, TYPE_STEP_MS);
+    }, TYPE_START_MS[mode]);
+    return () => {
+      window.clearTimeout(start);
+      window.clearInterval(interval);
+    };
+  }, [mode]);
+
+  let remaining = count;
+  const done = count >= TAGLINE_LENGTH;
+  return (
+    <p className={`st-tag${done ? ' st-tag-done' : ''}`}>
+      <span aria-hidden="true">
+        {TAGLINE.map((line, i) => {
+          const shown = Math.min(remaining, line.length);
+          remaining -= shown;
+          const caret = !done && count > 0 && shown > 0 && (shown < line.length || remaining === 0);
+          return (
+            <span key={i} className="st-tag-line">
+              {line.slice(0, shown)}
+              {caret && <i className="st-tag-caret" />}
+              <span className="st-tag-rest">{line.slice(shown)}</span>
+              {i === TAGLINE.length - 1 && <span className="st-tag-star">✦</span>}
+            </span>
+          );
+        })}
+      </span>
+      <span className="sr-only">{TAGLINE.join('，')}</span>
+    </p>
+  );
+};
+
 export const Stage00Start: React.FC<Stage00StartProps> = ({ mode, onStart, onBrowse }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const soundRef = useRef<HTMLAudioElement>(null);
@@ -129,6 +186,19 @@ export const Stage00Start: React.FC<Stage00StartProps> = ({ mode, onStart, onBro
       <audio ref={soundRef} src={asset(sound)} preload="auto" onEnded={() => setSoundPlaying(false)} />
       <div className="st-scrim" aria-hidden="true" />
       <div className="st-night-fade" aria-hidden="true" />
+      {mode === 'night' ? (
+        <span className="st-meteor" aria-hidden="true" />
+      ) : (
+        <span className="st-plane" aria-hidden="true">
+          <span className="st-contrail" />
+          <svg className="st-plane-body" viewBox="0 0 32 32" width="22" height="22">
+            <path
+              d="M30 16c0-1-1-1.6-2.2-1.6h-7.6L13.4 3.5h-2.6l3.5 10.9H7.6L5 11.2H3l1.6 4.8L3 20.8h2l2.6-3.2h6.7l-3.5 10.9h2.6l6.8-10.9h7.6C29 17.6 30 17 30 16z"
+              fill="currentColor"
+            />
+          </svg>
+        </span>
+      )}
       <button
         type="button"
         className="st-sound"
@@ -144,8 +214,8 @@ export const Stage00Start: React.FC<Stage00StartProps> = ({ mode, onStart, onBro
           <span className="st-title-star" aria-hidden="true">
             ✦
           </span>
-          <h1 className="st-logo">ReadPal</h1>
-          <p className="st-tag">阅读，自有同路人</p>
+          <h1 className="st-logo">Deerly</h1>
+          <StartTagline mode={mode} />
         </header>
 
         <div className="st-bottom">

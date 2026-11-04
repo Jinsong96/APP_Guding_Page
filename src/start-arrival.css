@@ -119,22 +119,131 @@
   text-shadow: 0 2px 18px #0b143099;
 }
 
+/* Two-line tagline in the page's serif, typed out after the meteor / plane passes (StartTagline);
+   a star pops in once typing ends. */
 .st-tag {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  font-size: 13px;
-  letter-spacing: 3px;
-  color: #ece7f4;
+  margin-top: 12px;
+  font-family: 'Songti SC', 'STSong', 'Noto Serif SC', serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 2px;
+  color: #fbf6ec;
+  text-shadow: 0 1px 3px #0b1430cc, 0 0 14px #0b1430aa;
 }
 
-.st-tag::before,
-.st-tag::after {
+.st-tag-line {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  white-space: nowrap;
+}
+
+.st-tag-rest {
+  visibility: hidden;
+}
+
+.st-tag-caret {
+  display: inline-block;
+  width: 2px;
+  height: 0.9em;
+  margin: 0 1px -0.1em;
+  background: currentColor;
+  animation: st-caret 700ms steps(1) infinite;
+}
+
+.st-tag-star {
+  position: absolute;
+  top: -0.2em;
+  left: 100%;
+  margin-left: 4px;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  color: #f6dd9e;
+  text-shadow: 0 0 8px #f6dd9e;
+  opacity: 0;
+  transform: scale(0.2) rotate(-60deg);
+}
+
+.st-tag-done .st-tag-star {
+  animation: st-star-pop 600ms cubic-bezier(0.2, 0.9, 0.3, 1.4) 200ms forwards;
+}
+
+/* Night: a meteor arcs across the sky along a gentle curve — rising from
+   the lower left, levelling off and dipping slightly at the right — passing between logo and tagline.
+   offset-rotate keeps the tail behind the head along the curve. */
+.st-meteor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  width: 150px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(270deg, #fffef6 0%, #fff3c8cc 8%, #c9d4ff55 45%, #0000 100%);
+  filter: drop-shadow(0 0 6px #fff6d6);
+  offset-path: path('M -10 175 C 90 120, 220 92, 380 104');
+  offset-anchor: 100% 50%;
+  offset-rotate: auto;
+  offset-distance: 0%;
+  opacity: 0;
+  pointer-events: none;
+  animation: st-meteor 1100ms cubic-bezier(0.35, 0.1, 0.55, 1) 500ms forwards;
+}
+
+.st-meteor::before {
   content: '';
-  width: 20px;
-  height: 1px;
-  background: #ece7f499;
+  position: absolute;
+  top: 50%;
+  right: -3px;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px 3px #fff6d6, 0 0 22px 6px #ffe7a866;
+}
+
+/* Day: a small plane crosses left to right above the title, drawing a contrail that slowly melts. */
+.st-plane {
+  position: absolute;
+  top: 9%;
+  left: 0;
+  z-index: 9;
+  width: 100%;
+  height: 22px;
+  color: #3a4568;
+  pointer-events: none;
+  transform: rotate(-6deg);
+}
+
+.st-plane-body {
+  position: absolute;
+  top: 0;
+  left: -30px;
+  filter: drop-shadow(0 1px 2px #ffffffaa);
+  animation: st-plane-fly 2600ms cubic-bezier(0.45, 0.05, 0.55, 0.95) 300ms both;
+}
+
+.st-contrail {
+  position: absolute;
+  top: 10px;
+  left: -20px;
+  width: calc(100% + 40px);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #ffffff00, #ffffffee 70%, #ffffff);
+  box-shadow: 0 0 6px #ffffff;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  animation:
+    st-contrail 2600ms cubic-bezier(0.45, 0.05, 0.55, 0.95) 300ms both,
+    st-contrail-fade 2200ms ease-in 2700ms forwards;
 }
 
 .st-bottom {
@@ -270,6 +379,64 @@
   animation-delay: 850ms;
 }
 
+@keyframes st-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes st-star-pop {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes st-meteor {
+  0% {
+    opacity: 0;
+    offset-distance: 0%;
+    transform: scaleX(0.3);
+  }
+  15% {
+    opacity: 1;
+    transform: none;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    offset-distance: 100%;
+    transform: scaleX(0.6);
+  }
+}
+
+@keyframes st-plane-fly {
+  from {
+    left: -30px;
+  }
+  to {
+    left: calc(100% + 30px);
+  }
+}
+
+@keyframes st-contrail {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes st-contrail-fade {
+  to {
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+
 @keyframes st-fade {
   to {
     opacity: 0;
@@ -378,19 +545,27 @@
   text-shadow: 0 0 10px #fff3d6;
 }
 
+.st-day .st-content {
+  padding-top: 3%;
+}
+
+.st-day .st-tag {
+  margin-top: 6px;
+}
+
 .st-day .st-logo {
   color: #1d2846;
   text-shadow: 0 1px 14px #ffffffcc;
 }
 
 .st-day .st-tag {
-  color: #34406a;
-  text-shadow: 0 0 10px #ffffffcc;
+  color: #1f2a52;
+  text-shadow: 0 0 2px #fff, 0 0 6px #fffffff2, 0 0 16px #ffffffcc;
 }
 
-.st-day .st-tag::before,
-.st-day .st-tag::after {
-  background: #34406a80;
+.st-day .st-tag-star {
+  color: #d39a3a;
+  text-shadow: 0 0 8px #fff3d6;
 }
 
 .st-day .st-headline {
@@ -464,6 +639,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .st-meteor,
+  .st-plane {
+    display: none;
+  }
+
+  .st-tag-star {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
   .st-night-fade,
   .st-title,
   .st-bottom,
