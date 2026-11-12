@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>一鹿知 · Deerly — 下一程，一起读</title>
+  <link rel="stylesheet" href="styles.css?v=3" />
+</head>
+<body>
+  <div id="app" class="deerly-site">
+    <!-- 顶部极简导航栏 -->
+    <header class="site-navbar">
+      <div class="nav-inner">
+        <a href="#top" class="brand-lockup" id="navBrandHome" onclick="window.deerlySwitchView && window.deerlySwitchView('overview'); return false;">
+          <img class="brand-icon-img" src="assets/onboarding/companion-wick-portrait.png" alt="一鹿知" />
+          <div class="brand-text-group">
+            <span class="brand-cn-name">一鹿知</span>
+            <span class="brand-en-sub">Deerly</span>
+          </div>
+        </a>
+      </div>
+    </header>
+
+    <!-- 旅伴快速切换下拉框 -->
+    <div class="companion-dropdown hidden" id="companionDropdown"></div>
+
+    <!-- ==================== VIEW 1: 产品概览页（精简文字 · 大胆留白 · 宣传片5大章节） ==================== -->
+    <div id="overviewPage" class="overview-view">
+      <!-- 0. Hero 首屏：大留白 + 整体居中 -->
+      <section class="hero-overview-section" id="sec-overview">
+        <div class="hero-centered-container">
+          <h1 class="hero-display-title">
+            告别英文阅读的<br />
+            <span class="stamp-strike">看不懂</span> 与 <span class="stamp-strike">记不住</span>
+          </h1>
+          <p class="hero-lead-copy">
+            读过的每一天，都会把你带向更远的地方。<br />
+            选一位旅伴，按自己的节奏出发。
+          </p>
+
+          <div class="hero-cta-row">
+            <button type="button" class="btn-primary-dark" data-goto-demo="01" onclick="window.deerlyGoDemo && window.deerlyGoDemo('01')">
+              <span>开始完整互动 Demo</span>
+              <span>→</span>
+            </button>
+          </div>
+
+          <!-- 极简 5 站路线轴 -->
+          <div class="train-route-bar">
+            <div class="route-stop" data-scroll="#sec-companions">
+              <span class="stop-dot">1</span><strong>出发</strong>
+            </div>
+            <div class="route-line"></div>
+            <div class="route-stop" data-scroll="#sec-match">
+              <span class="stop-dot">2</span><strong>推荐</strong>
+            </div>
+            <div class="route-line"></div>
+            <div class="route-stop" data-scroll="#sec-reading">
+              <span class="stop-dot">3</span><strong>阅读</strong>
+            </div>
+            <div class="route-line"></div>
+            <div class="route-stop" data-scroll="#sec-practice">
+              <span class="stop-dot">4</span><strong>练习</strong>
+            </div>
+            <div class="route-line"></div>
+            <div class="route-stop" data-scroll="#sec-ticket">
+              <span class="stop-dot">5</span><strong>到站</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 1: ① 出发 · 选一位旅伴 -->
+      <section class="overview-chapter-section warm-cream-bg" id="sec-companions">
+        <div class="chapter-container">
+          <div class="chapter-header-row">
+            <div>
+              <div class="chapter-badge navy">① 出发 · 选一位旅伴</div>
+              <h2 class="chapter-title">一趟英文阅读的旅程</h2>
+              <p class="chapter-en-sub">A JOURNEY OF ENGLISH READING</p>
+            </div>
+            <button type="button" class="chapter-try-btn" data-goto-demo="02" onclick="window.deerlyGoDemo && window.deerlyGoDemo('02')">选 TA 出发 →</button>
+          </div>
+
+          <div class="overview-companions-grid" id="overviewCompanionsGrid"></div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 2: ② 定难度 · 选兴趣 -->
+      <section class="overview-chapter-section" id="sec-match">
+        <div class="chapter-container">
+          <div class="split-feature-block">
+            <div class="feature-copy-col">
+              <div class="chapter-badge crimson">② 定难度 · 选兴趣</div>
+              <h2 class="chapter-title">为你挑好每一篇</h2>
+              <p class="chapter-en-sub">MATCHED TO YOUR LEVEL & INTERESTS</p>
+              <p class="feature-body-text">
+                6 大主题任选，4 档 CEFR 难度实时改写。
+              </p>
+
+              <div class="interest-pills-showcase">
+                <span class="theme-chip active">🌐 世界</span>
+                <span class="theme-chip active">🔬 科学</span>
+                <span class="theme-chip active">🏺 文化</span>
+                <span class="theme-chip">🏛️ 商业</span>
+                <span class="theme-chip">🌱 成长</span>
+                <span class="theme-chip">🍀 故事</span>
+              </div>
+
+              <button type="button" class="chapter-try-btn" data-goto-demo="04" onclick="window.deerlyGoDemo && window.deerlyGoDemo('04')">体验定级选文 →</button>
+            </div>
+
+            <!-- 右侧：同一篇文章，一键换难度 -->
+            <div class="feature-interactive-col">
+              <div class="live-level-switcher-card">
+                <div class="lls-header">
+                  <div>
+                    <span class="lls-eyebrow">ONE ARTICLE, FOUR LEVELS</span>
+                    <h3>同一篇文章，一键换难度</h3>
+                  </div>
+                  <div class="lls-pills" id="overviewLevelBtns">
+                    <button type="button" class="lls-btn" data-lv="A1">A1</button>
+                    <button type="button" class="lls-btn" data-lv="A2">A2</button>
+                    <button type="button" class="lls-btn" data-lv="B1">B1</button>
+                    <button type="button" class="lls-btn active" data-lv="B2+">B2+</button>
+                  </div>
+                </div>
+                <div class="lls-body" id="overviewLevelPreview"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 3: ③ 阅读 · 四大能力 Bento Grid -->
+      <section class="overview-chapter-section night-navy-bg" id="sec-reading">
+        <div class="chapter-container">
+          <div class="chapter-header-row light-text">
+            <div>
+              <div class="chapter-badge gold">③ 阅读 · 沉浸共读</div>
+              <h2 class="chapter-title">一段一段读，不吃力</h2>
+              <p class="chapter-en-sub">READ IT ONE SEGMENT AT A TIME</p>
+            </div>
+            <button type="button" class="chapter-try-btn gold-btn" data-goto-demo="01" onclick="window.deerlyGoDemo && window.deerlyGoDemo('01')">开始完整互动 Demo →</button>
+          </div>
+
+          <div class="bento-reading-grid">
+            <div class="bento-card" data-goto-demo="07" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07')">
+              <div>
+                <div class="bento-step-tag">分段读</div>
+                <h3>一段一段读，不吃力</h3>
+                <p class="bento-en">READ IT ONE SEGMENT AT A TIME</p>
+              </div>
+              <div class="bento-mini-mock">
+                <div class="mock-seg-bar"><span>The Grand Tour</span><span>1 / 18</span></div>
+                <p class="mock-seg-en">Today, many young people take a <b>gap</b> year after school...</p>
+                <div class="mock-seg-tools"><span>🔊 朗读</span><span>文A 译文</span><span>📖 解读</span></div>
+              </div>
+            </div>
+
+            <div class="bento-card" data-goto-demo="07" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07')">
+              <div>
+                <div class="bento-step-tag">点词即查</div>
+                <h3>遇到生词，点一下</h3>
+                <p class="bento-en">TAP ANY WORD · SAVED TO WORD BOOK</p>
+              </div>
+              <div class="bento-mini-mock vocab-mock">
+                <div class="mock-word-head">
+                  <strong>gap</strong>
+                  <span>/ɡæp/</span>
+                  <span class="star-icon">★ 存词句本</span>
+                </div>
+                <p class="mock-word-def">n. 间隔（take a gap year 间隔年）</p>
+              </div>
+            </div>
+
+            <div class="bento-card" data-goto-demo="07" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07')">
+              <div>
+                <div class="bento-step-tag">整篇听读</div>
+                <h3>整篇听读，读到哪亮到哪</h3>
+                <p class="bento-en">LISTEN ALONG, WORD BY WORD</p>
+              </div>
+              <div class="bento-mini-mock audio-mock">
+                <p class="mock-hl-line"><mark>Today, many young people take a gap year</mark> after school.</p>
+                <div class="mock-wave-row">
+                  <span class="play-dot">❚❚</span>
+                  <div class="wave-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                  <span class="voice-pill">美音 · 1.0x</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bento-card wide-span-2" data-goto-demo="07" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07')">
+              <div>
+                <div class="bento-step-tag">AI 句法解读</div>
+                <h3>读不透？看一眼解读</h3>
+                <p class="bento-en">KEY PHRASES, EXPLAINED</p>
+              </div>
+              <div class="bento-mini-mock breakdown-mock">
+                <div class="bd-mock-col">
+                  <div class="bd-mock-line">
+                    <span class="chunk-c1">Today</span> , <span class="chunk-c2">many young people</span> <span class="chunk-c3">take a gap year</span> <span class="chunk-c4">after school or university</span> .
+                  </div>
+                  <div class="bd-mock-line">
+                    <span class="chunk-c1">如今</span> ， <span class="chunk-c2">许多年轻人</span> <span class="chunk-c4">在中学或大学毕业后</span> <span class="chunk-c3">参加间隔年</span> 。
+                  </div>
+                </div>
+                <div class="bd-mock-exprs">
+                  <div><span class="expr-badge">固定搭配</span> <strong>take a gap year</strong> 参加间隔年</div>
+                  <div><span class="expr-badge">固定搭配</span> <strong>work abroad</strong> 出国工作</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 4 & 5: ④ 练习 + ⑤ 到站车票 -->
+      <section class="overview-chapter-section warm-cream-bg" id="sec-practice">
+        <div class="chapter-container">
+          <div class="dual-feature-cards">
+            <div class="showcase-panel-card">
+              <div>
+                <div class="chapter-badge crimson">④ 练习 · 理解小测</div>
+                <h2 class="panel-big-title">一段读完，顺手练一题</h2>
+                <p class="chapter-en-sub">A QUICK CHECK AFTER EVERY READ</p>
+              </div>
+              <div class="mini-quiz-preview-box">
+                <div class="mq-stem">What was the main job of a "bear-leader"?</div>
+                <div class="mq-opt correct">✓ A. To guide studies and prevent trouble</div>
+                <div class="mq-opt">B. To carry all the luggage</div>
+                <div class="mq-companion-float">
+                  <img src="assets/reader/companions/wick-quiz-right.png" alt="灯芯" />
+                  <span class="mq-bubble">Perfect! 答对啦！</span>
+                </div>
+              </div>
+              <button type="button" class="chapter-try-btn" data-goto-demo="07-quiz" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07-quiz')">体验边读边练 →</button>
+            </div>
+
+            <div class="showcase-panel-card" id="sec-ticket">
+              <div>
+                <div class="chapter-badge navy">⑤ 到站 · 阅读报告</div>
+                <h2 class="panel-big-title">到站啦，收下这张车票</h2>
+                <p class="chapter-en-sub">A TICKET FOR EVERY READ</p>
+              </div>
+              <div class="mini-ticket-preview-box">
+                <div class="mt-top">
+                  <span class="mt-station">第 1 站 · 阅读完成</span>
+                  <strong>The Grand Tour</strong>
+                </div>
+                <div class="mt-stats">
+                  <div><span>本篇词汇</span><strong>534 词</strong></div>
+                  <div><span>阅读时长</span><strong>1 分 33 秒</strong></div>
+                  <div><span>累计天数</span><strong>1 天</strong></div>
+                </div>
+              </div>
+              <button type="button" class="chapter-try-btn" data-goto-demo="08" onclick="window.deerlyGoDemo && window.deerlyGoDemo('08')">查看递车票动效 →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 底部大号召唤进入 Demo -->
+      <section class="bottom-launch-banner">
+        <div class="footer-inner">
+          <img class="footer-logo-deer" src="assets/onboarding/companion-wick-portrait.png" alt="一鹿知" />
+          <h2 class="footer-brand-name">准备好登车了吗？</h2>
+          <p class="footer-slogan">立即在网页上体验完整 8 步流程</p>
+          <button type="button" class="primary-cta-btn" style="margin:24px 0 36px;font-size:17px;padding:18px 42px;" data-goto-demo="01" onclick="window.deerlyGoDemo && window.deerlyGoDemo('01')">
+            <span>🚀 开始完整互动 Demo</span>
+          </button>
+          <div class="footer-companions-parade">
+            <img src="assets/onboarding/companion-pal-figure.png" alt="帕利" />
+            <img src="assets/onboarding/companion-tuanzi-figure.png" alt="团子" />
+            <img src="assets/onboarding/companion-doctor-figure.png" alt="医生Jojo" />
+            <img src="assets/onboarding/companion-wick-figure.png" alt="灯芯" />
+          </div>
+          <div class="wechat-mp-badge">一鹿知 · Deerly — 下一程，一起读</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== VIEW 2: 全屏沉浸式 8 步互动 Demo 体验视图 ==================== -->
+    <section class="live-demo-view hidden" id="demoPage">
+      <div class="demo-shell-container">
+        <!-- 顶部精简 8 步流程控制条 -->
+        <div class="demo-top-strip">
+          <button type="button" class="back-overview-btn" id="backToOverviewBtn" onclick="window.deerlySwitchView && window.deerlySwitchView('overview')">
+            ← 返回产品介绍
+          </button>
+
+          <nav class="flow-stepper" id="flowStepper" aria-label="演示流程跳转">
+            <button type="button" class="step-pill active" data-step="01" onclick="window.deerlyGoDemo && window.deerlyGoDemo('01')"><span class="step-num">01</span><span class="step-name">封面</span></button>
+            <span class="step-arrow">›</span>
+            <button type="button" class="step-pill" data-step="02" onclick="window.deerlyGoDemo && window.deerlyGoDemo('02')"><span class="step-num">02</span><span class="step-name">选旅伴</span></button>
+            <span class="step-arrow">›</span>
+            <button type="button" class="step-pill" data-step="03" onclick="window.deerlyGoDemo && window.deerlyGoDemo('03')"><span class="step-num">03</span><span class="step-name">选兴趣</span></button>
+            <span class="step-arrow">›</span>
+            <button type="button" class="step-pill" data-step="04" onclick="window.deerlyGoDemo && window.deerlyGoDemo('04')"><span class="step-num">04</span><span class="step-name">选难度</span></button>
+            <span class="step-arrow">›</span>
+            <button type="button" class="step-pill" data-step="05" onclick="window.deerlyGoDemo && window.deerlyGoDemo('05')"><span class="step-num">05</span><span class="step-name">出票</span></button>
+            <span class="step-arrow">›</span>
+            <button type="button" class="step-pill" data-step="06" onclick="window.deerlyGoDemo && window.deerlyGoDemo('06')"><span class="step-num">06</span><span class="step-name">首页</span></button>
+            <span class="step-arrow">›</span>
+            <button type="button" class="step-pill" data-step="07" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07')"><span class="step-num">07</span><span class="step-name">阅读器</span></button>
+            <span class="step-arrow">›</span>
+            <button type="button" class="step-pill" data-step="08" onclick="window.deerlyGoDemo && window.deerlyGoDemo('08')"><span class="step-num">08</span><span class="step-name">报告车票</span></button>
+          </nav>
+
+          <div class="demo-console-controls">
+            <button type="button" class="icon-btn" id="bgmToggleBtn" title="列车环境音开关">
+              <span id="bgmIcon">🎵</span>
+            </button>
+            <button type="button" class="reset-demo-btn" id="resetDemoBtn">↺ 重置</button>
+          </div>
+        </div>
+
+        <!-- 动态主舞台 -->
+        <main class="stage-viewport" id="stageViewport"></main>
+      </div>
+    </section>
+
+    <!-- 全局查词浮层弹窗 -->
+    <div class="vocab-popover hidden" id="vocabPopover"></div>
+
+    <!-- 全局海报分享弹窗（第 08 屏分享车票） -->
+    <div class="modal-backdrop hidden" id="shareModalBackdrop">
+      <div class="share-poster-modal" id="sharePosterModal"></div>
+    </div>
+
+    <!-- 读完庆祝全屏浮层（第 07 屏末 -> 第 08 屏过渡） -->
+    <div class="celebrate-overlay hidden" id="celebrateOverlay"></div>
+
+    <!-- 全局 Toast -->
+    <div class="toast-pill hidden" id="globalToast">
+      <span class="toast-dot"></span>
+      <span id="globalToastText"></span>
+    </div>
+  </div>
+
+  <!-- 合并为普通免模块脚本，支持 file:// 直接双击打开与 http 服务 -->
+  <script src="bundle.js?v=3"></script>
+</body>
+</html>
