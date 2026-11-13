@@ -92,9 +92,9 @@ const COMPANIONS = [
   },
   {
     id: 'tuanzi',
-    name: 'Tuanzi',
-    nameEn: 'Tuanzi',
-    title: 'Tuanzi · 猫',
+    name: 'Tuánzǐ',
+    nameEn: 'Tuánzǐ',
+    title: 'Tuánzǐ · 猫',
     seat: 'B-03',
     role: '守护型旅伴',
     tags: ['嘴硬', '护短', '可靠'],
