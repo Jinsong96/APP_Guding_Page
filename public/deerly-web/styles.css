@@ -3595,3 +3595,361 @@ button {
   width: min(640px, 100%);
   justify-content: space-between;
 }
+
+/* ==================== V3: 官网信息页脚（深色多栏，参考 Claude） ==================== */
+.site-info-footer {
+  background: #121110;
+  color: #e8e5de;
+  padding: 76px 40px 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.footer-info-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.footer-info-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr);
+  gap: 44px;
+  padding-bottom: 52px;
+}
+
+.footer-brand-block {
+  max-width: 320px;
+}
+
+.footer-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.footer-brand-mark {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.footer-brand-cn {
+  font-size: 17px;
+  font-weight: 800;
+  color: #f5f3ee;
+  letter-spacing: 0.5px;
+}
+
+.footer-brand-en {
+  font-size: 11.5px;
+  color: #8d8a82;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  padding-top: 2px;
+}
+
+.footer-tagline {
+  font-size: 13px;
+  line-height: 1.75;
+  color: #a5a29a;
+  margin-bottom: 22px;
+}
+
+.footer-subscribe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e1c19;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 5px 5px 5px 16px;
+  transition: border-color 0.18s;
+}
+
+.footer-subscribe:focus-within {
+  border-color: rgba(184, 60, 42, 0.65);
+}
+
+.footer-subscribe input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e8e5de;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.footer-subscribe input::placeholder {
+  color: #7a776f;
+}
+
+.footer-subscribe-btn {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--crimson);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+}
+
+.footer-subscribe-btn:hover {
+  background: #a03322;
+}
+
+.footer-subscribe-note {
+  font-size: 11.5px;
+  color: #6f6c65;
+  margin-top: 10px;
+  line-height: 1.5;
+  min-height: 17px;
+}
+
+.footer-link-col h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #7d7a72;
+  margin-bottom: 16px;
+  letter-spacing: 0.8px;
+}
+
+.footer-link-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.footer-link-col a,
+.footer-link-col .footer-link-static {
+  display: inline-block;
+  font-size: 13px;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: color 0.16s;
+}
+
+.footer-link-col a {
+  color: #c9c5bc;
+}
+
+.footer-link-col a:hover {
+  color: #ffffff;
+}
+
+.footer-link-col .footer-link-static {
+  color: #c2beb5;
+  cursor: default;
+}
+
+.footer-link-col .footer-link-static:hover {
+  color: #c2beb5;
+}
+
+.footer-legal {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px 28px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  color: #6f6c65;
+}
+
+.footer-legal-left {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  line-height: 1.55;
+}
+
+.footer-legal-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  line-height: 1.55;
+}
+
+.footer-legal a {
+  color: #8a857c;
+  text-decoration: none;
+  transition: color 0.16s;
+}
+
+.footer-legal a:hover {
+  color: #d5d1c8;
+  text-decoration: underline;
+}
+
+.footer-legal-sep {
+  color: #3c3934;
+}
+
+/* ---- 订阅提示行（默认空，仅在交互时出现文字） ---- */
+.footer-subscribe-note {
+  margin-top: 8px;
+  min-height: 0;
+}
+
+/* ---- 社交图标 + 语言切换底栏 ---- */
+.footer-social-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 0;
+  padding: 22px 0 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.footer-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-social-link {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8f8b82;
+  transition: color 0.16s, background 0.16s;
+}
+
+.footer-social-link svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
+.footer-social-link:hover {
+  color: #f2efe8;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.footer-social-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.14);
+  flex-shrink: 0;
+}
+
+.footer-lang {
+  margin-left: auto;
+  position: relative;
+}
+
+.footer-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #1a1816;
+  color: #d5d1c8;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: border-color 0.16s, color 0.16s;
+}
+
+.footer-lang-btn:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #ffffff;
+}
+
+.footer-lang-btn svg {
+  display: block;
+}
+
+.footer-lang-globe {
+  width: 14px;
+  height: 14px;
+}
+
+.footer-lang-caret {
+  width: 12px;
+  height: 12px;
+  opacity: 0.75;
+  transition: transform 0.18s ease;
+}
+
+.footer-lang-btn.open .footer-lang-caret {
+  transform: rotate(180deg);
+}
+
+.footer-lang-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  min-width: 136px;
+  padding: 6px;
+  background: #1e1c19;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 30;
+}
+
+.footer-lang-menu.hidden {
+  display: none;
+}
+
+.footer-lang-item {
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  color: #c2beb5;
+  transition: background 0.14s, color 0.14s;
+}
+
+.footer-lang-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.footer-lang-item.active {
+  color: #ffffff;
+  background: rgba(184, 60, 42, 0.24);
+}
+
+@media (max-width: 1120px) {
+  .footer-info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 38px;
+  }
+  .footer-brand-block {
+    max-width: none;
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .site-info-footer {
+    padding: 56px 22px 26px;
+  }
+  .footer-info-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .footer-legal {
+    flex-direction: column;
+  }
+}

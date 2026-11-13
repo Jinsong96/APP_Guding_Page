@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>一鹿知 · Deerly — 下一程，一起读</title>
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <div id="app" class="deerly-site">
@@ -275,9 +275,209 @@
             <img src="assets/onboarding/companion-doctor-figure.png" alt="医生Jojo" />
             <img src="assets/onboarding/companion-wick-figure.png" alt="灯芯" />
           </div>
-          <div class="wechat-mp-badge">一鹿知 · Deerly — 下一程，一起读</div>
         </div>
       </section>
+
+      <!-- 官网信息页脚（参考 Claude 多栏深色页脚结构） -->
+      <footer class="site-info-footer">
+        <div class="footer-info-inner">
+          <div class="footer-info-grid">
+            <div class="footer-brand-block">
+              <div class="footer-brand-lockup">
+                <img class="footer-brand-mark" src="assets/onboarding/companion-wick-figure.png" alt="一鹿知" />
+                <span class="footer-brand-cn">一鹿知</span>
+                <span class="footer-brand-en">Deerly</span>
+              </div>
+              <p class="footer-tagline" data-en="Every day you read takes you a little further.<br />Pick a companion and start at your own pace.">读过的每一天，都会把你带向更远的地方。<br />选一位旅伴，按自己的节奏出发。</p>
+              <form class="footer-subscribe" id="footerSubscribeForm" novalidate>
+                <input type="email" id="footerSubscribeInput" placeholder="留下邮箱，每周新读物提醒你" data-en-placeholder="Weekly new reads by email" aria-label="邮箱订阅" />
+                <button type="submit" class="footer-subscribe-btn" aria-label="提交订阅">↑</button>
+              </form>
+              <p class="footer-subscribe-note" id="footerSubscribeNote"></p>
+            </div>
+
+            <div class="footer-link-col">
+              <h4 data-en="Product">产品</h4>
+              <ul>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Reader">阅读器</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Leveled Rewrite">分级改写</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Companions">旅伴系统</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Word Book">词句本</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Journey Ticket">纪念车票</span></li>
+              </ul>
+            </div>
+
+            <div class="footer-link-col">
+              <h4 data-en="Capabilities">学习能力</h4>
+              <ul>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Segmented Reading">分段精读</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Tap to Look Up">点词即查</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Listen &amp; Follow">听读跟读</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Sentence Breakdown">句法拆解</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Quick Quiz">理解小测</span></li>
+              </ul>
+            </div>
+
+            <div class="footer-link-col">
+              <h4 data-en="Resources">资源</h4>
+              <ul>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Changelog">更新日志</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="User Guide">使用指南</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="FAQ">常见问题</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Feedback">反馈建议</span></li>
+              </ul>
+            </div>
+
+            <div class="footer-link-col">
+              <h4 data-en="Company &amp; Legal">公司与条款</h4>
+              <ul>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="About Us">关于我们</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Terms of Use">用户协议</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Privacy Policy">隐私政策</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Minors' Protection">未成年人保护</span></li>
+                <li><span class="footer-link-static" title="内容筹备中" data-en="Contact Us">联系我们</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="footer-social-bar">
+            <div class="footer-social-icons">
+              <button type="button" class="footer-social-link" title="微信" data-title-zh="微信" data-title-en="WeChat" aria-label="微信">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.1 3.4C5 3.4 1.7 6.1 1.7 9.5c0 1.9 1.1 3.6 2.9 4.8l-.8 2.4 2.7-1.4c.6.2 1.3.3 2 .4a5.3 5.3 0 0 1-.1-1.1c0-3.3 3.2-5.9 7.2-5.9h.5c-.7-3-4-5.3-8-5.3Zm-2.6 3.4a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Zm5.3 0a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"/><path fill="currentColor" d="M22.3 13.8c0-2.8-2.5-5-5.6-5s-5.6 2.2-5.6 5 2.5 5 5.6 5c.7 0 1.3-.1 1.9-.3l2.2 1.1-.6-2c1.3-1 2.1-2.4 2.1-3.8Zm-7.6-1.2a1 1 0 1 1 0 2 1 1 0 0 1 0-2Zm4 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg>
+              </button>
+              <button type="button" class="footer-social-link" title="小红书" data-title-zh="小红书" data-title-en="RED" aria-label="小红书">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" d="M2.7 5.1c2.9-.7 6.3-.1 9.3 1.7 3-1.8 6.4-2.4 9.3-1.7v13.8c-2.9-.7-6.3-.1-9.3 1.7-3-1.8-6.4-2.4-9.3-1.7V5.1Z"/><path fill="none" stroke="currentColor" stroke-width="1.9" d="M12 6.8v13.8"/></svg>
+              </button>
+              <button type="button" class="footer-social-link" title="抖音" data-title-zh="抖音" data-title-en="TikTok" aria-label="抖音">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.53.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07Z"/></svg>
+              </button>
+              <button type="button" class="footer-social-link" title="X" aria-label="X">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </button>
+              <button type="button" class="footer-social-link" title="Instagram" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.9" y="2.9" width="18.2" height="18.2" rx="5.2" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.4" cy="6.6" r="1.35" fill="currentColor"/></svg>
+              </button>
+              <button type="button" class="footer-social-link" title="YouTube" aria-label="YouTube">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z"/></svg>
+              </button>
+            </div>
+
+            <span class="footer-social-divider"></span>
+
+            <div class="footer-lang" id="footerLang">
+              <button type="button" class="footer-lang-btn" id="footerLangBtn" aria-haspopup="true" aria-expanded="false">
+                <svg class="footer-lang-globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="4.2" ry="9.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.8 12h18.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+                <span id="footerLangLabel">中文</span>
+                <svg class="footer-lang-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 9 12 15.4 18.5 9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="footer-lang-menu hidden" id="footerLangMenu" role="menu">
+                <button type="button" class="footer-lang-item active" role="menuitem" data-lang="zh">简体中文</button>
+                <button type="button" class="footer-lang-item" role="menuitem" data-lang="en">English</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-legal">
+            <div class="footer-legal-left">
+              <span data-en="© 2026 Oriental Zhixue (Beijing) Education Technology Co., Ltd. All rights reserved.">© 2026 东方智学（北京）教育科技有限公司 · 保留所有权利</span>
+              <span data-en="11F, Room C-1208-049, Building 1, No.18 Zhongguancun East Road, Haidian District, Beijing">北京市海淀区中关村东路18号1号楼11层C-1208-049号</span>
+            </div>
+            <div class="footer-legal-right">
+              <a href="https://beian.miit.gov.cn" target="_blank" rel="noopener noreferrer">京ICP备2022023953号-3X</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <script>
+        (function () {
+          var form = document.getElementById('footerSubscribeForm');
+          var input = document.getElementById('footerSubscribeInput');
+          var note = document.getElementById('footerSubscribeNote');
+          var langBtn = document.getElementById('footerLangBtn');
+          var langMenu = document.getElementById('footerLangMenu');
+          var langLabel = document.getElementById('footerLangLabel');
+          var langWrap = document.getElementById('footerLang');
+
+          var MSG = {
+            zh: { invalid: '请输入有效的邮箱地址', ok: '已记录（演示环境，暂不实际发送）', soon: '该账号即将上线' },
+            en: { invalid: 'Please enter a valid email address', ok: 'Received (demo only — nothing is sent yet)', soon: 'This account is coming soon' }
+          };
+
+          var current = 'zh';
+          try { current = localStorage.getItem('deerlyFooterLang') || 'zh'; } catch (err) { current = 'zh'; }
+
+          function applyLang(l) {
+            current = l;
+            document.querySelectorAll('[data-en]').forEach(function (el) {
+              if (!el.hasAttribute('data-zh')) el.setAttribute('data-zh', el.innerHTML);
+              el.innerHTML = l === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-zh');
+            });
+            document.querySelectorAll('[data-en-placeholder]').forEach(function (el) {
+              if (!el.hasAttribute('data-zh-placeholder')) el.setAttribute('data-zh-placeholder', el.placeholder);
+              el.placeholder = l === 'en' ? el.getAttribute('data-en-placeholder') : el.getAttribute('data-zh-placeholder');
+            });
+            document.querySelectorAll('.footer-social-link').forEach(function (el) {
+              var zh = el.getAttribute('data-title-zh');
+              var en = el.getAttribute('data-title-en');
+              if (zh && en) el.setAttribute('title', l === 'en' ? en : zh);
+            });
+            if (langLabel) langLabel.textContent = l === 'en' ? 'English' : '中文';
+            var footerEl = document.querySelector('.site-info-footer');
+            if (footerEl) footerEl.setAttribute('lang', l === 'en' ? 'en' : 'zh-CN');
+            if (langMenu) {
+              langMenu.querySelectorAll('.footer-lang-item').forEach(function (b) {
+                b.classList.toggle('active', b.getAttribute('data-lang') === l);
+              });
+            }
+            if (note) note.textContent = '';
+            try { localStorage.setItem('deerlyFooterLang', l); } catch (err) {}
+          }
+
+          if (form) {
+            form.addEventListener('submit', function (e) {
+              e.preventDefault();
+              var v = (input.value || '').trim();
+              if (!v || v.indexOf('@') === -1) {
+                note.textContent = MSG[current].invalid;
+                note.style.color = '#d0906f';
+                return;
+              }
+              note.textContent = MSG[current].ok;
+              note.style.color = '#8fb59a';
+              input.value = '';
+            });
+          }
+
+          if (langBtn && langMenu && langWrap) {
+            langBtn.addEventListener('click', function (e) {
+              e.stopPropagation();
+              var opened = !langMenu.classList.contains('hidden');
+              langMenu.classList.toggle('hidden', opened);
+              langBtn.classList.toggle('open', !opened);
+              langBtn.setAttribute('aria-expanded', String(!opened));
+            });
+            langMenu.querySelectorAll('.footer-lang-item').forEach(function (b) {
+              b.addEventListener('click', function () {
+                applyLang(b.getAttribute('data-lang'));
+                langMenu.classList.add('hidden');
+                langBtn.classList.remove('open');
+                langBtn.setAttribute('aria-expanded', 'false');
+              });
+            });
+            document.addEventListener('click', function (e) {
+              if (!langWrap.contains(e.target)) {
+                langMenu.classList.add('hidden');
+                langBtn.classList.remove('open');
+                langBtn.setAttribute('aria-expanded', 'false');
+              }
+            });
+          }
+
+          applyLang(current);
+        })();
+      </script>
+
     </div>
 
     <!-- ==================== VIEW 2: 全屏沉浸式 8 步互动 Demo 体验视图 ==================== -->
