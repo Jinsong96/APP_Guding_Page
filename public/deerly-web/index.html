@@ -4,20 +4,35 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>一鹿知 · Deerly — 下一程，一起读</title>
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
   <div id="app" class="deerly-site">
-    <!-- 顶部极简导航栏 -->
-    <header class="site-navbar">
+    <!-- 顶部导航：分组功能入口与完整体验 -->
+    <header class="site-navbar" id="siteNavbar">
       <div class="nav-inner">
-        <a href="#top" class="brand-lockup" id="navBrandHome" onclick="window.deerlySwitchView && window.deerlySwitchView('overview'); return false;">
-          <img class="brand-icon-img" src="assets/onboarding/companion-wick-portrait-v2.png" alt="一鹿知" />
-          <div class="brand-text-group">
-            <span class="brand-cn-name">一鹿知</span>
-            <span class="brand-en-sub">Deerly</span>
-          </div>
+        <a href="#sec-overview" class="brand-lockup" id="navBrandHome" data-nav-section aria-label="一鹿知 Deerly 首页">
+          <img class="brand-icon-img" src="assets/onboarding/companion-wick-portrait-v2.png" alt="" />
+          <span class="brand-text-group"><span class="brand-cn-name">一鹿知</span><span class="brand-en-sub">Deerly</span></span>
         </a>
+        <div class="nav-desktop" id="siteNavigation">
+          <nav class="nav-main" aria-label="主导航">
+            <div class="nav-item">
+              <button type="button" class="nav-trigger" aria-expanded="false" aria-controls="navProduct">产品 <svg class="nav-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <div class="nav-panel nav-panel-product" id="navProduct" hidden>
+                <div class="nav-panel-columns"><div><p class="nav-group-label">探索一鹿知</p><a class="nav-panel-link" href="#sec-overview" data-nav-section><span>产品概览</span><small>从第一篇开始，读向更远的地方</small></a><a class="nav-panel-link" href="#sec-match" data-nav-section><span>分级阅读</span><small>匹配你的水平与兴趣</small></a><a class="nav-panel-link" href="#sec-reading" data-nav-section><span>沉浸式阅读器</span><small>查词、听读与解读，一起完成</small></a></div><div><p class="nav-group-label">你的阅读旅程</p><a class="nav-panel-link" href="#sec-companions" data-nav-section><span>选择旅伴</span><small>找到陪你一起读的 TA</small></a><a class="nav-panel-link" href="#sec-practice" data-nav-section><span>理解小测</span><small>读完一段，检验一点收获</small></a><a class="nav-panel-link" href="#sec-ticket" data-nav-section><span>纪念车票</span><small>留住每一次阅读的进步</small></a></div></div>
+                <div class="nav-panel-footer"><span>下一程，一起读。</span><button type="button" data-nav-demo>体验完整阅读流程 <span aria-hidden="true">↗</span></button></div>
+              </div>
+            </div>
+            <div class="nav-item">
+              <button type="button" class="nav-trigger" aria-expanded="false" aria-controls="navLearning">学习能力 <svg class="nav-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <div class="nav-panel nav-panel-learning" id="navLearning" hidden><p class="nav-group-label">让每一次阅读更轻松</p><div class="nav-skills-grid"><a class="nav-panel-link" href="#sec-reading" data-nav-section><span>分段精读</span><small>把长文章拆成轻松的小段</small></a><a class="nav-panel-link" href="#sec-words" data-nav-section><span>点词即查</span><small>遇到生词，点一下就懂</small></a><a class="nav-panel-link" href="#sec-listen" data-nav-section><span>整篇听读</span><small>边听边读，跟上英文的节奏</small></a><a class="nav-panel-link" href="#sec-syntax" data-nav-section><span>AI 句法解读</span><small>看懂句子，也读懂表达</small></a></div></div>
+            </div>
+            <a class="nav-direct" href="#sec-companions" data-nav-section>认识旅伴</a>
+          </nav>
+          <div class="nav-actions"><a class="nav-secondary" href="#sec-reading" data-nav-section>看看怎么读</a><button class="nav-primary" type="button" data-nav-demo>开始体验 <span aria-hidden="true">↗</span></button></div>
+        </div>
+        <button class="nav-mobile-toggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="siteNavigation"><span></span><span></span></button>
       </div>
     </header>
 
@@ -161,7 +176,7 @@
             <div class="bento-card" data-goto-demo="07" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07')">
               <div>
                 <div class="bento-step-tag">点词即查</div>
-                <h3>遇到生词，点一下</h3>
+                <h3 id="sec-words">遇到生词，点一下</h3>
                 <p class="bento-en">TAP ANY WORD · SAVED TO WORD BOOK</p>
               </div>
               <div class="bento-mini-mock vocab-mock">
@@ -177,7 +192,7 @@
             <div class="bento-card" data-goto-demo="07" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07')">
               <div>
                 <div class="bento-step-tag">整篇听读</div>
-                <h3>整篇听读，读到哪亮到哪</h3>
+                <h3 id="sec-listen">整篇听读，读到哪亮到哪</h3>
                 <p class="bento-en">LISTEN ALONG, WORD BY WORD</p>
               </div>
               <div class="bento-mini-mock audio-mock">
@@ -193,7 +208,7 @@
             <div class="bento-card wide-span-2" data-goto-demo="07" onclick="window.deerlyGoDemo && window.deerlyGoDemo('07')">
               <div>
                 <div class="bento-step-tag">AI 句法解读</div>
-                <h3>读不透？看一眼解读</h3>
+                <h3 id="sec-syntax">读不透？看一眼解读</h3>
                 <p class="bento-en">KEY PHRASES, EXPLAINED</p>
               </div>
               <div class="bento-mini-mock breakdown-mock">
@@ -540,5 +555,6 @@
 
   <!-- 合并为普通免模块脚本，支持 file:// 直接双击打开与 http 服务 -->
   <script src="bundle.js?v=3"></script>
+  <script src="navigation.js?v=1"></script>
 </body>
 </html>
